@@ -6,12 +6,14 @@
   <title>AV Coach – Coaching Managérial & Accompagnement du Changement</title>
   <meta name="description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME. Posture managériale, accompagnement du changement. Prenez rendez-vous dès aujourd'hui." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://jinbeistudio.github.io/avcoach/" />
+  <link rel="canonical" href="https://avcoach.fr/" />
 
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://jinbeistudio.github.io/avcoach/" />
+  <meta property="og:url"         content="https://avcoach.fr/" />
   <meta property="og:title"       content="AV Coach – Coaching Managérial & Accompagnement du Changement" />
   <meta property="og:description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME." />
+  <meta property="og:image"       content="https://avcoach.fr/og-image.jpg" />
+  <meta name="twitter:card"       content="summary_large_image" />
 
   <script type="application/ld+json">
   {
@@ -19,7 +21,7 @@
     "@type": "ProfessionalService",
     "name": "AV Coach",
     "description": "Coaching managérial individuel et collectif pour managers et équipes de TPE/PME",
-    "url": "https://jinbeistudio.github.io/avcoach",
+    "url": "https://avcoach.fr",
     "telephone": "+33-6-00-00-00-00",
     "address": { "@type": "PostalAddress", "addressCountry": "FR" },
     "serviceType": ["Coaching managérial","Accompagnement du changement","Coaching individuel","Coaching collectif"]
@@ -33,6 +35,8 @@
 </head>
 <body>
 
+
+
 <!-- NAVIGATION -->
 <nav id="main-nav">
   <div class="container nav-inner">
@@ -45,23 +49,32 @@
             <stop offset="100%" stop-color="#C05F10"/>
           </linearGradient>
         </defs>
+        <!-- Compass star -->
         <path d="M100,4 L110,88 L196,100 L110,112 L100,196 L90,112 L4,100 L90,88 Z"
               fill="none" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Outer circle -->
         <circle cx="100" cy="100" r="72" stroke="white" stroke-width="2.5" fill="none"/>
+        <!-- Inner circle -->
         <circle cx="100" cy="100" r="56" stroke="white" stroke-width="1.5" fill="none"/>
+        <!-- Torch body -->
         <rect x="91" y="100" width="18" height="38" rx="3" fill="white"/>
         <line x1="95" y1="106" x2="105" y2="106" stroke="#0B1829" stroke-width="1.2"/>
         <line x1="95" y1="114" x2="105" y2="114" stroke="#0B1829" stroke-width="1.2"/>
         <line x1="95" y1="122" x2="105" y2="122" stroke="#0B1829" stroke-width="1.2"/>
+        <!-- Torch cup -->
         <path d="M87,100 Q100,95 113,100 L110,108 Q100,105 90,108 Z" fill="white"/>
+        <!-- Torch base -->
         <rect x="93" y="136" width="14" height="6" rx="2" fill="white"/>
         <rect x="89" y="140" width="22" height="4" rx="2" fill="white"/>
+        <!-- Snake detail -->
         <path d="M100,132 C94,124 106,118 100,110 C94,102 106,96 100,88"
               stroke="#0B1829" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Flame -->
         <path d="M100,98 C96,88 88,80 92,66 C94,58 98,52 100,44 C102,52 106,58 108,66 C112,80 104,88 100,98 Z"
               fill="url(#navFlame)"/>
         <path d="M100,90 C98,84 94,78 96,70 C97,65 99,60 100,55 C101,60 103,65 104,70 C106,78 102,84 100,90 Z"
               fill="#FFC94D" opacity="0.6"/>
+        <!-- Text -->
         <text x="100" y="175" text-anchor="middle"
               font-family="Georgia, serif" font-size="16" font-style="italic"
               fill="#E87520" letter-spacing="1">AV Coach</text>
@@ -73,8 +86,7 @@
       <li><a href="#parcours">Parcours</a></li>
       <li><a href="#temoignages">Témoignages</a></li>
       <li><a href="#contact" class="nav-cta">Contact</a></li>
-    </ul>
-    <div class="hamburger" onclick="toggleMenu()" aria-label="Menu" role="button" tabindex="0">
+    </ul>    <div class="hamburger" onclick="toggleMenu()" aria-label="Menu" role="button" tabindex="0">
       <span></span><span></span><span></span>
     </div>
   </div>
@@ -135,13 +147,13 @@
 <section id="apropos">
   <div class="container">
     <div class="apropos-grid reveal">
-      <div class="apropos-img">
+      <div class="apropos-img img-wrap">
         <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Coach professionnel" loading="lazy" />
       </div>
       <div>
-        <p class="section-label">À propos</p>
+        <p class="section-label" >À propos</p>
         <h2 class="section-title">Une approche humaine au service de votre développement</h2>
-        <p class="section-lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <p class="section-lead"  >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
         <p style="color:var(--text-muted);font-size:.95rem;margin-bottom:1.5rem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</p>
         <a href="#contact" class="btn-primary">Me contacter</a>
         <div class="stat-row">
@@ -175,7 +187,7 @@
 <section id="offres">
   <div class="container">
     <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
-      <p class="section-label">Offres</p>
+      <p class="section-label" >Offres</p>
       <h2 class="section-title">Des programmes sur mesure pour vos besoins</h2>
       <p class="section-lead" style="margin:0 auto">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
     </div>
@@ -230,9 +242,9 @@
   <div class="container">
     <div class="parcours-grid reveal">
       <div>
-        <p class="section-label">Parcours</p>
+        <p class="section-label" >Parcours</p>
         <h2 class="section-title">Un parcours au service de votre transformation</h2>
-        <p class="section-lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+        <p class="section-lead"  >Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
         <div class="timeline">
           <div class="timeline-item">
             <div class="timeline-year">2015 – Aujourd'hui</div>
@@ -252,7 +264,7 @@
         </div>
       </div>
       <div>
-        <p class="section-label">Certifications</p>
+        <p class="section-label" >Certifications</p>
         <h2 class="section-title">Formations & accréditations</h2>
         <div class="certif-grid">
           <div class="certif-card"><div class="certif-icon">🏆</div><div><h4>ICF – Coaching certifié</h4><p>Lorem ipsum dolor sit amet consectetur.</p></div></div>
@@ -284,7 +296,7 @@
 <section id="temoignages">
   <div class="container">
     <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
-      <p class="section-label">Témoignages</p>
+      <p class="section-label" >Témoignages</p>
       <h2 class="section-title">Ce que disent mes clients</h2>
     </div>
     <div class="temoignages-grid">
@@ -292,7 +304,7 @@
         <div class="stars" aria-label="5 étoiles">★★★★★</div>
         <blockquote>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</blockquote>
         <div class="temoignage-author">
-          <div class="author-avatar">M</div>
+          <div class="author-avatar img-wrap">M</div>
           <div><div class="author-name">Marie D.</div><div class="author-role">Directrice, PME industrielle</div></div>
         </div>
       </article>
@@ -300,7 +312,7 @@
         <div class="stars" aria-label="5 étoiles">★★★★★</div>
         <blockquote>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</blockquote>
         <div class="temoignage-author">
-          <div class="author-avatar">T</div>
+          <div class="author-avatar img-wrap">T</div>
           <div><div class="author-name">Thomas R.</div><div class="author-role">Manager, équipe de 12 personnes</div></div>
         </div>
       </article>
@@ -308,7 +320,7 @@
         <div class="stars" aria-label="5 étoiles">★★★★★</div>
         <blockquote>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur.</blockquote>
         <div class="temoignage-author">
-          <div class="author-avatar">S</div>
+          <div class="author-avatar img-wrap">S</div>
           <div><div class="author-name">Sophie L.</div><div class="author-role">CEO, startup en hypercroissance</div></div>
         </div>
       </article>
@@ -334,7 +346,7 @@
 <section id="contact">
   <div class="container">
     <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
-      <p class="section-label">Contact</p>
+      <p class="section-label" >Contact</p>
       <h2 class="section-title">Parlons de votre projet</h2>
       <p class="section-lead" style="margin:0 auto">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Prenez un premier rendez-vous découverte gratuit et sans engagement.</p>
     </div>
@@ -396,6 +408,9 @@
   </div>
 </footer>
 
+
+<script src="js/auth.js"></script>
+<script src="js/editor.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
