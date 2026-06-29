@@ -46,27 +46,59 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ── Contact form ──────────────────────────────────────────────────────────────
-document.querySelector('.contact-form')?.addEventListener('submit', e => {
+document.querySelector('.contact-form')?.addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = e.target.querySelector('.btn-submit');
+  const form = e.target;
+  const btn  = form.querySelector('.btn-submit');
+  const prenom  = form.querySelector('#prenom').value.trim();
+  const nom     = form.querySelector('#nom').value.trim();
+  const email   = form.querySelector('#email').value.trim();
+  const sujet   = form.querySelector('#sujet').value;
+  const message = form.querySelector('#message').value.trim();
+
+  if (!prenom || !nom || !email || !message) return;
+
   btn.textContent = 'Envoi en cours…'; btn.disabled = true;
-  setTimeout(() => {
-    e.target.reset();
+
+  const name = `${prenom} ${nom}${sujet ? ' — ' + sujet : ''}`;
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+    if (!res.ok) throw new Error();
+    form.reset();
     document.getElementById('form-success').style.display = 'block';
+  } catch {
+    alert('Une erreur est survenue, veuillez réessayer ou contacter directement par email.');
+  } finally {
     btn.textContent = 'Envoyer le message'; btn.disabled = false;
-  }, 1200);
+  }
 });
 
 // ── Login modal ───────────────────────────────────────────────────────────────
+let _firstLoginUsername = null;
+
 function openLogin() {
   document.getElementById('login-overlay').classList.add('open');
+  showLoginStep(1);
   setTimeout(() => document.getElementById('login-user').focus(), 50);
 }
 function closeLogin() {
   document.getElementById('login-overlay').classList.remove('open');
-  document.getElementById('login-error').style.display = 'none';
+  showLoginStep(1);
+  _firstLoginUsername = null;
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
+  document.getElementById('setpwd-new').value = '';
+  document.getElementById('setpwd-confirm').value = '';
+}
+function showLoginStep(n) {
+  document.getElementById('login-step-1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('login-step-2').style.display = n === 2 ? '' : 'none';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('setpwd-error').style.display = 'none';
 }
 
 document.getElementById('login-overlay').addEventListener('click', e => {
@@ -77,6 +109,12 @@ document.getElementById('login-user').addEventListener('keydown', e => {
 });
 document.getElementById('login-pass').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
+});
+document.getElementById('setpwd-new').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('setpwd-confirm').focus();
+});
+document.getElementById('setpwd-confirm').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSetPassword();
 });
 
 async function doLogin() {
@@ -89,15 +127,54 @@ async function doLogin() {
   btn.textContent = 'Connexion…'; btn.disabled = true;
 
   try {
-    await Auth.login(username, password);
-    closeLogin();
-    Editor.enter();
+    const result = await Auth.login(username, password);
+    if (result.firstLogin) {
+      _firstLoginUsername = result.username;
+      showLoginStep(2);
+      setTimeout(() => document.getElementById('setpwd-new').focus(), 50);
+    } else {
+      closeLogin();
+      setEditButtonText('✎ Éditer');
+    }
   } catch (err) {
     errEl.textContent = err.message || 'Identifiants incorrects';
     errEl.style.display = 'block';
     document.getElementById('login-pass').value = '';
   } finally {
     btn.textContent = 'Se connecter'; btn.disabled = false;
+  }
+}
+
+async function doSetPassword() {
+  const newPassword = document.getElementById('setpwd-new').value;
+  const confirm     = document.getElementById('setpwd-confirm').value;
+  const errEl       = document.getElementById('setpwd-error');
+  const btn         = document.getElementById('setpwd-btn');
+
+  errEl.style.display = 'none';
+
+  if (newPassword !== confirm) {
+    errEl.textContent = 'Les mots de passe ne correspondent pas';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPassword.length < 8) {
+    errEl.textContent = 'Le mot de passe doit faire au moins 8 caractères';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Enregistrement…'; btn.disabled = true;
+
+  try {
+    await Auth.setPassword(_firstLoginUsername, newPassword);
+    closeLogin();
+    setEditButtonText('✎ Éditer');
+  } catch (err) {
+    errEl.textContent = err.message || 'Erreur lors de la définition du mot de passe';
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Définir le mot de passe'; btn.disabled = false;
   }
 }
 
@@ -117,11 +194,33 @@ async function toggleEdit() {
 async function logout() {
   await Auth.logout();
   Editor.exit();
+  setEditButtonText('Connexion');
 }
+
+// ── Helpers boutons connexion ────────────────────────────────────────────────
+function setEditButtonText(text) {
+  document.getElementById('editToggle').textContent = text;
+  const mob = document.getElementById('editToggleMobile');
+  if (mob) mob.textContent = text;
+  const loggedIn = text !== 'Connexion';
+  ['logoutBtn', 'logoutBtnMobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = loggedIn ? '' : 'none';
+  });
+}
+
+// Ferme le dropdown historique si clic hors de la zone
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.history-wrap');
+  const dd   = document.getElementById('history-dropdown');
+  if (dd && dd.style.display === 'block' && wrap && !wrap.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
 
 // ── Auto-restore session ──────────────────────────────────────────────────────
 (async () => {
   const user = await Auth.verify();
-  if (user) Editor.loadContent();
-  else       Editor.loadContent();
+  if (user) setEditButtonText('✎ Éditer');
+  Editor.loadContent();
 })();

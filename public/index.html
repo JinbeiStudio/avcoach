@@ -43,27 +43,52 @@
       <div class="login-logo-icon">🔐</div>
       <div class="login-logo-text">AV<span>Coach</span> Admin</div>
     </div>
-    <h2>Espace administrateur</h2>
-    <p>Connectez-vous pour modifier le contenu du site.</p>
-    <div id="login-error"></div>
-    <div class="login-field">
-      <label for="login-user">Identifiant</label>
-      <input type="text" id="login-user" placeholder="admin" autocomplete="username" />
+
+    <!-- Étape 1 : identifiant + mot de passe -->
+    <div id="login-step-1">
+      <h2>Espace administrateur</h2>
+      <p>Connectez-vous pour modifier le contenu du site.</p>
+      <div id="login-error"></div>
+      <div class="login-field">
+        <label for="login-user">Identifiant</label>
+        <input type="text" id="login-user" placeholder="utilisateur" autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label for="login-pass">Mot de passe</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button id="login-btn" onclick="doLogin()">Se connecter</button>
     </div>
-    <div class="login-field">
-      <label for="login-pass">Mot de passe</label>
-      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+
+    <!-- Étape 2 : définir le mot de passe (première connexion) -->
+    <div id="login-step-2" style="display:none">
+      <h2>Première connexion</h2>
+      <p>Bienvenue ! Veuillez définir votre mot de passe pour continuer.</p>
+      <div id="setpwd-error"></div>
+      <div class="login-field">
+        <label for="setpwd-new">Nouveau mot de passe</label>
+        <input type="password" id="setpwd-new" placeholder="8 caractères minimum" autocomplete="new-password" />
+      </div>
+      <div class="login-field">
+        <label for="setpwd-confirm">Confirmer le mot de passe</label>
+        <input type="password" id="setpwd-confirm" placeholder="••••••••" autocomplete="new-password" />
+      </div>
+      <button id="setpwd-btn" onclick="doSetPassword()">Définir le mot de passe</button>
     </div>
-    <button id="login-btn" onclick="doLogin()">Se connecter</button>
   </div>
 </div>
 
 <!-- EDIT BAR -->
 <div id="edit-bar" role="toolbar" aria-label="Barre d'édition">
-  <span>✎ Mode édition activé — cliquez sur n'importe quel texte ou image pour modifier</span>
-  <button class="btn-save"   onclick="Editor.save()">Enregistrer</button>
-  <button class="btn-cancel" onclick="Editor.exit()">Quitter l'édition</button>
-  <button class="btn-cancel btn-logout" onclick="logout()">⎋ Déconnexion</button>
+  <span>✎ Mode édition — cliquez sur un texte ou une image pour modifier</span>
+  <div class="edit-bar-actions">
+    <button class="btn-save"   onclick="Editor.save()">💾 Enregistrer</button>
+    <div class="history-wrap">
+      <button class="btn-history" onclick="Editor.toggleHistory()" title="Versions précédentes">🕐 Historique</button>
+      <div id="history-dropdown" class="history-dropdown" style="display:none"></div>
+    </div>
+    <button class="btn-cancel" onclick="Editor.exit()">✕ Quitter</button>
+  </div>
 </div>
 
 <!-- NAVIGATION -->
@@ -78,8 +103,15 @@
       <li><a href="#parcours">Parcours</a></li>
       <li><a href="#temoignages">Témoignages</a></li>
       <li><a href="#contact" class="nav-cta">Contact</a></li>
+      <li class="nav-links-connexion">
+        <button class="nav-edit-btn" id="editToggleMobile" onclick="toggleEdit()">Connexion</button>
+        <button class="nav-edit-btn nav-logout-btn" id="logoutBtnMobile" onclick="logout()" style="display:none">⎋ Déconnexion</button>
+      </li>
     </ul>
-    <button class="nav-edit-btn" id="editToggle" onclick="toggleEdit()">Connexion</button>
+    <div class="nav-actions-desktop">
+      <button class="nav-edit-btn nav-edit-btn--desktop" id="editToggle" onclick="toggleEdit()">Connexion</button>
+      <button class="nav-edit-btn nav-edit-btn--desktop nav-logout-btn" id="logoutBtn" onclick="logout()" style="display:none">⎋ Déconnexion</button>
+    </div>
     <div class="hamburger" onclick="toggleMenu()" aria-label="Menu" role="button" tabindex="0">
       <span></span><span></span><span></span>
     </div>
@@ -398,7 +430,7 @@
       <li><a href="#temoignages">Témoignages</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <p class="footer-copy" contenteditable="false">© 2025 AV Coach – Tous droits réservés</p>
+    <p class="footer-copy" contenteditable="false">© 2026 JinbeiStudio – Tous droits réservés</p>
   </div>
 </footer>
 

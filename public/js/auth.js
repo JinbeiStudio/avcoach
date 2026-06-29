@@ -13,6 +13,19 @@ const Auth = (() => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur de connexion');
+    if (data.firstLogin) return { firstLogin: true, username: data.username };
+    setToken(data.token);
+    return data.user;
+  }
+
+  async function setPassword(username, newPassword) {
+    const res = await fetch('/api/set-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, newPassword })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur');
     setToken(data.token);
     return data.user;
   }
@@ -47,5 +60,5 @@ const Auth = (() => {
     return { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
   }
 
-  return { login, logout, verify, getToken, authHeaders };
+  return { login, setPassword, logout, verify, getToken, authHeaders };
 })();

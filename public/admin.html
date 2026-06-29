@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — AVCoach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0b1829; --navy-mid: #0f2236; --navy-light: #162d47;
+      --orange: #e87520; --text-light: #e2e8f0; --text-muted: #94a3b8;
+      --green: #4ade80; --red: #f87171;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text-light); min-height: 100vh; }
+
+    /* ── Auth gate ── */
+    #auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-card {
+      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 360px;
+    }
+    .auth-card h1 { font-size: 1.4rem; margin-bottom: 1.5rem; }
+    .auth-card input {
+      width: 100%; padding: .7rem 1rem; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05);
+      color: var(--text-light); font-size: .95rem; margin-bottom: .75rem;
+    }
+    .auth-card button {
+      width: 100%; padding: .75rem; background: var(--orange); color: #fff;
+      border: none; border-radius: 8px; font-size: .95rem; font-weight: 600; cursor: pointer;
+    }
+    #auth-error { color: var(--red); font-size: .85rem; margin-top: .5rem; display: none; }
+
+    /* ── App ── */
+    #app { display: none; }
+    header {
+      background: var(--navy-mid); border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    header h1 { font-size: 1.1rem; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    #user-label { color: var(--text-muted); font-size: .85rem; }
+    #btn-logout {
+      background: none; border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted);
+      padding: .35rem .9rem; border-radius: 6px; font-size: .8rem; cursor: pointer;
+    }
+    #btn-logout:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.07); padding: 0 2rem; background: var(--navy-mid); }
+    .tab {
+      padding: .85rem 1.5rem; font-size: .9rem; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent; color: var(--text-muted); background: none; border-top: none; border-left: none; border-right: none;
+      transition: color .2s;
+    }
+    .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+    .tab:hover:not(.active) { color: var(--text-light); }
+    .tab-badge {
+      background: var(--orange); color: #fff; border-radius: 20px;
+      font-size: .7rem; font-weight: 700; padding: .1rem .5rem; margin-left: .4rem;
+    }
+
+    main { max-width: 960px; margin: 2rem auto; padding: 0 1.5rem; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .card.unread { border-left: 3px solid var(--orange); }
+    .card-meta { display: flex; align-items: baseline; gap: 1rem; margin-bottom: .6rem; flex-wrap: wrap; }
+    .card-name { font-weight: 600; font-size: .95rem; }
+    .card-email { color: var(--orange); font-size: .85rem; text-decoration: none; }
+    .card-email:hover { text-decoration: underline; }
+    .card-date { color: var(--text-muted); font-size: .8rem; margin-left: auto; }
+    .card-body { color: var(--text-light); font-size: .9rem; line-height: 1.6; white-space: pre-wrap; }
+    .card-actions { display: flex; gap: .5rem; margin-top: .85rem; }
+    .btn-sm {
+      font-size: .8rem; padding: .3rem .8rem; border-radius: 6px;
+      border: none; cursor: pointer; font-weight: 500;
+    }
+    .btn-neutral { background: rgba(255,255,255,0.08); color: var(--text-light); }
+    .btn-neutral:hover { background: rgba(255,255,255,0.15); }
+    .btn-danger { background: rgba(248,113,113,0.1); color: var(--red); }
+    .btn-danger:hover { background: rgba(248,113,113,0.2); }
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-primary:hover { opacity: .85; }
+
+    /* ── Historique éditions ── */
+    .version-card {
+      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; margin-bottom: 1rem; overflow: hidden;
+    }
+    .version-header {
+      display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+      cursor: pointer; user-select: none;
+    }
+    .version-header:hover { background: rgba(255,255,255,0.03); }
+    .version-badge {
+      background: var(--orange); color: #fff; border-radius: 6px;
+      padding: .2rem .55rem; font-size: .8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .version-info { flex: 1; }
+    .version-date { font-size: .9rem; font-weight: 500; }
+    .version-author { font-size: .8rem; color: var(--text-muted); margin-top: .1rem; }
+    .version-chevron { color: var(--text-muted); font-size: .8rem; transition: transform .2s; }
+    .version-card.open .version-chevron { transform: rotate(90deg); }
+
+    .version-body { display: none; border-top: 1px solid rgba(255,255,255,0.06); padding: 1.25rem 1.5rem; }
+    .version-card.open .version-body { display: block; }
+
+    .diff-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    .diff-tab {
+      font-size: .8rem; padding: .3rem .8rem; border-radius: 6px; border: none;
+      cursor: pointer; font-weight: 500; background: rgba(255,255,255,0.06); color: var(--text-muted);
+    }
+    .diff-tab.active { background: var(--orange); color: #fff; }
+
+    .diff-content { display: none; }
+    .diff-content.active { display: block; }
+
+    .diff-block { margin-bottom: .75rem; }
+    .diff-label { font-size: .75rem; color: var(--text-muted); margin-bottom: .3rem; text-transform: uppercase; letter-spacing: .05em; }
+    .diff-text {
+      background: var(--navy-light); border-radius: 8px; padding: .75rem 1rem;
+      font-size: .85rem; line-height: 1.6; color: var(--text-light);
+    }
+    .diff-added { background: rgba(74,222,128,0.12); color: var(--green); border-radius: 3px; padding: 0 2px; }
+    .diff-removed { background: rgba(248,113,113,0.12); color: var(--red); border-radius: 3px; padding: 0 2px; text-decoration: line-through; }
+    .diff-unchanged { color: var(--text-muted); }
+    .no-change { color: var(--text-muted); font-style: italic; font-size: .85rem; }
+
+    .empty-state { text-align: center; padding: 4rem; color: var(--text-muted); }
+    .loading-state { text-align: center; padding: 4rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<!-- Auth gate -->
+<div id="auth-gate">
+  <div class="auth-card">
+    <h1>AVCoach — Admin</h1>
+    <input type="text" id="login-user" placeholder="Identifiant" autocomplete="username" />
+    <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password" />
+    <button onclick="doLogin()">Se connecter</button>
+    <div id="auth-error"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <header>
+    <h1><a href="/" style="color:inherit;text-decoration:none">AVCoach</a> <span style="color:var(--text-muted);font-weight:400"> / Admin</span></h1>
+    <div class="header-right">
+      <span id="user-label"></span>
+      <button id="btn-logout" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('messages')">
+      Messages <span id="unread-badge" class="tab-badge" style="display:none"></span>
+    </button>
+    <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
+  </div>
+
+  <main>
+    <!-- Panel messages -->
+    <div id="panel-messages" class="panel active">
+      <div class="loading-state" id="msg-loading">Chargement…</div>
+      <div id="message-list"></div>
+      <div class="empty-state" id="msg-empty" style="display:none">Aucun message pour l'instant.</div>
+    </div>
+
+    <!-- Panel historique éditions -->
+    <div id="panel-history" class="panel">
+      <div class="loading-state" id="hist-loading">Chargement…</div>
+      <div id="version-list"></div>
+      <div class="empty-state" id="hist-empty" style="display:none">Aucune version sauvegardée.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+let token = localStorage.getItem('avcoach_token');
+let allVersions = [];
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur');
+    if (data.firstLogin) { errEl.textContent = 'Définissez d\'abord votre mot de passe sur le site principal.'; errEl.style.display = 'block'; return; }
+    if (data.user.role !== 'admin') { errEl.textContent = 'Accès réservé aux administrateurs.'; errEl.style.display = 'block'; return; }
+    token = data.token;
+    localStorage.setItem('avcoach_token', token);
+    showApp(data.user);
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('avcoach_token');
+  token = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-gate').style.display = 'flex';
+}
+
+function showApp(user) {
+  document.getElementById('auth-gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('user-label').textContent = user?.username || '';
+  loadMessages();
+  loadHistory();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['messages','history'][i] === name));
+  document.getElementById('panel-messages').classList.toggle('active', name === 'messages');
+  document.getElementById('panel-history').classList.toggle('active', name === 'history');
+}
+
+// ── Messages ─────────────────────────────────────────────────────────────────
+async function loadMessages() {
+  const res = await fetch('/api/messages', { headers: { Authorization: 'Bearer ' + token } });
+  const messages = await res.json();
+  document.getElementById('msg-loading').style.display = 'none';
+
+  const unread = messages.filter(m => !m.read).length;
+  const badge = document.getElementById('unread-badge');
+  if (unread) { badge.textContent = unread; badge.style.display = ''; } else badge.style.display = 'none';
+
+  if (!messages.length) { document.getElementById('msg-empty').style.display = 'block'; return; }
+
+  document.getElementById('message-list').innerHTML = messages.map(m => {
+    const date = fmtDate(m.received_at);
+    return `<div class="card ${m.read ? '' : 'unread'}" id="msg-${m.id}">
+      <div class="card-meta">
+        <span class="card-name">${esc(m.name)}</span>
+        <a class="card-email" href="mailto:${esc(m.email)}">${esc(m.email)}</a>
+        <span class="card-date">${date}</span>
+      </div>
+      <div class="card-body">${esc(m.message)}</div>
+      <div class="card-actions">
+        ${!m.read ? `<button class="btn-sm btn-neutral" onclick="markRead(${m.id})">✓ Lu</button>` : ''}
+        <button class="btn-sm btn-danger" onclick="deleteMsg(${m.id})">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function markRead(id) {
+  await fetch(`/api/messages/${id}/read`, { method: 'PATCH', headers: { Authorization: 'Bearer ' + token } });
+  const card = document.getElementById('msg-' + id);
+  card.classList.remove('unread');
+  card.querySelector('.btn-neutral')?.remove();
+  const unread = document.querySelectorAll('.card.unread').length;
+  const badge = document.getElementById('unread-badge');
+  unread ? badge.textContent = unread : badge.style.display = 'none';
+}
+
+async function deleteMsg(id) {
+  if (!confirm('Supprimer ce message ?')) return;
+  await fetch(`/api/messages/${id}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+  document.getElementById('msg-' + id).remove();
+  if (!document.querySelector('.card')) document.getElementById('msg-empty').style.display = 'block';
+}
+
+// ── Historique éditions ───────────────────────────────────────────────────────
+async function loadHistory() {
+  const res = await fetch('/api/content/history/full', { headers: { Authorization: 'Bearer ' + token } });
+  allVersions = await res.json();
+  document.getElementById('hist-loading').style.display = 'none';
+
+  if (!allVersions.length) { document.getElementById('hist-empty').style.display = 'block'; return; }
+
+  // Compter les non-base pour le numéro d'édition
+  const editVersions = allVersions.filter(v => !v.is_base);
+  document.getElementById('version-list').innerHTML = allVersions.map((v, i) => {
+    const label = v.is_base ? 'V0' : `V${editVersions.length - editVersions.indexOf(v)}`;
+    const prev  = allVersions[i + 1] || null;
+    return `<div class="version-card" id="ver-${v.id}">
+      <div class="version-header" onclick="toggleVersion(${v.id})">
+        <span class="version-badge">${label}</span>
+        <div class="version-info">
+          <div class="version-date">${fmtDate(v.saved_at)}</div>
+          <div class="version-author">par ${esc(v.username || '—')}</div>
+        </div>
+        <button class="btn-sm btn-primary" style="margin-left:auto;margin-right:.75rem;flex-shrink:0"
+          onclick="event.stopPropagation();restoreVersion(${v.id},'${label}')">↩ Restaurer</button>
+        <span class="version-chevron">▶</span>
+      </div>
+      <div class="version-body">
+        ${renderVersionBody(v, prev, label)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleVersion(id) {
+  document.getElementById('ver-' + id).classList.toggle('open');
+}
+
+async function restoreVersion(id, label) {
+  if (!confirm(`Restaurer la ${label} comme nouvelle version active ?`)) return;
+  const v = allVersions.find(v => v.id === id);
+  if (!v) return;
+  const res = await fetch('/api/content', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ snapshot: v.snapshot })
+  });
+  if (res.ok) {
+    alert(`${label} restaurée avec succès.`);
+    loadHistory();
+  } else {
+    alert('Erreur lors de la restauration.');
+  }
+}
+
+function renderVersionBody(v, prev, label) {
+  const texts = extractTexts(v.snapshot);
+
+  if (!prev) {
+    // V1 : juste le contenu
+    return `<div class="diff-label">Contenu de base (${label})</div>` +
+      texts.map(({ key, text }) =>
+        text.trim() ? `<div class="diff-block"><div class="diff-text">${esc(text)}</div></div>` : ''
+      ).filter(Boolean).join('');
+  }
+
+  const prevTexts = extractTexts(prev.snapshot);
+  const diffs = buildDiffs(texts, prevTexts);
+  const changed = diffs.filter(d => d.changed);
+
+  if (!changed.length) return `<div class="no-change">Aucune modification de texte détectée.</div>`;
+
+  return `<div class="diff-label">${changed.length} bloc${changed.length > 1 ? 's' : ''} modifié${changed.length > 1 ? 's' : ''}</div>` +
+    changed.map(d => `
+      <div class="diff-block">
+        <div class="diff-label" style="margin-bottom:.2rem">Avant</div>
+        <div class="diff-text">${wordDiff(d.before, d.after).before}</div>
+        <div class="diff-label" style="margin:.4rem 0 .2rem">Après</div>
+        <div class="diff-text">${wordDiff(d.before, d.after).after}</div>
+      </div>`
+    ).join('');
+}
+
+function extractTexts(snapshot) {
+  return Object.entries(snapshot)
+    .filter(([k]) => k.startsWith('el_'))
+    .map(([key, html]) => ({ key, text: stripTags(html) }));
+}
+
+function buildDiffs(current, previous) {
+  return current.map((c, i) => {
+    const p = previous[i];
+    const before = p ? p.text : '';
+    const after  = c.text;
+    return { key: c.key, before, after, changed: before.trim() !== after.trim() };
+  });
+}
+
+function wordDiff(before, after) {
+  const bWords = before.split(/(\s+)/);
+  const aWords = after.split(/(\s+)/);
+  const bSet = new Set(bWords);
+  const aSet = new Set(aWords);
+
+  const beforeHtml = bWords.map(w =>
+    w.trim() && !aSet.has(w) ? `<span class="diff-removed">${esc(w)}</span>` : `<span class="diff-unchanged">${esc(w)}</span>`
+  ).join('');
+
+  const afterHtml = aWords.map(w =>
+    w.trim() && !bSet.has(w) ? `<span class="diff-added">${esc(w)}</span>` : `<span class="diff-unchanged">${esc(w)}</span>`
+  ).join('');
+
+  return { before: beforeHtml, after: afterHtml };
+}
+
+// ── Utilitaires ───────────────────────────────────────────────────────────────
+function stripTags(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent || '';
+}
+
+function fmtDate(str) {
+  return new Date(str + 'Z').toLocaleDateString('fr-FR', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
+
+if (token) {
+  fetch('/api/verify', { headers: { Authorization: 'Bearer ' + token } })
+    .then(r => r.json())
+    .then(d => {
+      if (d.valid && d.user.role === 'admin') showApp(d.user);
+      else { localStorage.removeItem('avcoach_token'); token = null; }
+    })
+    .catch(() => {});
+}
+</script>
+</body>
+</html>
