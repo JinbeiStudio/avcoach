@@ -30,13 +30,16 @@ function transformHtml(html) {
   html = html.replace(/src="\/images\//g, 'src="images/');
 
   // Supprime le bloc login-overlay
-  html = html.replace(/<!-- LOGIN MODAL -->[\s\S]*?<\/div>\n<\/div>\n/m, '');
+  html = html.replace(/<!-- LOGIN MODAL -->[\s\S]*?(?=<!-- EDIT BAR -->)/m, '');
 
   // Supprime le bloc edit-bar
-  html = html.replace(/<!-- EDIT BAR -->[\s\S]*?<\/div>\n/m, '');
+  html = html.replace(/<!-- EDIT BAR -->\n<div id="edit-bar"[\s\S]*?<\/div>\n<\/div>\n/m, '');
 
-  // Supprime le bouton Connexion dans la nav
-  html = html.replace(/\s*<button class="nav-edit-btn"[^>]*>.*?<\/button>\n/g, '');
+  // Supprime le conteneur des boutons nav desktop (Connexion + Déconnexion)
+  html = html.replace(/\s*<div class="nav-actions-desktop">[\s\S]*?<\/div>/m, '');
+
+  // Supprime le li mobile Connexion/Déconnexion
+  html = html.replace(/\s*<li class="nav-links-connexion">[\s\S]*?<\/li>/m, '');
 
   // Supprime les attributs contenteditable
   html = html.replace(/ contenteditable="false"/g, '');
