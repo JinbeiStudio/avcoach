@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AV Coach – Coaching Managérial & Accompagnement du Changement</title>
+  <meta name="description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME. Posture managériale, accompagnement du changement. Prenez rendez-vous dès aujourd'hui." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://avcoach.fr/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://avcoach.fr/" />
+  <meta property="og:title" content="AV Coach – Coaching Managérial & Accompagnement du Changement" />
+  <meta property="og:description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME." />
+  <meta property="og:image" content="https://avcoach.fr/og-image.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AV Coach – Coaching Managérial" />
+  <meta name="twitter:description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "AV Coach",
+    "description": "Coaching managérial individuel et collectif pour managers et équipes de TPE/PME",
+    "url": "https://avcoach.fr",
+    "telephone": "+33-6-00-00-00-00",
+    "address": { "@type": "PostalAddress", "addressCountry": "FR" },
+    "serviceType": ["Coaching managérial", "Accompagnement du changement", "Coaching individuel", "Coaching collectif"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0B1829;
+      --navy-mid: #0F2040;
+      --navy-light: #16305A;
+      --orange: #E87520;
+      --orange-light: #F09040;
+      --orange-dark: #C05F10;
+      --cream: #F5EDD8;
+      --cream-dark: #E8D9BF;
+      --text-light: #D4E3F5;
+      --text-muted: #8AA5C0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text-light);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+    a { color: var(--orange); text-decoration: none; }
+    a:hover { color: var(--orange-light); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* LOGIN MODAL */
+    #login-overlay {
+      display: none; position: fixed; inset: 0; z-index: 3000;
+      background: rgba(6,14,25,0.92); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    #login-overlay.open { display: flex; }
+    #login-box {
+      background: #0F2040; border: 1px solid rgba(232,117,32,0.25);
+      border-radius: 20px; padding: 2.5rem 2.5rem 2rem;
+      width: 100%; max-width: 400px; position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+    #login-box h2 { font-size: 1.5rem; color: var(--cream); margin-bottom: .4rem; }
+    #login-box p { font-size: .85rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .login-field { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.2rem; }
+    .login-field label { font-size: .78rem; font-weight: 600; letter-spacing: .5px; color: var(--text-muted); text-transform: uppercase; }
+    .login-field input {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: .85rem 1rem;
+      color: var(--text-light); font-family: 'Inter', sans-serif; font-size: .95rem;
+      outline: none; transition: border-color .2s;
+    }
+    .login-field input:focus { border-color: var(--orange); background: rgba(232,117,32,0.06); }
+    #login-error {
+      display: none; background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3);
+      border-radius: 8px; padding: .6rem 1rem; color: #F87171;
+      font-size: .85rem; margin-bottom: 1rem; text-align: center;
+    }
+    #login-btn {
+      width: 100%; padding: .9rem; background: var(--orange); color: #fff;
+      border: none; border-radius: 50px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: background .2s, transform .2s;
+    }
+    #login-btn:hover { background: var(--orange-light); transform: translateY(-1px); }
+    #login-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,0.08); border: none; color: var(--text-muted);
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: background .2s, color .2s;
+    }
+    #login-close:hover { background: rgba(232,117,32,0.2); color: var(--orange); }
+    .login-logo {
+      display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem;
+    }
+    .login-logo-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: rgba(232,117,32,0.15); border: 1px solid rgba(232,117,32,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .login-logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--cream); }
+    .login-logo-text span { color: var(--orange); }
+
+    /* EDIT MODE */
+    body.edit-mode [contenteditable] {
+      outline: 2px dashed var(--orange);
+      outline-offset: 4px;
+      border-radius: 4px;
+      cursor: text;
+      min-height: 1em;
+    }
+    body.edit-mode [contenteditable]:focus { outline: 2px solid var(--orange); background: rgba(232,117,32,0.06); }
+    body.edit-mode .img-wrap { position: relative; cursor: pointer; }
+    body.edit-mode .img-wrap::after {
+      content: '✎ Changer l'image';
+      position: absolute; inset: 0;
+      background: rgba(11,24,41,0.75);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 500;
+      color: var(--orange); opacity: 0;
+      transition: opacity .2s;
+      border-radius: inherit;
+    }
+    body.edit-mode .img-wrap:hover::after { opacity: 1; }
+
+    #edit-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2000;
+      background: var(--orange); color: #fff;
+      display: flex; align-items: center; gap: 1rem;
+      padding: .6rem 1.5rem; font-size: 14px; font-weight: 500;
+      transform: translateY(-100%); transition: transform .3s;
+    }
+    #edit-bar.visible { transform: translateY(0); }
+    #edit-bar button {
+      padding: .35rem 1rem; border-radius: 6px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    #edit-bar .btn-save { background: #fff; color: var(--orange-dark); }
+    #edit-bar .btn-cancel { background: rgba(255,255,255,0.25); color: #fff; }
+    #edit-bar .btn-save:hover { background: var(--cream); }
+    #edit-bar .btn-cancel:hover { background: rgba(255,255,255,0.4); }
+
+    /* NAVIGATION */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 1.2rem 0;
+      transition: background .3s, padding .3s, box-shadow .3s;
+    }
+    nav.scrolled {
+      background: rgba(11,24,41,0.97);
+      padding: .8rem 0;
+      box-shadow: 0 2px 30px rgba(0,0,0,.4);
+      backdrop-filter: blur(10px);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--cream);
+      letter-spacing: 1px;
+    }
+    .nav-logo span { color: var(--orange); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--text-light); font-size: .9rem; font-weight: 400;
+      letter-spacing: .5px; transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px; background: var(--orange);
+      transform: scaleX(0); transition: transform .25s;
+    }
+    .nav-links a:hover, .nav-links a:focus { color: var(--orange); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-cta {
+      background: var(--orange); color: #fff !important;
+      padding: .5rem 1.25rem; border-radius: 40px;
+      font-weight: 500 !important; transition: background .2s, transform .2s !important;
+    }
+    .nav-cta:hover { background: var(--orange-light) !important; transform: translateY(-1px); }
+    .nav-cta::after { display: none !important; }
+    .nav-edit-btn {
+      background: transparent; border: 1px solid var(--orange);
+      color: var(--orange); padding: .4rem 1rem; border-radius: 40px;
+      font-size: .85rem; cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all .2s;
+    }
+    .nav-edit-btn:hover { background: var(--orange); color: #fff; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text-light); transition: all .3s; }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #080F1C 0%, #0B1829 45%, #0F2240 100%);
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 40%, rgba(232,117,32,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 50% at 20% 70%, rgba(22,48,90,0.6) 0%, transparent 60%);
+    }
+    .hero-compass {
+      position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+      width: 600px; height: 600px; opacity: .06;
+    }
+    .hero-content { position: relative; max-width: 700px; }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(232,117,32,0.15); border: 1px solid rgba(232,117,32,0.35);
+      color: var(--orange-light); padding: .4rem 1.1rem;
+      border-radius: 40px; font-size: .8rem; font-weight: 500;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero-content h1 {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1.15; color: var(--cream);
+      margin-bottom: 1.2rem;
+    }
+    .hero-content h1 em { color: var(--orange); font-style: italic; }
+    .hero-content p {
+      font-size: 1.1rem; color: var(--text-muted);
+      max-width: 560px; margin-bottom: 2.5rem;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--orange); color: #fff;
+      padding: .85rem 2.2rem; border-radius: 50px;
+      font-weight: 600; font-size: 1rem;
+      transition: background .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(232,117,32,0.35);
+    }
+    .btn-primary:hover { background: var(--orange-light); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,117,32,0.45); }
+    .btn-secondary {
+      display: inline-block;
+      border: 1.5px solid rgba(212,227,245,0.35); color: var(--text-light);
+      padding: .85rem 2.2rem; border-radius: 50px;
+      font-weight: 500; font-size: 1rem;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); background: rgba(232,117,32,0.06); }
+    .hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      color: var(--text-muted); font-size: .8rem; letter-spacing: 1px;
+      animation: bounce 2s infinite;
+    }
+    .hero-scroll::after {
+      content: ''; display: block;
+      width: 1px; height: 40px; background: linear-gradient(to bottom, var(--text-muted), transparent);
+    }
+    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+    /* SEPARATORS */
+    .sep { line-height: 0; display: block; width: 100%; }
+
+    /* SECTIONS */
+    section { padding: 5rem 0; }
+    .section-label {
+      font-size: .78rem; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      color: var(--cream); margin-bottom: 1.25rem; line-height: 1.2;
+    }
+    .section-lead {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 620px; margin-bottom: 3rem;
+    }
+
+    /* A PROPOS */
+    #apropos { background: var(--navy); }
+    .apropos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .apropos-img {
+      border-radius: 20px; overflow: hidden;
+      aspect-ratio: 4/5; position: relative;
+    }
+    .apropos-img img { width: 100%; height: 100%; object-fit: cover; }
+    .apropos-img::before {
+      content: ''; position: absolute; inset: -12px; z-index: -1;
+      border: 2px solid rgba(232,117,32,0.25); border-radius: 24px;
+    }
+    .stat-row { display: flex; gap: 2rem; margin-top: 2.5rem; }
+    .stat { text-align: center; }
+    .stat strong { display: block; font-size: 2rem; font-family: 'Playfair Display', serif; color: var(--orange); }
+    .stat span { font-size: .85rem; color: var(--text-muted); }
+
+    /* OFFRES */
+    #offres { background: var(--navy-mid); }
+    .offres-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .offre-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 2.5rem 2rem;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .offre-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--orange), var(--orange-light));
+      transform: scaleX(0); transition: transform .3s;
+    }
+    .offre-card:hover { border-color: rgba(232,117,32,0.3); transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+    .offre-card:hover::before { transform: scaleX(1); }
+    .offre-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(232,117,32,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem; font-size: 1.6rem;
+    }
+    .offre-card h3 { font-size: 1.25rem; color: var(--cream); margin-bottom: .75rem; }
+    .offre-card p { font-size: .9rem; color: var(--text-muted); line-height: 1.7; }
+    .offre-link {
+      display: inline-block; margin-top: 1.5rem;
+      color: var(--orange); font-size: .9rem; font-weight: 500;
+      position: relative;
+    }
+    .offre-link::after {
+      content: ' →'; transition: margin .2s;
+    }
+    .offre-card:hover .offre-link::after { margin-left: 4px; }
+
+    /* PARCOURS */
+    #parcours { background: var(--navy); }
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(to bottom, var(--orange), rgba(232,117,32,0.1));
+    }
+    .timeline-item { position: relative; margin-bottom: 3rem; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -2.4rem; top: .3rem;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--orange); box-shadow: 0 0 0 4px rgba(232,117,32,0.2);
+    }
+    .timeline-year {
+      font-size: .8rem; color: var(--orange); font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: .3rem;
+    }
+    .timeline-item h3 { font-size: 1.15rem; color: var(--cream); margin-bottom: .5rem; }
+    .timeline-item p { font-size: .9rem; color: var(--text-muted); }
+
+    .certif-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 3rem; }
+    .certif-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 1.5rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .certif-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .certif-card h4 { font-size: .95rem; color: var(--cream); margin-bottom: .3rem; }
+    .certif-card p { font-size: .82rem; color: var(--text-muted); }
+
+    /* TEMOIGNAGES */
+    #temoignages { background: var(--navy-mid); }
+    .temoignages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .temoignage-card {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 2rem;
+      transition: border-color .3s;
+    }
+    .temoignage-card:hover { border-color: rgba(232,117,32,0.25); }
+    .stars { color: var(--orange); font-size: 1rem; margin-bottom: 1rem; letter-spacing: 2px; }
+    .temoignage-card blockquote {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: 1rem; color: var(--cream); line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .temoignage-card blockquote::before { content: '\201C'; color: var(--orange); font-size: 2rem; line-height: .5; display: block; margin-bottom: .5rem; }
+    .temoignage-author { display: flex; align-items: center; gap: .85rem; }
+    .author-avatar {
+      width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+      background: rgba(232,117,32,0.15); border: 2px solid rgba(232,117,32,0.3);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--orange);
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-name { font-weight: 600; font-size: .9rem; color: var(--cream); }
+    .author-role { font-size: .8rem; color: var(--text-muted); }
+
+    /* CONTACT */
+    #contact { background: var(--navy); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    .contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .contact-item-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: rgba(232,117,32,0.1); border: 1px solid rgba(232,117,32,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .contact-item h4 { font-size: .85rem; color: var(--orange); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: .2rem; }
+    .contact-item p { font-size: .95rem; color: var(--text-light); }
+    .contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .5rem; }
+    .form-group label { font-size: .82rem; color: var(--text-muted); font-weight: 500; letter-spacing: .5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: .85rem 1rem;
+      color: var(--text-light); font-family: 'Inter', sans-serif; font-size: .95rem;
+      transition: border-color .2s, background .2s; outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--orange); background: rgba(232,117,32,0.06);
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-muted); }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-group select option { background: var(--navy-mid); }
+    .btn-submit {
+      background: var(--orange); color: #fff;
+      padding: 1rem 2.5rem; border-radius: 50px; border: none;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(232,117,32,0.3);
+      align-self: flex-start;
+    }
+    .btn-submit:hover { background: var(--orange-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,117,32,0.4); }
+    #form-success { display: none; background: rgba(232,117,32,0.1); border: 1px solid rgba(232,117,32,0.3); border-radius: 12px; padding: 1.2rem 1.5rem; color: var(--orange-light); font-weight: 500; }
+
+    /* FOOTER */
+    footer {
+      background: #060E19;
+      padding: 3rem 0 2rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--cream); }
+    .footer-logo span { color: var(--orange); }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { color: var(--text-muted); font-size: .85rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--orange); }
+    .footer-copy { font-size: .8rem; color: var(--text-muted); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .apropos-grid, .contact-grid { grid-template-columns: 1fr; }
+      .offres-grid { grid-template-columns: 1fr; }
+      .temoignages-grid { grid-template-columns: 1fr; }
+      .certif-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .apropos-img { aspect-ratio: 16/9; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 3.5rem 0; }
+      .hero-btns { flex-direction: column; }
+      .btn-primary, .btn-secondary { text-align: center; }
+      .stat-row { justify-content: center; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+
+    /* ANIMATIONS */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div id="login-overlay" role="dialog" aria-modal="true" aria-label="Connexion administrateur">
+  <div id="login-box">
+    <button id="login-close" onclick="closeLogin()" aria-label="Fermer">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon">🔐</div>
+      <div class="login-logo-text">AV<span>Coach</span> Admin</div>
+    </div>
+    <h2>Espace administrateur</h2>
+    <p>Connectez-vous pour modifier le contenu du site.</p>
+    <div id="login-error">Identifiants incorrects. Veuillez réessayer.</div>
+    <div class="login-field">
+      <label for="login-user">Identifiant</label>
+      <input type="text" id="login-user" placeholder="admin" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label for="login-pass">Mot de passe</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button id="login-btn" onclick="doLogin()">Se connecter</button>
+  </div>
+</div>
+
+<!-- EDIT BAR -->
+<div id="edit-bar">
+  <span>✎ Mode édition activé — cliquez sur n'importe quel texte ou image pour modifier</span>
+  <button class="btn-save" onclick="saveContent()">Enregistrer</button>
+  <button class="btn-cancel" onclick="exitEdit()">Quitter l'édition</button>
+  <button class="btn-cancel" onclick="logout()" style="margin-left:auto">⎋ Déconnexion</button>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="main-nav">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo" aria-label="AV Coach accueil">AV<span>Coach</span></a>
+    <ul class="nav-links">
+      <li><a href="#apropos">À propos</a></li>
+      <li><a href="#offres">Offres</a></li>
+      <li><a href="#parcours">Parcours</a></li>
+      <li><a href="#temoignages">Témoignages</a></li>
+      <li><a href="#contact" class="nav-cta">Contact</a></li>
+    </ul>
+    <button class="nav-edit-btn" onclick="toggleEdit()" id="editToggle" title="Passer en mode édition">✎ Éditer</button>
+    <div class="hamburger" onclick="toggleMenu()" aria-label="Menu" role="button" tabindex="0">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" role="banner">
+  <div class="hero-bg"></div>
+  <svg class="hero-compass" viewBox="0 0 400 400" aria-hidden="true">
+    <circle cx="200" cy="200" r="180" fill="none" stroke="currentColor" stroke-width="1"/>
+    <circle cx="200" cy="200" r="140" fill="none" stroke="currentColor" stroke-width=".5"/>
+    <circle cx="200" cy="200" r="100" fill="none" stroke="currentColor" stroke-width=".5"/>
+    <line x1="200" y1="20" x2="200" y2="380" stroke="currentColor" stroke-width=".5"/>
+    <line x1="20" y1="200" x2="380" y2="200" stroke="currentColor" stroke-width=".5"/>
+    <line x1="73" y1="73" x2="327" y2="327" stroke="currentColor" stroke-width=".5"/>
+    <line x1="327" y1="73" x2="73" y2="327" stroke="currentColor" stroke-width=".5"/>
+    <polygon points="200,40 208,190 200,160 192,190" fill="currentColor"/>
+    <polygon points="200,360 208,210 200,240 192,210" fill="currentColor" opacity=".5"/>
+    <text x="200" y="16" text-anchor="middle" font-size="14" fill="currentColor">N</text>
+    <text x="200" y="396" text-anchor="middle" font-size="14" fill="currentColor">S</text>
+    <text x="390" y="205" text-anchor="middle" font-size="14" fill="currentColor">E</text>
+    <text x="10" y="205" text-anchor="middle" font-size="14" fill="currentColor">O</text>
+  </svg>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag" contenteditable="false">Coaching professionnel certifié</div>
+      <h1 contenteditable="false">
+        Révélez votre <em>posture managériale</em> et conduisez le changement
+      </h1>
+      <p contenteditable="false">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Accompagnement individuel et collectif pour managers et équipes de TPE/PME qui souhaitent grandir.
+      </p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Prendre rendez-vous</a>
+        <a href="#offres" class="btn-secondary">Découvrir les offres</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">Découvrir</div>
+</section>
+
+<!-- SEPARATOR: WAVE BLUE -->
+<div class="sep" aria-hidden="true">
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="waveBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#060E19"/>
+        <stop offset="50%" stop-color="#0F2040"/>
+        <stop offset="100%" stop-color="#060E19"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,0 C240,80 480,80 720,40 C960,0 1200,80 1440,40 L1440,90 L0,90 Z" fill="url(#waveBlue)"/>
+    <path d="M0,20 C360,90 720,10 1080,60 C1260,80 1380,50 1440,60 L1440,90 L0,90 Z" fill="#0B1829" opacity=".6"/>
+  </svg>
+</div>
+
+<!-- A PROPOS -->
+<section id="apropos">
+  <div class="container">
+    <div class="apropos-grid reveal">
+      <div class="apropos-img img-wrap" onclick="replaceImage(this)" title="Cliquer pour changer l'image">
+        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Coach professionnel" loading="lazy" />
+      </div>
+      <div>
+        <p class="section-label" contenteditable="false">À propos</p>
+        <h2 class="section-title" contenteditable="false">Une approche humaine au service de votre développement</h2>
+        <p class="section-lead" contenteditable="false">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
+        </p>
+        <p style="color: var(--text-muted); font-size: .95rem; margin-bottom: 1.5rem;" contenteditable="false">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        </p>
+        <a href="#contact" class="btn-primary">Me contacter</a>
+        <div class="stat-row">
+          <div class="stat">
+            <strong contenteditable="false">10+</strong>
+            <span contenteditable="false">ans d'expérience</span>
+          </div>
+          <div class="stat">
+            <strong contenteditable="false">200+</strong>
+            <span contenteditable="false">coachés accompagnés</span>
+          </div>
+          <div class="stat">
+            <strong contenteditable="false">95%</strong>
+            <span contenteditable="false">de satisfaction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEPARATOR: FLAMME ORANGE -->
+<div class="sep" aria-hidden="true">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="flammeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#E87520" stop-opacity=".18"/>
+        <stop offset="100%" stop-color="#0F2040"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50 L1440,0 L0,0 Z" fill="#0B1829"/>
+    <path d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50 L1440,100 L0,100 Z" fill="url(#flammeGrad)"/>
+    <path d="M360,50 C380,10 400,0 420,20 C440,0 460,30 480,50" fill="none" stroke="rgba(232,117,32,0.3)" stroke-width="2"/>
+    <path d="M700,40 C720,5 740,0 760,18 C780,0 800,35 820,40" fill="none" stroke="rgba(232,117,32,0.2)" stroke-width="1.5"/>
+    <path d="M1050,45 C1070,8 1090,0 1110,22 C1130,0 1150,40 1170,45" fill="none" stroke="rgba(232,117,32,0.2)" stroke-width="1.5"/>
+  </svg>
+</div>
+
+<!-- OFFRES -->
+<section id="offres">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 3.5rem;" class="reveal">
+      <p class="section-label" contenteditable="false">Offres</p>
+      <h2 class="section-title" contenteditable="false">Des programmes sur mesure pour vos besoins</h2>
+      <p class="section-lead" style="margin: 0 auto;" contenteditable="false">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.
+      </p>
+    </div>
+    <div class="offres-grid">
+      <article class="offre-card reveal">
+        <div class="offre-icon">🧭</div>
+        <h3 contenteditable="false">Coaching individuel</h3>
+        <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim.</p>
+        <a href="#contact" class="offre-link">En savoir plus</a>
+      </article>
+      <article class="offre-card reveal">
+        <div class="offre-icon">🔥</div>
+        <h3 contenteditable="false">Coaching collectif</h3>
+        <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
+        <a href="#contact" class="offre-link">En savoir plus</a>
+      </article>
+      <article class="offre-card reveal">
+        <div class="offre-icon">⚡</div>
+        <h3 contenteditable="false">Accompagnement du changement</h3>
+        <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident sunt in culpa qui.</p>
+        <a href="#contact" class="offre-link">En savoir plus</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- SEPARATOR: BOUSSOLE BEIGE -->
+<div class="sep" aria-hidden="true">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bousGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#F5EDD8" stop-opacity=".04"/>
+        <stop offset="30%" stop-color="#E8D9BF" stop-opacity=".1"/>
+        <stop offset="70%" stop-color="#E8D9BF" stop-opacity=".1"/>
+        <stop offset="100%" stop-color="#F5EDD8" stop-opacity=".04"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,50 L1440,50 L1440,100 L0,100 Z" fill="#0B1829"/>
+    <path d="M0,50 C200,0 400,80 720,40 C900,20 1100,70 1440,30 L1440,50 L0,50 Z" fill="#0F2040"/>
+    <rect x="0" y="48" width="1440" height="4" fill="url(#bousGrad)"/>
+    <circle cx="720" cy="50" r="20" fill="none" stroke="rgba(245,237,216,0.12)" stroke-width="1"/>
+    <circle cx="720" cy="50" r="8" fill="none" stroke="rgba(245,237,216,0.18)" stroke-width="1"/>
+    <line x1="720" y1="30" x2="720" y2="70" stroke="rgba(245,237,216,0.15)" stroke-width="1"/>
+    <line x1="700" y1="50" x2="740" y2="50" stroke="rgba(245,237,216,0.15)" stroke-width="1"/>
+    <circle cx="300" cy="50" r="12" fill="none" stroke="rgba(245,237,216,0.07)" stroke-width="1"/>
+    <circle cx="1140" cy="50" r="12" fill="none" stroke="rgba(245,237,216,0.07)" stroke-width="1"/>
+  </svg>
+</div>
+
+<!-- PARCOURS -->
+<section id="parcours">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;" class="reveal">
+      <div>
+        <p class="section-label" contenteditable="false">Parcours</p>
+        <h2 class="section-title" contenteditable="false">Un parcours au service de votre transformation</h2>
+        <p class="section-lead" contenteditable="false">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+        </p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year" contenteditable="false">2015 – Aujourd'hui</div>
+            <h3 contenteditable="false">Coach certifiée & consultante</h3>
+            <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year" contenteditable="false">2010 – 2015</div>
+            <h3 contenteditable="false">Responsable RH en TPE/PME</h3>
+            <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year" contenteditable="false">2005 – 2010</div>
+            <h3 contenteditable="false">Manager opérationnel</h3>
+            <p contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="section-label" contenteditable="false">Certifications</p>
+        <h2 class="section-title" contenteditable="false">Formations & accréditations</h2>
+        <div class="certif-grid">
+          <div class="certif-card">
+            <div class="certif-icon">🏆</div>
+            <div>
+              <h4 contenteditable="false">ICF – Coaching certifié</h4>
+              <p contenteditable="false">Lorem ipsum dolor sit amet consectetur.</p>
+            </div>
+          </div>
+          <div class="certif-card">
+            <div class="certif-icon">📋</div>
+            <div>
+              <h4 contenteditable="false">Process Communication Model</h4>
+              <p contenteditable="false">Lorem ipsum dolor sit amet consectetur.</p>
+            </div>
+          </div>
+          <div class="certif-card">
+            <div class="certif-icon">🧠</div>
+            <div>
+              <h4 contenteditable="false">Intelligence émotionnelle</h4>
+              <p contenteditable="false">Lorem ipsum dolor sit amet consectetur.</p>
+            </div>
+          </div>
+          <div class="certif-card">
+            <div class="certif-icon">🌐</div>
+            <div>
+              <h4 contenteditable="false">Master Coach RNCP</h4>
+              <p contenteditable="false">Lorem ipsum dolor sit amet consectetur.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEPARATOR: WAVE BLUE 2 -->
+<div class="sep" aria-hidden="true">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="waveBlue2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#0B1829"/>
+        <stop offset="50%" stop-color="#162A4A"/>
+        <stop offset="100%" stop-color="#0B1829"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,30 1440,40 L1440,80 L0,80 Z" fill="url(#waveBlue2)"/>
+    <path d="M0,60 C240,20 600,80 960,40 C1200,10 1380,60 1440,50 L1440,80 L0,80 Z" fill="#0F2040" opacity=".7"/>
+  </svg>
+</div>
+
+<!-- TEMOIGNAGES -->
+<section id="temoignages">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 3.5rem;" class="reveal">
+      <p class="section-label" contenteditable="false">Témoignages</p>
+      <h2 class="section-title" contenteditable="false">Ce que disent mes clients</h2>
+    </div>
+    <div class="temoignages-grid">
+      <article class="temoignage-card reveal">
+        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+        <blockquote contenteditable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</blockquote>
+        <div class="temoignage-author">
+          <div class="author-avatar img-wrap" onclick="replaceImage(this)" title="Changer l'avatar">M</div>
+          <div>
+            <div class="author-name" contenteditable="false">Marie D.</div>
+            <div class="author-role" contenteditable="false">Directrice, PME industrielle</div>
+          </div>
+        </div>
+      </article>
+      <article class="temoignage-card reveal">
+        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+        <blockquote contenteditable="false">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</blockquote>
+        <div class="temoignage-author">
+          <div class="author-avatar img-wrap" onclick="replaceImage(this)" title="Changer l'avatar">T</div>
+          <div>
+            <div class="author-name" contenteditable="false">Thomas R.</div>
+            <div class="author-role" contenteditable="false">Manager, équipe de 12 personnes</div>
+          </div>
+        </div>
+      </article>
+      <article class="temoignage-card reveal">
+        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+        <blockquote contenteditable="false">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur.</blockquote>
+        <div class="temoignage-author">
+          <div class="author-avatar img-wrap" onclick="replaceImage(this)" title="Changer l'avatar">S</div>
+          <div>
+            <div class="author-name" contenteditable="false">Sophie L.</div>
+            <div class="author-role" contenteditable="false">CEO, startup en hypercroissance</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- SEPARATOR: FLAMME INVERSE -->
+<div class="sep" aria-hidden="true">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="flamme2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#0F2040"/>
+        <stop offset="100%" stop-color="#0B1829" stop-opacity=".8"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,30 C200,70 400,10 600,50 C800,85 1000,20 1200,55 C1320,75 1400,35 1440,40 L1440,80 L0,80 Z" fill="url(#flamme2)"/>
+    <path d="M0,0 L1440,0 L1440,30 C1200,10 800,60 400,20 C200,5 100,40 0,25 Z" fill="#0F2040"/>
+  </svg>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 3.5rem;" class="reveal">
+      <p class="section-label" contenteditable="false">Contact</p>
+      <h2 class="section-title" contenteditable="false">Parlons de votre projet</h2>
+      <p class="section-lead" style="margin: 0 auto;" contenteditable="false">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Prenez un premier rendez-vous découverte gratuit et sans engagement.
+      </p>
+    </div>
+    <div class="contact-grid reveal">
+      <div>
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-item-icon">📍</div>
+            <div>
+              <h4>Localisation</h4>
+              <p contenteditable="false">Paris & Île-de-France<br/>Séances possibles en visioconférence</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📞</div>
+            <div>
+              <h4>Téléphone</h4>
+              <p><a href="tel:+33600000000" contenteditable="false">+33 6 00 00 00 00</a></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">✉️</div>
+            <div>
+              <h4>Email</h4>
+              <p><a href="mailto:contact@avcoach.fr" contenteditable="false">contact@avcoach.fr</a></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">🕐</div>
+            <div>
+              <h4>Disponibilités</h4>
+              <p contenteditable="false">Lundi – Vendredi : 9h – 19h<br/>Samedi sur rendez-vous</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form class="contact-form" onsubmit="handleSubmit(event)" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prenom">Prénom *</label>
+            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required />
+          </div>
+          <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input type="text" id="nom" name="nom" placeholder="Votre nom" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" placeholder="votre@email.fr" required />
+        </div>
+        <div class="form-group">
+          <label for="sujet">Sujet</label>
+          <select id="sujet" name="sujet">
+            <option value="">Choisir un sujet</option>
+            <option value="individuel">Coaching individuel</option>
+            <option value="collectif">Coaching collectif</option>
+            <option value="changement">Accompagnement du changement</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" placeholder="Décrivez votre besoin ou votre question..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Envoyer le message</button>
+        <div id="form-success" role="alert">✓ Merci ! Votre message a bien été envoyé. Je vous recontacte dans les 24h.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-logo">AV<span>Coach</span></div>
+    <ul class="footer-links">
+      <li><a href="#apropos">À propos</a></li>
+      <li><a href="#offres">Offres</a></li>
+      <li><a href="#parcours">Parcours</a></li>
+      <li><a href="#temoignages">Témoignages</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <p class="footer-copy" contenteditable="false">© 2025 AV Coach – Tous droits réservés</p>
+  </div>
+</footer>
+
+<!-- HIDDEN FILE INPUT FOR IMAGE REPLACEMENT -->
+<input type="file" id="img-file-input" accept="image/*" style="display:none" />
+
+<script>
+  // ---- SCROLL EFFECTS ----
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // ---- REVEAL ON SCROLL ----
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ---- MOBILE MENU ----
+  function toggleMenu() {
+    const links = document.querySelector('.nav-links');
+    links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'absolute';
+    links.style.top = '70px';
+    links.style.left = '0'; links.style.right = '0';
+    links.style.background = 'rgba(11,24,41,0.98)';
+    links.style.padding = '1.5rem 2rem';
+    links.style.gap = '1.5rem';
+    links.style.borderBottom = '1px solid rgba(255,255,255,0.08)';
+    links.style.backdropFilter = 'blur(10px)';
+  }
+
+  // ---- FORM ----
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+    setTimeout(() => {
+      e.target.reset();
+      document.getElementById('form-success').style.display = 'block';
+      btn.textContent = 'Envoyer le message'; btn.disabled = false;
+    }, 1200);
+  }
+
+  // ---- AUTH ----
+  // Pour changer les identifiants, modifiez les valeurs ci-dessous :
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'avcoach2025';
+  const SESSION_KEY = 'avcoach_admin_session';
+
+  function isLoggedIn() {
+    return sessionStorage.getItem(SESSION_KEY) === 'true';
+  }
+
+  function openLogin() {
+    document.getElementById('login-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('login-user').focus(), 50);
+  }
+
+  function closeLogin() {
+    document.getElementById('login-overlay').classList.remove('open');
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+  }
+
+  function doLogin() {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      closeLogin();
+      enterEdit();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }
+  }
+
+  document.getElementById('login-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('login-user').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('login-pass').focus();
+  });
+  document.getElementById('login-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('login-overlay')) closeLogin();
+  });
+
+  function logout() {
+    sessionStorage.removeItem(SESSION_KEY);
+    exitEdit();
+    document.getElementById('editToggle').textContent = '✎ Éditer';
+  }
+
+  // ---- EDIT MODE ----
+  let editMode = false;
+
+  function toggleEdit() {
+    if (!isLoggedIn()) { openLogin(); return; }
+    enterEdit();
+  }
+
+  function enterEdit() {
+    editMode = true;
+    document.body.classList.add('edit-mode');
+    document.getElementById('edit-bar').classList.add('visible');
+    document.getElementById('editToggle').textContent = '✕ Fermer';
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+    });
+    document.querySelector('nav').style.top = '44px';
+  }
+
+  function exitEdit() {
+    editMode = false;
+    document.body.classList.remove('edit-mode');
+    document.getElementById('edit-bar').classList.remove('visible');
+    document.getElementById('editToggle').textContent = '✎ Éditer';
+    document.querySelector('nav').style.top = '';
+  }
+
+  function saveContent() {
+    const data = {};
+    document.querySelectorAll('[contenteditable="true"]').forEach((el, i) => {
+      data['el_' + i] = el.innerHTML;
+    });
+    document.querySelectorAll('img[data-original]').forEach((img, i) => {
+      data['img_' + i] = img.src;
+    });
+    localStorage.setItem('avcoach_content', JSON.stringify(data));
+    const bar = document.getElementById('edit-bar');
+    const orig = bar.querySelector('span').textContent;
+    bar.querySelector('span').textContent = '✓ Contenu enregistré avec succès !';
+    setTimeout(() => { bar.querySelector('span').textContent = orig; }, 2500);
+  }
+
+  function loadContent() {
+    const raw = localStorage.getItem('avcoach_content');
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      document.querySelectorAll('[contenteditable]').forEach((el, i) => {
+        if (data['el_' + i] !== undefined) el.innerHTML = data['el_' + i];
+      });
+      document.querySelectorAll('img').forEach((img, i) => {
+        if (data['img_' + i]) img.src = data['img_' + i];
+      });
+    } catch(e) {}
+  }
+  loadContent();
+
+  // ---- IMAGE REPLACEMENT ----
+  let currentImgWrap = null;
+  const fileInput = document.getElementById('img-file-input');
+
+  function replaceImage(wrap) {
+    if (!editMode) return;
+    currentImgWrap = wrap;
+    fileInput.click();
+  }
+
+  fileInput.addEventListener('change', function() {
+    if (!this.files || !this.files[0] || !currentImgWrap) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      let img = currentImgWrap.querySelector('img');
+      if (!img) {
+        currentImgWrap.style.backgroundImage = `url(${e.target.result})`;
+        currentImgWrap.style.backgroundSize = 'cover';
+        currentImgWrap.style.backgroundPosition = 'center';
+        currentImgWrap.textContent = '';
+      } else {
+        img.src = e.target.result;
+        img.setAttribute('data-original', 'replaced');
+      }
+    };
+    reader.readAsDataURL(this.files[0]);
+    this.value = '';
+  });
+
+  // ---- SMOOTH ANCHOR ----
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const offset = editMode ? 44 + 70 : 70;
+        window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
+        const links = document.querySelector('.nav-links');
+        if (links) links.style.display = '';
+      }
+    });
+  });
+</script>
+</body>
+</html>
