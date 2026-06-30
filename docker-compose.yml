@@ -11,6 +11,7 @@ services:
       - .env
     environment:
       NODE_ENV: development
+    command: npm run dev
 
 volumes:
   sqlite-data:
