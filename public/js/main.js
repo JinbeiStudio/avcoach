@@ -1,3 +1,4 @@
+/* exported toggleMenu, toggleEdit, logout */
 // ── Navigation scroll ─────────────────────────────────────────────────────────
 const nav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => {
@@ -217,6 +218,9 @@ document.addEventListener('click', e => {
     dd.style.display = 'none';
   }
 });
+
+// ── Tracking visite ───────────────────────────────────────────────────────────
+fetch('/api/track', { method: 'POST' }).catch(() => {});
 
 // ── Auto-restore session ──────────────────────────────────────────────────────
 (async () => {

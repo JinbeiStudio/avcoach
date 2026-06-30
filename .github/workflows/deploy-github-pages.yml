@@ -1,4 +1,4 @@
-name: Build & Deploy to GitHub Pages
+name: Build site statique & Deploy to GitHub Pages
 
 on:
   push:
@@ -27,15 +27,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Build static site
-        run: node build.js
+        run: npm run build:static
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/
+          path: static/
 
       - name: Deploy to GitHub Pages
         id: deploy

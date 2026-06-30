@@ -1,3 +1,4 @@
+/* exported Editor */
 const Editor = (() => {
   let active = false;
   let currentImgWrap = null;
@@ -19,11 +20,11 @@ const Editor = (() => {
 
   async function saveInitialVersion() {
     const snapshot = {};
-    document.querySelectorAll('[contenteditable]').forEach((el, i) => {
-      snapshot['el_' + i] = el.innerHTML;
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+      if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
     });
-    document.querySelectorAll('img').forEach((img, i) => {
-      snapshot['img_' + i] = img.src;
+    document.querySelectorAll('img').forEach(img => {
+      if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.src;
     });
     await fetch('/api/content', {
       method: 'POST',
@@ -46,11 +47,11 @@ const Editor = (() => {
 
   async function save() {
     const snapshot = {};
-    document.querySelectorAll('[contenteditable]').forEach((el, i) => {
-      snapshot['el_' + i] = el.innerHTML;
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+      if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
     });
-    document.querySelectorAll('img').forEach((img, i) => {
-      if (img.dataset.replaced) snapshot['img_' + i] = img.src;
+    document.querySelectorAll('img').forEach(img => {
+      if (img.dataset.editId && img.dataset.replaced) snapshot['img_' + img.dataset.editId] = img.src;
     });
 
     try {
@@ -71,20 +72,15 @@ const Editor = (() => {
       const res = await fetch('/api/content/latest');
       const { snapshot } = await res.json();
       if (!snapshot) return;
-      document.querySelectorAll('[contenteditable]').forEach((el, i) => {
-        if (snapshot['el_' + i] !== undefined) el.innerHTML = snapshot['el_' + i];
+      document.querySelectorAll('[contenteditable]').forEach(el => {
+        const key = 'el_' + el.dataset.editId;
+        if (el.dataset.editId && snapshot[key] !== undefined) el.innerHTML = snapshot[key];
       });
-      document.querySelectorAll('img').forEach((img, i) => {
-        if (snapshot['img_' + i]) { img.src = snapshot['img_' + i]; img.dataset.replaced = '1'; }
+      document.querySelectorAll('img').forEach(img => {
+        const key = 'img_' + img.dataset.editId;
+        if (img.dataset.editId && snapshot[key]) { img.src = snapshot[key]; img.dataset.replaced = '1'; }
       });
     } catch {}
-  }
-
-  function showSaveConfirm() {
-    const span = document.querySelector('#edit-bar > span');
-    const orig = span.textContent;
-    span.textContent = '✓ Contenu sauvegardé avec succès !';
-    setTimeout(() => { span.textContent = orig; }, 2500);
   }
 
   async function toggleHistory() {
@@ -126,11 +122,13 @@ const Editor = (() => {
       const res = await fetch(`/api/content/${id}`, { headers: Auth.authHeaders() });
       const { snapshot } = await res.json();
       if (!snapshot) return;
-      document.querySelectorAll('[contenteditable]').forEach((el, i) => {
-        if (snapshot['el_' + i] !== undefined) el.innerHTML = snapshot['el_' + i];
+      document.querySelectorAll('[contenteditable]').forEach(el => {
+        const key = 'el_' + el.dataset.editId;
+        if (el.dataset.editId && snapshot[key] !== undefined) el.innerHTML = snapshot[key];
       });
-      document.querySelectorAll('img').forEach((img, i) => {
-        if (snapshot['img_' + i]) { img.src = snapshot['img_' + i]; img.dataset.replaced = '1'; }
+      document.querySelectorAll('img').forEach(img => {
+        const key = 'img_' + img.dataset.editId;
+        if (img.dataset.editId && snapshot[key]) { img.src = snapshot[key]; img.dataset.replaced = '1'; }
       });
       const span = document.querySelector('#edit-bar > span');
       const orig = span.textContent;
@@ -151,7 +149,7 @@ const Editor = (() => {
     if (!this.files?.[0] || !currentImgWrap) return;
     const reader = new FileReader();
     reader.onload = e => {
-      let img = currentImgWrap.querySelector('img');
+      const img = currentImgWrap.querySelector('img');
       if (img) {
         img.src = e.target.result;
         img.dataset.replaced = '1';
