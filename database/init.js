@@ -6,19 +6,6 @@ const { getDb } = require('./db');
 function initDatabase() {
   const db = getDb();
 
-  // Détecte si l'ancienne table existe (password NOT NULL) et migre si besoin
-  const tableInfo = db.prepare("PRAGMA table_info(users)").all();
-  const passwordCol = tableInfo.find(c => c.name === 'password');
-  const needsMigration = passwordCol && passwordCol.notnull === 1;
-
-  if (needsMigration) {
-    console.log('⚙️  Migration du schéma en cours…');
-    db.exec(`
-      DROP TABLE IF EXISTS content_saves;
-      DROP TABLE IF EXISTS users;
-    `);
-  }
-
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id                   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +25,11 @@ function initDatabase() {
       saved_at   TEXT NOT NULL DEFAULT (datetime('now')),
       snapshot   TEXT NOT NULL,
       is_base    INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS app_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT
     );
 
     CREATE TABLE IF NOT EXISTS page_views (
@@ -61,21 +53,6 @@ function initDatabase() {
       read       INTEGER NOT NULL DEFAULT 0
     );
   `);
-
-  // Migration : ajout des nouvelles colonnes si absentes
-  const userCols = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
-  if (!userCols.includes('email')) {
-    db.exec("ALTER TABLE users ADD COLUMN email TEXT NOT NULL DEFAULT ''");
-  }
-  if (!userCols.includes('welcome_email_sent')) {
-    db.exec("ALTER TABLE users ADD COLUMN welcome_email_sent INTEGER NOT NULL DEFAULT 0");
-  }
-
-  // Migration : ajout unique_count à page_views si absent
-  const pvCols = db.prepare("PRAGMA table_info(page_views)").all().map(c => c.name);
-  if (!pvCols.includes('unique_count')) {
-    db.exec("ALTER TABLE page_views ADD COLUMN unique_count INTEGER NOT NULL DEFAULT 0");
-  }
 
   // Seed des deux utilisateurs avec mot de passe temporaire aléatoire
   const users = [

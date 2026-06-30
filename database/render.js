@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const parse5 = require('parse5');
 
 const INDEX_PATH = process.env.INDEX_HTML_PATH || path.join(__dirname, '..', 'public', 'index.html');
@@ -15,6 +16,52 @@ function getAttr(node, name) {
   return (node.attrs || []).find(a => a.name === name);
 }
 
+function parseIndexHtml(html) {
+  const doc = parse5.parse(html, { sourceCodeLocationInfo: true });
+  const editableEls = [];
+  const imgEls = [];
+  walk(doc, node => {
+    if (!node.tagName) return;
+    if (getAttr(node, 'contenteditable')) editableEls.push(node);
+    if (node.tagName === 'img') imgEls.push(node);
+  });
+  return { editableEls, imgEls };
+}
+
+// Empreinte du fichier tel qu'il est actuellement sur disque — sert à
+// détecter qu'un déploiement a remplacé index.html (push) depuis la
+// dernière écriture connue du serveur.
+function hashIndexHtml() {
+  const html = fs.readFileSync(INDEX_PATH, 'utf8');
+  return crypto.createHash('sha256').update(html).digest('hex');
+}
+
+// Lit le contenu actuel de index.html et le transforme en snapshot
+// { el_<id>: innerHTML, img_<id>: src } — l'inverse de renderIndexHtml.
+// Utilisé pour capturer une nouvelle V0 quand un déploiement a pushé un
+// nouveau index.html (nouvelle structure et/ou nouveau contenu de base).
+function readIndexSnapshot() {
+  const html = fs.readFileSync(INDEX_PATH, 'utf8');
+  const { editableEls, imgEls } = parseIndexHtml(html);
+  const snapshot = {};
+
+  editableEls.forEach(node => {
+    const editId = getAttr(node, 'data-edit-id')?.value;
+    const loc = node.sourceCodeLocation;
+    if (!editId || !loc?.startTag || !loc?.endTag) return;
+    snapshot['el_' + editId] = html.slice(loc.startTag.endOffset, loc.endTag.startOffset);
+  });
+
+  imgEls.forEach(node => {
+    const editId = getAttr(node, 'data-edit-id')?.value;
+    const src = getAttr(node, 'src')?.value;
+    if (!editId || !src) return;
+    snapshot['img_' + editId] = src;
+  });
+
+  return snapshot;
+}
+
 // Réécrit index.html en remplaçant uniquement le contenu des éléments
 // [contenteditable] (el_<data-edit-id>) et les src des <img> (img_<data-edit-id>),
 // identifiés par un attribut stable plutôt que par position — pour rester
@@ -23,15 +70,7 @@ function getAttr(node, name) {
 // pour ne produire que des diffs minimaux.
 function renderIndexHtml(snapshot) {
   const html = fs.readFileSync(INDEX_PATH, 'utf8');
-  const doc = parse5.parse(html, { sourceCodeLocationInfo: true });
-
-  const editableEls = [];
-  const imgEls = [];
-  walk(doc, node => {
-    if (!node.tagName) return;
-    if (getAttr(node, 'contenteditable')) editableEls.push(node);
-    if (node.tagName === 'img') imgEls.push(node);
-  });
+  const { editableEls, imgEls } = parseIndexHtml(html);
 
   const replacements = [];
 
@@ -74,4 +113,4 @@ function renderIndexHtml(snapshot) {
   fs.writeFileSync(INDEX_PATH, out);
 }
 
-module.exports = { renderIndexHtml };
+module.exports = { renderIndexHtml, readIndexSnapshot, hashIndexHtml };

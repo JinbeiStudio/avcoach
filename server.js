@@ -9,7 +9,8 @@ const path     = require('path');
 const nodemailer       = require('nodemailer');
 const { getDb }        = require('./database/db');
 const { initDatabase } = require('./database/init');
-const { renderIndexHtml } = require('./database/render');
+const { renderIndexHtml, readIndexSnapshot, hashIndexHtml } = require('./database/render');
+const { getMeta, setMeta } = require('./database/meta');
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -239,6 +240,7 @@ app.post('/api/content', requireAuth, (req, res) => {
   `).run();
   try {
     renderIndexHtml(snapshot);
+    setMeta('last_rendered_hash', hashIndexHtml());
   } catch (e) {
     console.error('Échec régénération index.html :', e.message);
   }
@@ -405,16 +407,27 @@ if (newUsers.length > 0) {
 }
 
 if (require.main === module) {
-  // Régénère index.html à partir du dernier contenu sauvegardé (utile après un
-  // déploiement repartant d'un checkout git vierge — la base reste la source
-  // de vérité, le fichier HTML n'est qu'un cache régénérable).
+  // Détecte si index.html a changé depuis la dernière écriture connue du
+  // serveur (= un déploiement a pushé un nouveau fichier). Si oui, ce
+  // fichier devient la nouvelle référence : on efface l'historique
+  // d'édition (les positions/ids du contenu sauvegardé peuvent ne plus
+  // correspondre) et on recapture une V0 à partir de ce qui vient d'être
+  // pushé. Sinon (simple redémarrage), on ne touche à rien — le fichier
+  // est déjà dans l'état laissé par la dernière sauvegarde.
   try {
-    const latest = getDb()
-      .prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1')
-      .get();
-    if (latest) renderIndexHtml(JSON.parse(latest.snapshot));
+    const currentHash = hashIndexHtml();
+    const knownHash   = getMeta('last_rendered_hash');
+
+    if (knownHash !== undefined && knownHash !== currentHash) {
+      console.log('⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l\'historique éditorial.');
+      getDb().exec('DELETE FROM content_saves');
+      getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
+        .run(JSON.stringify(readIndexSnapshot()));
+    }
+
+    setMeta('last_rendered_hash', hashIndexHtml());
   } catch (e) {
-    console.error('Échec régénération index.html au démarrage :', e.message);
+    console.error('Échec de la synchronisation index.html au démarrage :', e.message);
   }
 
   app.listen(PORT, () => {
