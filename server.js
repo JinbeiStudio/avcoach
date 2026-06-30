@@ -10,6 +10,18 @@ const nodemailer       = require('nodemailer');
 const { getDb }        = require('./database/db');
 const { initDatabase } = require('./database/init');
 
+function createTransporter() {
+  return nodemailer.createTransport({
+    host:   process.env.SMTP_HOST   || 'smtp.mail.me.com',
+    port:   parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+}
+
 const app    = express();
 const PORT   = process.env.PORT || 3456;
 const SECRET = process.env.JWT_SECRET;
@@ -137,10 +149,7 @@ app.post('/api/users', requireAuth, async (req, res) => {
       .prepare("INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role) VALUES (?, ?, ?, 1, 0, ?)")
       .run(username, email, hash, userRole);
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.mail.me.com', port: 587, secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
+    const transporter = createTransporter();
     await transporter.sendMail({
       from: `"AV Coach" <${process.env.SMTP_USER}>`,
       to: email,
@@ -186,10 +195,7 @@ app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
 
   db.prepare('UPDATE users SET password = ?, must_set_password = 1 WHERE id = ?').run(hash, targetId);
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.me.com', port: 587, secure: false,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-  });
+  const transporter = createTransporter();
 
   try {
     await transporter.sendMail({
@@ -327,12 +333,7 @@ app.post('/api/contact', async (req, res) => {
     return res.status(400).json({ error: 'Tous les champs sont requis' });
   }
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.me.com',
-    port: 587,
-    secure: false,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-  });
+  const transporter = createTransporter();
 
   try {
     await transporter.sendMail({
@@ -381,10 +382,7 @@ const { newUsers } = initDatabase();
 
 // Envoi des emails de bienvenue pour les nouveaux utilisateurs
 if (newUsers.length > 0) {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.me.com', port: 587, secure: false,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-  });
+  const transporter = createTransporter();
   for (const { username, email, tempPassword, role } of newUsers) {
     transporter.sendMail({
       from: `"AV Coach" <${process.env.SMTP_USER}>`,
@@ -400,7 +398,11 @@ if (newUsers.length > 0) {
   }
 }
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);
-  console.log(`   Base de données : database/avcoach.sqlite\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);
+    console.log(`   Base de données : database/avcoach.sqlite\n`);
+  });
+}
+
+module.exports = app;
