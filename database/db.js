@@ -15,7 +15,7 @@ function getDb() {
 }
 
 function resetDb() {
-  if (db) { try { db.close(); } catch {} }
+  if (db) { try { db.close(); } catch (_e) {} }
   db = null;
 }
 

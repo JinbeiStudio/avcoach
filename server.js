@@ -383,7 +383,7 @@ const { newUsers } = initDatabase();
 // Envoi des emails de bienvenue pour les nouveaux utilisateurs
 if (newUsers.length > 0) {
   const transporter = createTransporter();
-  for (const { username, email, tempPassword, role } of newUsers) {
+  for (const { username, email, tempPassword } of newUsers) {
     transporter.sendMail({
       from: `"AV Coach" <${process.env.SMTP_USER}>`,
       to: email,

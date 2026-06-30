@@ -1,3 +1,4 @@
+/* exported Editor */
 const Editor = (() => {
   let active = false;
   let currentImgWrap = null;
@@ -80,13 +81,6 @@ const Editor = (() => {
     } catch {}
   }
 
-  function showSaveConfirm() {
-    const span = document.querySelector('#edit-bar > span');
-    const orig = span.textContent;
-    span.textContent = '✓ Contenu sauvegardé avec succès !';
-    setTimeout(() => { span.textContent = orig; }, 2500);
-  }
-
   async function toggleHistory() {
     const dropdown = document.getElementById('history-dropdown');
     if (dropdown.style.display === 'block') {
@@ -151,7 +145,7 @@ const Editor = (() => {
     if (!this.files?.[0] || !currentImgWrap) return;
     const reader = new FileReader();
     reader.onload = e => {
-      let img = currentImgWrap.querySelector('img');
+      const img = currentImgWrap.querySelector('img');
       if (img) {
         img.src = e.target.result;
         img.dataset.replaced = '1';

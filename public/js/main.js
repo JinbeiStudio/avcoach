@@ -1,3 +1,4 @@
+/* exported toggleMenu, toggleEdit, logout */
 // ── Navigation scroll ─────────────────────────────────────────────────────────
 const nav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => {

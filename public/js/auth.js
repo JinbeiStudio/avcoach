@@ -1,3 +1,4 @@
+/* exported Auth */
 const Auth = (() => {
   const TOKEN_KEY = 'avcoach_token';
 

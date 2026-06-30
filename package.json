@@ -8,11 +8,14 @@
     "dev": "node server.js",
     "build": "npm install --omit=dev",
     "build:static": "node build-static.js",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "lint": "eslint ."
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
     "testTimeout": 15000
   },
   "keywords": [],
@@ -28,6 +31,8 @@
     "nodemailer": "^9.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.39.4",
     "jest": "^30.4.2",
     "supertest": "^7.2.2"
   }

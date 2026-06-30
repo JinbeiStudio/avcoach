@@ -104,15 +104,6 @@ function initDatabase() {
   }
 
   return { newUsers };
-
-  // Ajoute is_base si la colonne n'existe pas encore (migration)
-  const cols = db.prepare("PRAGMA table_info(content_saves)").all();
-  if (!cols.find(c => c.name === 'is_base')) {
-    db.exec("ALTER TABLE content_saves ADD COLUMN is_base INTEGER NOT NULL DEFAULT 0");
-    console.log('✓ Colonne is_base ajoutée à content_saves');
-  }
-
-  console.log('✓ Base de données prête');
 }
 
 module.exports = { initDatabase };
