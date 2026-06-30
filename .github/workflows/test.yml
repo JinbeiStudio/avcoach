@@ -25,3 +25,6 @@ jobs:
         env:
           JWT_SECRET: ci-test-secret-key
           NODE_ENV: test
+
+      - name: Check static build
+        run: npm run build:static
