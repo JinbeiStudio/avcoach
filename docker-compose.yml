@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3456:3456"
+    volumes:
+      - .:/app
+      - /app/node_modules        # node_modules du conteneur, pas du host
+      - sqlite-data:/app/database
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+
+volumes:
+  sqlite-data:
