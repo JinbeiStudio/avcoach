@@ -218,6 +218,9 @@ document.addEventListener('click', e => {
   }
 });
 
+// ── Tracking visite ───────────────────────────────────────────────────────────
+fetch('/api/track', { method: 'POST' }).catch(() => {});
+
 // ── Auto-restore session ──────────────────────────────────────────────────────
 (async () => {
   const user = await Auth.verify();

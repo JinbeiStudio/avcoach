@@ -35,7 +35,7 @@
 </head>
 <body>
 
-<!-- LOGIN MODAL -->
+<!-- [DYNAMIC:START] login modal -->
 <div id="login-overlay" role="dialog" aria-modal="true" aria-label="Connexion administrateur">
   <div id="login-box">
     <button id="login-close" onclick="closeLogin()" aria-label="Fermer">✕</button>
@@ -77,8 +77,9 @@
     </div>
   </div>
 </div>
+<!-- [DYNAMIC:END] -->
 
-<!-- EDIT BAR -->
+<!-- [DYNAMIC:START] edit bar -->
 <div id="edit-bar" role="toolbar" aria-label="Barre d'édition">
   <span>✎ Mode édition — cliquez sur un texte ou une image pour modifier</span>
   <div class="edit-bar-actions">
@@ -90,6 +91,7 @@
     <button class="btn-cancel" onclick="Editor.exit()">✕ Quitter</button>
   </div>
 </div>
+<!-- [DYNAMIC:END] -->
 
 <!-- NAVIGATION -->
 <nav id="main-nav">
@@ -103,15 +105,19 @@
       <li><a href="#parcours">Parcours</a></li>
       <li><a href="#temoignages">Témoignages</a></li>
       <li><a href="#contact" class="nav-cta">Contact</a></li>
+      <!-- [DYNAMIC:START] nav mobile connexion -->
       <li class="nav-links-connexion">
         <button class="nav-edit-btn" id="editToggleMobile" onclick="toggleEdit()">Connexion</button>
         <button class="nav-edit-btn nav-logout-btn" id="logoutBtnMobile" onclick="logout()" style="display:none">⎋ Déconnexion</button>
       </li>
+      <!-- [DYNAMIC:END] -->
     </ul>
+    <!-- [DYNAMIC:START] nav desktop connexion -->
     <div class="nav-actions-desktop">
       <button class="nav-edit-btn nav-edit-btn--desktop" id="editToggle" onclick="toggleEdit()">Connexion</button>
       <button class="nav-edit-btn nav-edit-btn--desktop nav-logout-btn" id="logoutBtn" onclick="logout()" style="display:none">⎋ Déconnexion</button>
     </div>
+    <!-- [DYNAMIC:END] -->
     <div class="hamburger" onclick="toggleMenu()" aria-label="Menu" role="button" tabindex="0">
       <span></span><span></span><span></span>
     </div>
@@ -434,10 +440,12 @@
   </div>
 </footer>
 
+<!-- [DYNAMIC:START] input file image + scripts auth/editor -->
 <input type="file" id="img-file-input" accept="image/*" style="display:none" />
 
 <script src="/js/auth.js"></script>
 <script src="/js/editor.js"></script>
+<!-- [DYNAMIC:END] -->
 <script src="/js/main.js"></script>
 </body>
 </html>

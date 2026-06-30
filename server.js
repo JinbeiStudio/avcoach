@@ -45,8 +45,11 @@ app.post('/api/login', (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
   if (!user) return res.status(401).json({ error: 'Identifiant inconnu' });
 
-  // Première connexion : aucun mot de passe défini
-  if (user.must_set_password || !user.password) {
+  // Première connexion : valider le mot de passe temporaire puis demander le définitif
+  if (user.must_set_password) {
+    if (!password || !user.password || !bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ error: 'Identifiant ou mot de passe temporaire incorrect' });
+    }
     return res.json({ firstLogin: true, username: user.username });
   }
 
@@ -115,21 +118,41 @@ app.get('/api/users', requireAuth, (req, res) => {
   res.json(users);
 });
 
-// POST /api/users  (créer un utilisateur admin)
-app.post('/api/users', requireAuth, (req, res) => {
+// POST /api/users  (créer un utilisateur — admin seulement)
+app.post('/api/users', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const { username, password } = req.body;
-  if (!username || !password || password.length < 8) {
-    return res.status(400).json({ error: 'Identifiant et mot de passe (≥ 8 car.) requis' });
+  const { username, email, role } = req.body;
+  if (!username || !email) {
+    return res.status(400).json({ error: 'Identifiant et email requis' });
   }
+  const validRoles = ['admin', 'editor'];
+  const userRole = validRoles.includes(role) ? role : 'editor';
+
+  const crypto = require('crypto');
+  const tempPassword = crypto.randomBytes(6).toString('base64url');
+  const hash = bcrypt.hashSync(tempPassword, 12);
+
   try {
-    const hash = bcrypt.hashSync(password, 12);
     const result = getDb()
-      .prepare("INSERT INTO users (username, password) VALUES (?, ?)")
-      .run(username, hash);
-    res.status(201).json({ id: result.lastInsertRowid, username });
+      .prepare("INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role) VALUES (?, ?, ?, 1, 0, ?)")
+      .run(username, email, hash, userRole);
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.mail.me.com', port: 587, secure: false,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+    await transporter.sendMail({
+      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Bienvenue sur AVCoach — vos identifiants`,
+      text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.`,
+      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
+    });
+
+    res.status(201).json({ id: result.lastInsertRowid, username, role: userRole });
   } catch (e) {
-    if (e.message.includes('UNIQUE')) return res.status(409).json({ error: 'Identifiant déjà utilisé' });
+    if (e.message?.includes('UNIQUE')) return res.status(409).json({ error: 'Identifiant déjà utilisé' });
+    console.error('Erreur création utilisateur :', e.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
@@ -147,6 +170,40 @@ app.put('/api/users/:id/password', requireAuth, (req, res) => {
   const hash = bcrypt.hashSync(password, 12);
   getDb().prepare('UPDATE users SET password = ? WHERE id = ?').run(hash, targetId);
   res.json({ message: 'Mot de passe mis à jour' });
+});
+
+// POST /api/users/:id/reset-password  (admin — réinitialise avec un mot de passe temporaire)
+app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+  const targetId = parseInt(req.params.id);
+  const db   = getDb();
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(targetId);
+  if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+
+  const crypto     = require('crypto');
+  const tempPassword = crypto.randomBytes(6).toString('base64url');
+  const hash       = bcrypt.hashSync(tempPassword, 12);
+
+  db.prepare('UPDATE users SET password = ?, must_set_password = 1 WHERE id = ?').run(hash, targetId);
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.mail.me.com', port: 587, secure: false,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  });
+
+  try {
+    await transporter.sendMail({
+      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      to: user.email,
+      subject: `AVCoach — Réinitialisation de votre mot de passe`,
+      text: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nIdentifiant : ${user.username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous et définissez un nouveau mot de passe définitif.`,
+      html: `<p>Bonjour,</p><p>Votre mot de passe AVCoach a été réinitialisé.</p><table><tr><td><strong>Identifiant</strong></td><td>${user.username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous et définissez un nouveau mot de passe définitif.</p>`
+    });
+    res.json({ message: 'Mot de passe réinitialisé et email envoyé' });
+  } catch (err) {
+    console.error('Échec envoi email reset :', err.message);
+    res.status(500).json({ error: 'Mot de passe réinitialisé mais échec envoi email' });
+  }
 });
 
 // DELETE /api/users/:id
@@ -220,6 +277,49 @@ app.get('/api/content/:id', requireAuth, (req, res) => {
   res.json({ snapshot: JSON.parse(row.snapshot), saved_at: row.saved_at });
 });
 
+// POST /api/track  (enregistre une visite — public)
+app.post('/api/track', (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const ip    = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+  const db    = getDb();
+
+  const isNew = db.prepare(
+    'INSERT OR IGNORE INTO visitor_ips (date, ip) VALUES (?, ?)'
+  ).run(today, ip).changes > 0;
+
+  db.prepare(`
+    INSERT INTO page_views (date, count, unique_count) VALUES (?, 1, ?)
+    ON CONFLICT(date) DO UPDATE SET
+      count        = count + 1,
+      unique_count = unique_count + ?
+  `).run(today, isNew ? 1 : 0, isNew ? 1 : 0);
+
+  res.json({ ok: true });
+});
+
+// GET /api/stats  (admin seulement)
+app.get('/api/stats', requireAuth, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+  const db    = getDb();
+  const today = new Date().toISOString().slice(0, 10);
+  const totals  = db.prepare('SELECT SUM(count) as t, SUM(unique_count) as u FROM page_views').get();
+  const todayRow = db.prepare('SELECT count, unique_count FROM page_views WHERE date = ?').get(today);
+  const last30  = db.prepare(`
+    SELECT date, count, unique_count FROM page_views
+    WHERE date >= date('now', '-29 days')
+    ORDER BY date ASC
+  `).all();
+  const messages = db.prepare('SELECT COUNT(*) as n FROM contact_messages').get()?.n || 0;
+  res.json({
+    total:        totals?.t || 0,
+    totalUnique:  totals?.u || 0,
+    today:        todayRow?.count || 0,
+    todayUnique:  todayRow?.unique_count || 0,
+    last30,
+    messages
+  });
+});
+
 // POST /api/contact
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
@@ -277,7 +377,28 @@ app.delete('/api/messages/:id', requireAuth, (req, res) => {
 
 // ── Démarrage ────────────────────────────────────────────────────────────────
 
-initDatabase();
+const { newUsers } = initDatabase();
+
+// Envoi des emails de bienvenue pour les nouveaux utilisateurs
+if (newUsers.length > 0) {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.mail.me.com', port: 587, secure: false,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  });
+  for (const { username, email, tempPassword, role } of newUsers) {
+    transporter.sendMail({
+      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Bienvenue sur AVCoach — vos identifiants`,
+      text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.\n\nCe mot de passe temporaire ne sera plus valable une fois changé.`,
+      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
+    }).then(() => {
+      console.log(`✓ Email de bienvenue envoyé à ${email} (${username})`);
+    }).catch(err => {
+      console.error(`✗ Échec envoi email ${username} :`, err.message);
+    });
+  }
+}
 
 app.listen(PORT, () => {
   console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "node build.js"
+    "build": "npm install --omit=dev",
+    "build:static": "node build-static.js"
   },
   "keywords": [],
   "author": "",

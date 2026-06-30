@@ -162,18 +162,60 @@
   </header>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('messages')">
+    <button class="tab active" onclick="switchTab('stats')">Statistiques</button>
+    <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
+    <button class="tab" onclick="switchTab('messages')">
       Messages <span id="unread-badge" class="tab-badge" style="display:none"></span>
     </button>
-    <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
+    <button class="tab" onclick="switchTab('users')">Utilisateurs</button>
   </div>
 
   <main>
     <!-- Panel messages -->
-    <div id="panel-messages" class="panel active">
+    <div id="panel-messages" class="panel">
       <div class="loading-state" id="msg-loading">Chargement…</div>
       <div id="message-list"></div>
       <div class="empty-state" id="msg-empty" style="display:none">Aucun message pour l'instant.</div>
+    </div>
+
+    <!-- Panel statistiques -->
+    <div id="panel-stats" class="panel active">
+      <div class="loading-state" id="stats-loading">Chargement…</div>
+      <div id="stats-content" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem">
+          <div class="card" style="text-align:center">
+            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-total">—</div>
+            <div style="color:var(--text-muted);font-size:.8rem;margin-top:.25rem">Pages vues total</div>
+            <div style="font-size:1rem;font-weight:600;color:var(--text-light);margin-top:.5rem" id="stat-total-unique">—</div>
+            <div style="color:var(--text-muted);font-size:.75rem">visiteurs uniques</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-today">—</div>
+            <div style="color:var(--text-muted);font-size:.8rem;margin-top:.25rem">Pages vues aujourd'hui</div>
+            <div style="font-size:1rem;font-weight:600;color:var(--text-light);margin-top:.5rem" id="stat-today-unique">—</div>
+            <div style="color:var(--text-muted);font-size:.75rem">visiteurs uniques</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-messages">—</div>
+            <div style="color:var(--text-muted);font-size:.85rem;margin-top:.25rem">Messages reçus</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:.85rem;font-weight:600;margin-bottom:1rem">Visiteurs — 30 derniers jours</div>
+          <div style="display:flex;gap:.5rem;margin-bottom:.75rem">
+    <button id="chart-btn-unique" onclick="renderChart('unique')"
+      style="font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer">
+      Uniques
+    </button>
+    <button id="chart-btn-all" onclick="renderChart('all')"
+      style="font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer">
+      Pages vues
+    </button>
+  </div>
+  <div id="chart" style="display:flex;align-items:flex-end;gap:3px;height:150px;overflow:visible"></div>
+          <div id="chart-labels" style="display:flex;gap:3px;margin-top:.35rem"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Panel historique éditions -->
@@ -181,6 +223,44 @@
       <div class="loading-state" id="hist-loading">Chargement…</div>
       <div id="version-list"></div>
       <div class="empty-state" id="hist-empty" style="display:none">Aucune version sauvegardée.</div>
+    </div>
+
+    <!-- Panel utilisateurs -->
+    <div id="panel-users" class="panel">
+      <!-- Formulaire de création -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:1rem">Créer un utilisateur</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;align-items:end">
+          <div>
+            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Identifiant</label>
+            <input id="new-username" type="text" placeholder="prenom.nom"
+              style="width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem">
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Email</label>
+            <input id="new-email" type="email" placeholder="email@example.com"
+              style="width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem">
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Rôle</label>
+            <select id="new-role"
+              style="padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem;cursor:pointer">
+              <option value="editor">Editor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:.75rem;display:flex;align-items:center;gap:1rem">
+          <button class="btn-sm" id="btn-create-user" onclick="createUser()"
+            style="background:var(--orange);color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer">
+            + Créer et envoyer l'invitation
+          </button>
+          <span id="create-user-msg" style="font-size:.8rem;display:none"></span>
+        </div>
+      </div>
+
+      <div class="loading-state" id="users-loading">Chargement…</div>
+      <div id="users-list"></div>
     </div>
   </main>
 </div>
@@ -203,7 +283,7 @@ async function doLogin() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur');
     if (data.firstLogin) { errEl.textContent = 'Définissez d\'abord votre mot de passe sur le site principal.'; errEl.style.display = 'block'; return; }
-    if (data.user.role !== 'admin') { errEl.textContent = 'Accès réservé aux administrateurs.'; errEl.style.display = 'block'; return; }
+    if (data.user.role !== 'admin' && data.user.role !== 'editor') { errEl.textContent = 'Accès non autorisé.'; errEl.style.display = 'block'; return; }
     token = data.token;
     localStorage.setItem('avcoach_token', token);
     showApp(data.user);
@@ -224,15 +304,27 @@ function showApp(user) {
   document.getElementById('auth-gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-label').textContent = user?.username || '';
+
+  // Masquer l'onglet Utilisateurs pour les editors
+  if (user.role !== 'admin') {
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.textContent.trim() === 'Utilisateurs') t.style.display = 'none';
+    });
+  }
+
   loadMessages();
   loadHistory();
+  loadStats();
+  if (user.role === 'admin') loadUsers();
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['messages','history'][i] === name));
-  document.getElementById('panel-messages').classList.toggle('active', name === 'messages');
-  document.getElementById('panel-history').classList.toggle('active', name === 'history');
+  const names = ['stats', 'history', 'messages', 'users'];
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
+  ['messages','history','users','stats'].forEach(p =>
+    document.getElementById('panel-' + p).classList.toggle('active', p === name)
+  );
 }
 
 // ── Messages ─────────────────────────────────────────────────────────────────
@@ -393,6 +485,142 @@ function wordDiff(before, after) {
   return { before: beforeHtml, after: afterHtml };
 }
 
+// ── Statistiques ─────────────────────────────────────────────────────────────
+async function loadStats() {
+  const res  = await fetch('/api/stats', { headers: { Authorization: 'Bearer ' + token } });
+  const data = await res.json();
+  document.getElementById('stats-loading').style.display = 'none';
+  document.getElementById('stats-content').style.display = 'block';
+
+  document.getElementById('stat-total').textContent        = data.total;
+  document.getElementById('stat-total-unique').textContent  = data.totalUnique;
+  document.getElementById('stat-today').textContent         = data.today;
+  document.getElementById('stat-today-unique').textContent  = data.todayUnique;
+  document.getElementById('stat-messages').textContent      = data.messages;
+
+  // Barchart 30 jours
+  let _chartDays = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const found = data.last30.find(r => r.date === key);
+    _chartDays.push({ date: key, count: found?.count || 0, unique: found?.unique_count || 0 });
+  }
+  window._chartDays = _chartDays;
+
+  function renderChart(mode) {
+    const days   = window._chartDays;
+    const key    = mode === 'unique' ? 'unique' : 'count';
+    const label  = mode === 'unique' ? 'visiteur unique' : 'page vue';
+    const max    = Math.max(...days.map(d => d[key]), 1);
+    document.getElementById('chart').innerHTML = days.map(d => {
+      const h = Math.max(4, Math.round((d[key] / max) * 120));
+      const showVal = d[key] > 0;
+      return `<div title="${d.date} : ${d[key]} ${label}${d[key] > 1 ? 's' : ''}"
+        style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:default">
+        ${showVal ? `<span style="font-size:.65rem;font-weight:600;color:var(--text-light);margin-bottom:3px;line-height:1">${d[key]}</span>` : ''}
+        <div style="width:100%;height:${h}px;background:var(--orange);border-radius:3px 3px 0 0;opacity:${d[key] ? 1 : 0.15}"></div>
+      </div>`;
+    }).join('');
+    document.getElementById('chart-labels').innerHTML = days.map(d => {
+      const day = d.date.slice(8);
+      return `<div style="flex:1;font-size:.6rem;color:var(--text-muted);text-align:center">${day === '01' || day === '15' ? d.date.slice(5) : ''}</div>`;
+    }).join('');
+    document.getElementById('chart-btn-unique').style.cssText = mode === 'unique'
+      ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
+      : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
+    document.getElementById('chart-btn-all').style.cssText = mode === 'all'
+      ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
+      : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
+  }
+  window.renderChart = renderChart;
+  renderChart('unique');
+}
+
+// ── Utilisateurs ─────────────────────────────────────────────────────────────
+async function createUser() {
+  const username = document.getElementById('new-username').value.trim();
+  const email    = document.getElementById('new-email').value.trim();
+  const role     = document.getElementById('new-role').value;
+  const msg      = document.getElementById('create-user-msg');
+  const btn      = document.getElementById('btn-create-user');
+
+  if (!username || !email) {
+    msg.textContent = 'Identifiant et email requis.';
+    msg.style.color = 'var(--red)'; msg.style.display = 'inline';
+    return;
+  }
+
+  btn.textContent = 'Création…'; btn.disabled = true;
+  msg.style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ username, email, role })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    msg.textContent = `✓ Invitation envoyée à ${email}`;
+    msg.style.color = 'var(--green)'; msg.style.display = 'inline';
+    document.getElementById('new-username').value = '';
+    document.getElementById('new-email').value    = '';
+    loadUsers();
+  } catch (err) {
+    msg.textContent = 'Erreur : ' + err.message;
+    msg.style.color = 'var(--red)'; msg.style.display = 'inline';
+  } finally {
+    btn.textContent = '+ Créer et envoyer l\'invitation'; btn.disabled = false;
+  }
+}
+
+async function loadUsers() {
+  const res   = await fetch('/api/users', { headers: { Authorization: 'Bearer ' + token } });
+  const users = await res.json();
+  document.getElementById('users-loading').style.display = 'none';
+
+  document.getElementById('users-list').innerHTML = users.map(u => `
+    <div class="card" id="user-${u.id}">
+      <div class="card-meta">
+        <span class="card-name">${esc(u.username)}</span>
+        <span style="font-size:.8rem;padding:.15rem .6rem;border-radius:20px;background:rgba(255,255,255,0.08);color:var(--text-muted)">${u.role}</span>
+        <span class="card-date">Dernière connexion : ${u.last_login ? fmtDate(u.last_login) : '—'}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm btn-danger" onclick="resetPassword(${u.id}, '${esc(u.username)}')">
+          ↺ Réinitialiser le mot de passe
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function resetPassword(id, username) {
+  if (!confirm(`Réinitialiser le mot de passe de ${username} ?\n\nUn mot de passe temporaire sera envoyé par email.`)) return;
+  const btn = document.querySelector(`#user-${id} .btn-danger`);
+  btn.textContent = 'Envoi…'; btn.disabled = true;
+  try {
+    const res = await fetch(`/api/users/${id}/reset-password`, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    btn.textContent = '✓ Email envoyé';
+    btn.style.background = 'rgba(74,222,128,0.1)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = '↺ Réinitialiser le mot de passe';
+      btn.style = ''; btn.disabled = false;
+    }, 3000);
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    btn.textContent = '↺ Réinitialiser le mot de passe'; btn.disabled = false;
+  }
+}
+
 // ── Utilitaires ───────────────────────────────────────────────────────────────
 function stripTags(html) {
   const d = document.createElement('div');
@@ -419,7 +647,7 @@ if (token) {
   fetch('/api/verify', { headers: { Authorization: 'Bearer ' + token } })
     .then(r => r.json())
     .then(d => {
-      if (d.valid && d.user.role === 'admin') showApp(d.user);
+      if (d.valid && (d.user.role === 'admin' || d.user.role === 'editor')) showApp(d.user);
       else { localStorage.removeItem('avcoach_token'); token = null; }
     })
     .catch(() => {});
