@@ -9,6 +9,9 @@ const fs   = require('fs');
 // ── Environnement de test (avant tout require) ────────────────────────────────
 const DB_FILE = path.join(os.tmpdir(), `avcoach-test-${process.pid}.sqlite`);
 process.env.DATABASE_PATH = DB_FILE;
+const INDEX_HTML_FILE = path.join(os.tmpdir(), `avcoach-test-${process.pid}-index.html`);
+fs.copyFileSync(path.join(__dirname, '..', 'public', 'index.html'), INDEX_HTML_FILE);
+process.env.INDEX_HTML_PATH = INDEX_HTML_FILE;
 process.env.JWT_SECRET    = 'test-secret-key-ci';
 process.env.JWT_EXPIRES_IN = '1h';
 process.env.SMTP_HOST     = 'localhost';
@@ -67,6 +70,7 @@ afterAll(() => {
   for (const ext of ['', '-shm', '-wal']) {
     try { fs.unlinkSync(DB_FILE + ext); } catch {}
   }
+  try { fs.unlinkSync(INDEX_HTML_FILE); } catch {}
 });
 
 // ── Auth ──────────────────────────────────────────────────────────────────────

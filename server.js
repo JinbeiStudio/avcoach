@@ -9,6 +9,7 @@ const path     = require('path');
 const nodemailer       = require('nodemailer');
 const { getDb }        = require('./database/db');
 const { initDatabase } = require('./database/init');
+const { renderIndexHtml } = require('./database/render');
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -236,6 +237,11 @@ app.post('/api/content', requireAuth, (req, res) => {
       SELECT id FROM content_saves WHERE is_base = 0 ORDER BY id DESC LIMIT 5
     )
   `).run();
+  try {
+    renderIndexHtml(snapshot);
+  } catch (e) {
+    console.error('Échec régénération index.html :', e.message);
+  }
   res.json({ message: 'Contenu sauvegardé' });
 });
 
@@ -399,6 +405,18 @@ if (newUsers.length > 0) {
 }
 
 if (require.main === module) {
+  // Régénère index.html à partir du dernier contenu sauvegardé (utile après un
+  // déploiement repartant d'un checkout git vierge — la base reste la source
+  // de vérité, le fichier HTML n'est qu'un cache régénérable).
+  try {
+    const latest = getDb()
+      .prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1')
+      .get();
+    if (latest) renderIndexHtml(JSON.parse(latest.snapshot));
+  } catch (e) {
+    console.error('Échec régénération index.html au démarrage :', e.message);
+  }
+
   app.listen(PORT, () => {
     console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);
     console.log(`   Base de données : database/avcoach.sqlite\n`);

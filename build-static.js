@@ -32,6 +32,7 @@ function transformHtml(html) {
 
   // Supprime les attributs d'édition
   html = html.replace(/ contenteditable="false"/g, '');
+  html = html.replace(/ data-edit-id="[^"]*"/g, '');
   html = html.replace(/ onclick="replaceImage\(this\)"/g, '');
   html = html.replace(/ title="Cliquer pour changer l'image"/g, '');
 
