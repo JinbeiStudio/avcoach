@@ -1,7 +1,0 @@
-node_modules
-static
-database/*.sqlite
-database/*.sqlite-shm
-database/*.sqlite-wal
-.env
-.git
