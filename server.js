@@ -286,14 +286,6 @@ app.get('/api/content/base', requireAuth, (req, res) => {
   res.json({ exists: !!row });
 });
 
-// GET /api/content/history  (5 dernières éditions hors V0 — pour la barre d'édition)
-app.get('/api/content/history', requireAuth, (req, res) => {
-  const rows = getDb()
-    .prepare('SELECT id, saved_at FROM content_saves WHERE is_base = 0 ORDER BY id DESC LIMIT 5')
-    .all();
-  res.json(rows);
-});
-
 // GET /api/content/history/full  (toutes les versions avec auteur — pour admin)
 app.get('/api/content/history/full', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
@@ -308,13 +300,6 @@ app.get('/api/content/history/full', requireAuth, (req, res) => {
     )
     .all();
   res.json(rows.map((r) => ({ ...r, snapshot: JSON.parse(r.snapshot) })));
-});
-
-// GET /api/content/:id  (récupérer une version spécifique)
-app.get('/api/content/:id', requireAuth, (req, res) => {
-  const row = getDb().prepare('SELECT snapshot, saved_at FROM content_saves WHERE id = ?').get(req.params.id);
-  if (!row) return res.status(404).json({ error: 'Version introuvable' });
-  res.json({ snapshot: JSON.parse(row.snapshot), saved_at: row.saved_at });
 });
 
 // POST /api/track  (enregistre une visite — public)
