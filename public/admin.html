@@ -124,6 +124,10 @@
     .diff-content.active { display: block; }
 
     .diff-block { margin-bottom: .75rem; }
+    .diff-id {
+      display: inline-block; font-size: .7rem; font-family: monospace; color: var(--orange);
+      background: rgba(232,117,32,0.1); border-radius: 4px; padding: .1rem .5rem; margin-bottom: .4rem;
+    }
     .diff-label { font-size: .75rem; color: var(--text-muted); margin-bottom: .3rem; text-transform: uppercase; letter-spacing: .05em; }
     .diff-text {
       background: var(--navy-light); border-radius: 8px; padding: .75rem 1rem;
@@ -220,6 +224,11 @@
 
     <!-- Panel historique éditions -->
     <div id="panel-history" class="panel">
+      <div id="export-index-wrap" style="display:none;justify-content:flex-end;margin-bottom:1rem">
+        <a class="btn-sm btn-neutral" href="/index.html" download="index.html" style="text-decoration:none">
+          📥 Exporter index.html
+        </a>
+      </div>
       <div class="loading-state" id="hist-loading">Chargement…</div>
       <div id="version-list"></div>
       <div class="empty-state" id="hist-empty" style="display:none">Aucune version sauvegardée.</div>
@@ -305,12 +314,11 @@ function showApp(user) {
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-label').textContent = user?.username || '';
 
-  // Masquer l'onglet Utilisateurs pour les editors
-  if (user.role !== 'admin') {
-    document.querySelectorAll('.tab').forEach(t => {
-      if (t.textContent.trim() === 'Utilisateurs') t.style.display = 'none';
-    });
-  }
+  // Masquer l'onglet Utilisateurs et l'export pour les editors
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.trim() === 'Utilisateurs') t.style.display = user.role === 'admin' ? '' : 'none';
+  });
+  document.getElementById('export-index-wrap').style.display = user.role === 'admin' ? 'flex' : 'none';
 
   loadMessages();
   loadHistory();
@@ -391,7 +399,7 @@ async function loadHistory() {
         <span class="version-badge">${label}</span>
         <div class="version-info">
           <div class="version-date">${fmtDate(v.saved_at)}</div>
-          <div class="version-author">par ${esc(v.username || '—')}</div>
+          <div class="version-author">par ${esc(v.username || (v.is_base ? 'Déploiement' : '—'))}</div>
         </div>
         <button class="btn-sm btn-primary" style="margin-left:auto;margin-right:.75rem;flex-shrink:0"
           onclick="event.stopPropagation();restoreVersion(${v.id},'${label}')">↩ Restaurer</button>
@@ -432,7 +440,7 @@ function renderVersionBody(v, prev, label) {
     // V1 : juste le contenu
     return `<div class="diff-label">Contenu de base (${label})</div>` +
       texts.map(({ key, text }) =>
-        text.trim() ? `<div class="diff-block"><div class="diff-text">${esc(text)}</div></div>` : ''
+        text.trim() ? `<div class="diff-block"><div class="diff-id">${esc(idOf(key))}</div><div class="diff-text">${esc(text)}</div></div>` : ''
       ).filter(Boolean).join('');
   }
 
@@ -445,12 +453,18 @@ function renderVersionBody(v, prev, label) {
   return `<div class="diff-label">${changed.length} bloc${changed.length > 1 ? 's' : ''} modifié${changed.length > 1 ? 's' : ''}</div>` +
     changed.map(d => `
       <div class="diff-block">
+        <div class="diff-id">${esc(idOf(d.key))}</div>
         <div class="diff-label" style="margin-bottom:.2rem">Avant</div>
         <div class="diff-text">${wordDiff(d.before, d.after).before}</div>
         <div class="diff-label" style="margin:.4rem 0 .2rem">Après</div>
         <div class="diff-text">${wordDiff(d.before, d.after).after}</div>
       </div>`
     ).join('');
+}
+
+// el_hero-tag → hero-tag (identifiant data-edit-id lisible)
+function idOf(key) {
+  return key.replace(/^el_/, '');
 }
 
 function extractTexts(snapshot) {
@@ -460,9 +474,9 @@ function extractTexts(snapshot) {
 }
 
 function buildDiffs(current, previous) {
-  return current.map((c, i) => {
-    const p = previous[i];
-    const before = p ? p.text : '';
+  const prevByKey = new Map(previous.map(p => [p.key, p.text]));
+  return current.map(c => {
+    const before = prevByKey.get(c.key) ?? '';
     const after  = c.text;
     return { key: c.key, before, after, changed: before.trim() !== after.trim() };
   });

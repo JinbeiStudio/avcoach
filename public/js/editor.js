@@ -2,7 +2,19 @@
 const Editor = (() => {
   let active = false;
   let currentImgWrap = null;
+  let baseline = {};
   const fileInput = document.getElementById('img-file-input');
+
+  function captureSnapshot() {
+    const snapshot = {};
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+      if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
+    });
+    document.querySelectorAll('img').forEach(img => {
+      if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.src;
+    });
+    return snapshot;
+  }
 
   async function enter() {
     active = true;
@@ -15,21 +27,16 @@ const Editor = (() => {
     const check = await fetch('/api/content/base', { headers: Auth.authHeaders() });
     const { exists } = await check.json();
     if (!exists) await saveInitialVersion();
-    loadContent();
+    await loadContent();
+    // Référence pour ne détecter/envoyer que les champs réellement modifiés
+    baseline = captureSnapshot();
   }
 
   async function saveInitialVersion() {
-    const snapshot = {};
-    document.querySelectorAll('[contenteditable]').forEach(el => {
-      if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
-    });
-    document.querySelectorAll('img').forEach(img => {
-      if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.src;
-    });
     await fetch('/api/content', {
       method: 'POST',
       headers: Auth.authHeaders(),
-      body: JSON.stringify({ snapshot, isBase: true })
+      body: JSON.stringify({ snapshot: captureSnapshot(), isBase: true })
     });
   }
 
@@ -46,19 +53,19 @@ const Editor = (() => {
   function isActive() { return active; }
 
   async function save() {
-    const snapshot = {};
-    document.querySelectorAll('[contenteditable]').forEach(el => {
-      if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
-    });
-    document.querySelectorAll('img').forEach(img => {
-      if (img.dataset.editId && img.dataset.replaced) snapshot['img_' + img.dataset.editId] = img.src;
-    });
+    const current = captureSnapshot();
+    const delta = {};
+    for (const [key, value] of Object.entries(current)) {
+      if (baseline[key] !== value) delta[key] = value;
+    }
+
+    if (!Object.keys(delta).length) { exit(); return; }
 
     try {
       const res = await fetch('/api/content', {
         method: 'POST',
         headers: Auth.authHeaders(),
-        body: JSON.stringify({ snapshot })
+        body: JSON.stringify({ snapshot: delta })
       });
       if (!res.ok) throw new Error();
       exit();
@@ -78,7 +85,7 @@ const Editor = (() => {
       });
       document.querySelectorAll('img').forEach(img => {
         const key = 'img_' + img.dataset.editId;
-        if (img.dataset.editId && snapshot[key]) { img.src = snapshot[key]; img.dataset.replaced = '1'; }
+        if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
       });
     } catch {}
   }
@@ -128,7 +135,7 @@ const Editor = (() => {
       });
       document.querySelectorAll('img').forEach(img => {
         const key = 'img_' + img.dataset.editId;
-        if (img.dataset.editId && snapshot[key]) { img.src = snapshot[key]; img.dataset.replaced = '1'; }
+        if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
       });
       const span = document.querySelector('#edit-bar > span');
       const orig = span.textContent;
@@ -152,7 +159,6 @@ const Editor = (() => {
       const img = currentImgWrap.querySelector('img');
       if (img) {
         img.src = e.target.result;
-        img.dataset.replaced = '1';
       } else {
         currentImgWrap.style.backgroundImage = `url(${e.target.result})`;
         currentImgWrap.style.backgroundSize = 'cover';

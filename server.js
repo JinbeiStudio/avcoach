@@ -33,6 +33,23 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// GET /sitemap.xml — <lastmod> basé sur la dernière sauvegarde de contenu,
+// le signal que les crawlers utilisent pour prioriser le re-crawl.
+app.get('/sitemap.xml', (req, res) => {
+  const latest = getDb()
+    .prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1')
+    .get();
+  const lastmod = latest ? new Date(latest.saved_at + 'Z').toISOString() : new Date().toISOString();
+  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://avcoach.fr/</loc>
+    <lastmod>${lastmod}</lastmod>
+  </url>
+</urlset>
+`);
+});
+
 // ── Middleware auth ──────────────────────────────────────────────────────────
 
 function requireAuth(req, res, next) {
@@ -225,11 +242,23 @@ app.delete('/api/users/:id', requireAuth, (req, res) => {
 
 // POST /api/content  (sauvegarder le contenu édité)
 app.post('/api/content', requireAuth, (req, res) => {
-  const { snapshot, isBase } = req.body;
-  if (!snapshot) return res.status(400).json({ error: 'Snapshot requis' });
+  const { snapshot: delta, isBase } = req.body;
+  if (!delta) return res.status(400).json({ error: 'Snapshot requis' });
   const db = getDb();
+
+  // Le client n'envoie que les champs réellement modifiés (delta). On le
+  // fusionne avec le dernier état complet connu pour que chaque ligne de
+  // content_saves reste un instantané complet (historique/diff/restauration
+  // continuent de fonctionner comme avant) — mais on n'écrit dans le fichier
+  // que ce qui a changé.
+  let fullSnapshot = delta;
+  if (!isBase) {
+    const latest = db.prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1').get();
+    fullSnapshot = latest ? { ...JSON.parse(latest.snapshot), ...delta } : delta;
+  }
+
   db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)')
-    .run(req.user.id, JSON.stringify(snapshot), isBase ? 1 : 0);
+    .run(req.user.id, JSON.stringify(fullSnapshot), isBase ? 1 : 0);
   // Garde V0 + les 5 dernières éditions
   db.prepare(`
     DELETE FROM content_saves
@@ -239,7 +268,7 @@ app.post('/api/content', requireAuth, (req, res) => {
     )
   `).run();
   try {
-    renderIndexHtml(snapshot);
+    renderIndexHtml(delta);
     setMeta('last_rendered_hash', hashIndexHtml());
   } catch (e) {
     console.error('Échec régénération index.html :', e.message);
@@ -406,23 +435,30 @@ if (newUsers.length > 0) {
   }
 }
 
+function captureBaseVersion() {
+  getDb().exec('DELETE FROM content_saves');
+  getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
+    .run(JSON.stringify(readIndexSnapshot()));
+}
+
 if (require.main === module) {
   // Détecte si index.html a changé depuis la dernière écriture connue du
   // serveur (= un déploiement a pushé un nouveau fichier). Si oui, ce
   // fichier devient la nouvelle référence : on efface l'historique
   // d'édition (les positions/ids du contenu sauvegardé peuvent ne plus
   // correspondre) et on recapture une V0 à partir de ce qui vient d'être
-  // pushé. Sinon (simple redémarrage), on ne touche à rien — le fichier
-  // est déjà dans l'état laissé par la dernière sauvegarde.
+  // pushé. Au tout premier démarrage (aucun hash connu), on capture
+  // directement une V0 pour ne jamais démarrer sans. Sinon (simple
+  // redémarrage sans changement), on ne touche à rien.
   try {
     const currentHash = hashIndexHtml();
     const knownHash   = getMeta('last_rendered_hash');
 
-    if (knownHash !== undefined && knownHash !== currentHash) {
+    if (knownHash === undefined) {
+      captureBaseVersion();
+    } else if (knownHash !== currentHash) {
       console.log('⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l\'historique éditorial.');
-      getDb().exec('DELETE FROM content_saves');
-      getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
-        .run(JSON.stringify(readIndexSnapshot()));
+      captureBaseVersion();
     }
 
     setMeta('last_rendered_hash', hashIndexHtml());
