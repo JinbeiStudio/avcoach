@@ -188,12 +188,6 @@ describe('Contenu', () => {
     expect(res.body.exists).toBe(true);
   });
 
-  test('GET /api/content/history — accessible à un éditeur', async () => {
-    const res = await request(server).get('/api/content/history').set('Authorization', `Bearer ${editorToken}`);
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
-
   test('GET /api/content/history/full — refusé pour un éditeur', async () => {
     const res = await request(server).get('/api/content/history/full').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(403);

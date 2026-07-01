@@ -95,69 +95,6 @@ const Editor = (() => {
     } catch {}
   }
 
-  async function toggleHistory() {
-    const dropdown = document.getElementById('history-dropdown');
-    if (dropdown.style.display === 'block') {
-      dropdown.style.display = 'none';
-      return;
-    }
-    dropdown.innerHTML = '<div class="history-loading">Chargement…</div>';
-    dropdown.style.display = 'block';
-
-    try {
-      const res = await fetch('/api/content/history', { headers: Auth.authHeaders() });
-      const versions = await res.json();
-      if (!versions.length) {
-        dropdown.innerHTML = '<div class="history-empty">Aucune version sauvegardée</div>';
-        return;
-      }
-      dropdown.innerHTML = versions
-        .map((v, i) => {
-          const date = new Date(v.saved_at + 'Z');
-          const label = i === 0 ? ' (dernière)' : '';
-          const formatted = date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-          return `<button class="history-item" onclick="Editor.restoreVersion(${v.id})">
-          <span class="history-num">V${versions.length - i}</span>
-          <span class="history-date">${formatted}${label}</span>
-        </button>`;
-        })
-        .join('');
-    } catch {
-      dropdown.innerHTML = '<div class="history-empty">Erreur de chargement</div>';
-    }
-  }
-
-  async function restoreVersion(id) {
-    document.getElementById('history-dropdown').style.display = 'none';
-    try {
-      const res = await fetch(`/api/content/${id}`, { headers: Auth.authHeaders() });
-      const { snapshot } = await res.json();
-      if (!snapshot) return;
-      document.querySelectorAll('[contenteditable]').forEach((el) => {
-        const key = 'el_' + el.dataset.editId;
-        if (el.dataset.editId && snapshot[key] !== undefined) el.innerHTML = snapshot[key];
-      });
-      document.querySelectorAll('img').forEach((img) => {
-        const key = 'img_' + img.dataset.editId;
-        if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
-      });
-      const span = document.querySelector('#edit-bar > span');
-      const orig = span.textContent;
-      span.textContent = '↩ Version restaurée — pensez à enregistrer';
-      setTimeout(() => {
-        span.textContent = orig;
-      }, 3000);
-    } catch {
-      alert('Erreur lors de la restauration.');
-    }
-  }
-
   function replaceImage(wrap) {
     if (!active) return;
     currentImgWrap = wrap;
@@ -181,7 +118,7 @@ const Editor = (() => {
     this.value = '';
   });
 
-  return { enter, exit, isActive, save, loadContent, replaceImage, toggleHistory, restoreVersion };
+  return { enter, exit, isActive, save, loadContent, replaceImage };
 })();
 
 window.replaceImage = Editor.replaceImage.bind(Editor);
