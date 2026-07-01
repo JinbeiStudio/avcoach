@@ -406,23 +406,30 @@ if (newUsers.length > 0) {
   }
 }
 
+function captureBaseVersion() {
+  getDb().exec('DELETE FROM content_saves');
+  getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
+    .run(JSON.stringify(readIndexSnapshot()));
+}
+
 if (require.main === module) {
   // Détecte si index.html a changé depuis la dernière écriture connue du
   // serveur (= un déploiement a pushé un nouveau fichier). Si oui, ce
   // fichier devient la nouvelle référence : on efface l'historique
   // d'édition (les positions/ids du contenu sauvegardé peuvent ne plus
   // correspondre) et on recapture une V0 à partir de ce qui vient d'être
-  // pushé. Sinon (simple redémarrage), on ne touche à rien — le fichier
-  // est déjà dans l'état laissé par la dernière sauvegarde.
+  // pushé. Au tout premier démarrage (aucun hash connu), on capture
+  // directement une V0 pour ne jamais démarrer sans. Sinon (simple
+  // redémarrage sans changement), on ne touche à rien.
   try {
     const currentHash = hashIndexHtml();
     const knownHash   = getMeta('last_rendered_hash');
 
-    if (knownHash !== undefined && knownHash !== currentHash) {
+    if (knownHash === undefined) {
+      captureBaseVersion();
+    } else if (knownHash !== currentHash) {
       console.log('⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l\'historique éditorial.');
-      getDb().exec('DELETE FROM content_saves');
-      getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
-        .run(JSON.stringify(readIndexSnapshot()));
+      captureBaseVersion();
     }
 
     setMeta('last_rendered_hash', hashIndexHtml());
