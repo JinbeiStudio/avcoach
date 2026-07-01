@@ -325,11 +325,18 @@ nav.scrolled {
 .nav-logo {
   display: flex;
   align-items: center;
+  gap: 0;
 }
 .nav-logo-img {
   height: 62px;
   width: auto;
   display: block;
+}
+.nav-logo-text {
+  height: 40px;
+  width: auto;
+  display: block;
+  margin-left: -0.2rem;
 }
 .nav-links {
   display: flex;
@@ -525,7 +532,7 @@ nav.scrolled {
 }
 .hero-scroll {
   position: absolute;
-  bottom: 2rem;
+  bottom: 6.25vw;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -559,6 +566,15 @@ nav.scrolled {
   line-height: 0;
   display: block;
   width: 100%;
+}
+.sep svg {
+  display: block;
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+.sep-hero {
+  position: relative;
+  margin-top: -6.25vw;
 }
 
 /* ── Sections ──────────────────────────────────────────────────────────────── */
@@ -1011,12 +1027,9 @@ footer {
   flex-wrap: wrap;
 }
 .footer-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  color: var(--cream);
-}
-.footer-logo span {
-  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 .footer-links {
   display: flex;

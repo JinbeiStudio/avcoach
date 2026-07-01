@@ -107,10 +107,8 @@
     <nav id="main-nav">
       <div class="container nav-inner">
         <a href="#" class="nav-logo" aria-label="AV Coach accueil">
-          <div class="footer-logo">
-            AV
-            <span>Coach</span>
-          </div>
+          <img src="/images/logo-blanc.png" alt="AV Coach" class="nav-logo-img" />
+          <img src="/images/logo-texte.png" alt="" class="nav-logo-text" />
         </a>
         <ul class="nav-links">
           <li><a href="#apropos">À propos</a></li>
@@ -168,7 +166,7 @@
       </svg>
       <div class="container">
         <div class="hero-content">
-          <div class="hero-tag" contenteditable="false" data-edit-id="hero-tag">Coaching professionnel certifiés</div>
+          <div class="hero-tag" contenteditable="false" data-edit-id="hero-tag">Coaching professionnel certifié</div>
           <h1 contenteditable="false" data-edit-id="hero-title">
             Révélez votre
             <em>posture managériale</em>
@@ -188,7 +186,7 @@
     </section>
 
     <!-- SEPARATOR: WAVE BLUE -->
-    <div class="sep" aria-hidden="true">
+    <div class="sep sep-hero" aria-hidden="true">
       <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="waveBlue" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -196,9 +194,13 @@
             <stop offset="50%" stop-color="#0F2040" />
             <stop offset="100%" stop-color="#060E19" />
           </linearGradient>
+          <linearGradient id="waveFade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0B1829" stop-opacity="0" />
+            <stop offset="100%" stop-color="#0B1829" stop-opacity="1" />
+          </linearGradient>
         </defs>
         <path d="M0,0 C240,80 480,80 720,40 C960,0 1200,80 1440,40 L1440,90 L0,90 Z" fill="url(#waveBlue)" />
-        <path d="M0,20 C360,90 720,10 1080,60 C1260,80 1380,50 1440,60 L1440,90 L0,90 Z" fill="#0B1829" opacity=".6" />
+        <path d="M0,20 C360,90 720,10 1080,60 C1260,80 1380,50 1440,60 L1440,90 L0,90 Z" fill="url(#waveFade)" />
       </svg>
     </div>
 
@@ -268,24 +270,6 @@
           d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50 L1440,100 L0,100 Z"
           fill="url(#flammeGrad)"
         />
-        <path
-          d="M360,50 C380,10 400,0 420,20 C440,0 460,30 480,50"
-          fill="none"
-          stroke="rgba(232,117,32,0.3)"
-          stroke-width="2"
-        />
-        <path
-          d="M700,40 C720,5 740,0 760,18 C780,0 800,35 820,40"
-          fill="none"
-          stroke="rgba(232,117,32,0.2)"
-          stroke-width="1.5"
-        />
-        <path
-          d="M1050,45 C1070,8 1090,0 1110,22 C1130,0 1150,40 1170,45"
-          fill="none"
-          stroke="rgba(232,117,32,0.2)"
-          stroke-width="1.5"
-        />
       </svg>
     </div>
 
@@ -338,22 +322,108 @@
     <div class="sep" aria-hidden="true">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="bousGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#F5EDD8" stop-opacity=".04" />
-            <stop offset="30%" stop-color="#E8D9BF" stop-opacity=".1" />
-            <stop offset="70%" stop-color="#E8D9BF" stop-opacity=".1" />
-            <stop offset="100%" stop-color="#F5EDD8" stop-opacity=".04" />
+          <linearGradient id="bousWaveFade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0F2040" stop-opacity="1" />
+            <stop offset="100%" stop-color="#0F2040" stop-opacity="0" />
+          </linearGradient>
+          <filter id="bousGlow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+          <linearGradient id="bezelFade" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#F5EDD8" stop-opacity="0" />
+            <stop offset="15%" stop-color="#F5EDD8" stop-opacity=".5" />
+            <stop offset="50%" stop-color="#F5EDD8" stop-opacity=".6" />
+            <stop offset="85%" stop-color="#F5EDD8" stop-opacity=".5" />
+            <stop offset="100%" stop-color="#F5EDD8" stop-opacity="0" />
           </linearGradient>
         </defs>
-        <path d="M0,50 L1440,50 L1440,100 L0,100 Z" fill="#0B1829" />
-        <path d="M0,50 C200,0 400,80 720,40 C900,20 1100,70 1440,30 L1440,50 L0,50 Z" fill="#0F2040" />
-        <rect x="0" y="48" width="1440" height="4" fill="url(#bousGrad)" />
-        <circle cx="720" cy="50" r="20" fill="none" stroke="rgba(245,237,216,0.12)" stroke-width="1" />
-        <circle cx="720" cy="50" r="8" fill="none" stroke="rgba(245,237,216,0.18)" stroke-width="1" />
-        <line x1="720" y1="30" x2="720" y2="70" stroke="rgba(245,237,216,0.15)" stroke-width="1" />
-        <line x1="700" y1="50" x2="740" y2="50" stroke="rgba(245,237,216,0.15)" stroke-width="1" />
-        <circle cx="300" cy="50" r="12" fill="none" stroke="rgba(245,237,216,0.07)" stroke-width="1" />
-        <circle cx="1140" cy="50" r="12" fill="none" stroke="rgba(245,237,216,0.07)" stroke-width="1" />
+        <path d="M0,0 L1440,0 L1440,100 L0,100 Z" fill="#0B1829" />
+        <path d="M0,30 C200,5 400,50 720,25 C900,10 1100,40 1440,15 L1440,0 L0,0 Z" fill="url(#bousWaveFade)" />
+        <g transform="translate(0,-8)">
+          <line x1="60" y1="50" x2="1380" y2="50" stroke="url(#bezelFade)" stroke-width="1" />
+          <g fill="#F5EDD8">
+            <g transform="rotate(-65,120,50)">
+              <polygon points="120,39 123.6,50 116.4,50" opacity=".15" />
+              <polygon points="120,61 123.6,50 116.4,50" opacity=".07" />
+            </g>
+            <g transform="rotate(40,200,50)">
+              <polygon points="200,41 203,50 197,50" opacity=".18" />
+              <polygon points="200,59 203,50 197,50" opacity=".08" />
+            </g>
+            <g transform="rotate(-15,280,50)">
+              <polygon points="280,41 283,50 277,50" opacity=".22" />
+              <polygon points="280,59 283,50 277,50" opacity=".1" />
+            </g>
+            <g transform="rotate(70,360,50)">
+              <polygon points="360,39 363.6,50 356.4,50" opacity=".28" />
+              <polygon points="360,61 363.6,50 356.4,50" opacity=".13" />
+            </g>
+            <g transform="rotate(-35,440,50)">
+              <polygon points="440,41 443,50 437,50" opacity=".32" />
+              <polygon points="440,59 443,50 437,50" opacity=".14" />
+            </g>
+            <g transform="rotate(20,520,50)">
+              <polygon points="520,41 523,50 517,50" opacity=".38" />
+              <polygon points="520,59 523,50 517,50" opacity=".17" />
+            </g>
+            <g transform="rotate(-50,600,50)">
+              <polygon points="600,39 603.6,50 596.4,50" opacity=".42" />
+              <polygon points="600,61 603.6,50 596.4,50" opacity=".19" />
+            </g>
+            <g transform="rotate(55,840,50)">
+              <polygon points="840,39 843.6,50 836.4,50" opacity=".42" />
+              <polygon points="840,61 843.6,50 836.4,50" opacity=".19" />
+            </g>
+            <g transform="rotate(-8,920,50)">
+              <polygon points="920,41 923,50 917,50" opacity=".38" />
+              <polygon points="920,59 923,50 917,50" opacity=".17" />
+            </g>
+            <g transform="rotate(75,1000,50)">
+              <polygon points="1000,41 1003,50 997,50" opacity=".32" />
+              <polygon points="1000,59 1003,50 997,50" opacity=".14" />
+            </g>
+            <g transform="rotate(-42,1080,50)">
+              <polygon points="1080,39 1083.6,50 1076.4,50" opacity=".28" />
+              <polygon points="1080,61 1083.6,50 1076.4,50" opacity=".13" />
+            </g>
+            <g transform="rotate(28,1160,50)">
+              <polygon points="1160,41 1163,50 1157,50" opacity=".22" />
+              <polygon points="1160,59 1163,50 1157,50" opacity=".1" />
+            </g>
+            <g transform="rotate(-60,1240,50)">
+              <polygon points="1240,41 1243,50 1237,50" opacity=".18" />
+              <polygon points="1240,59 1243,50 1237,50" opacity=".08" />
+            </g>
+            <g transform="rotate(10,1320,50)">
+              <polygon points="1320,39 1323.6,50 1316.4,50" opacity=".15" />
+              <polygon points="1320,61 1323.6,50 1316.4,50" opacity=".07" />
+            </g>
+          </g>
+          <g transform="translate(720,50) scale(1.25) translate(-720,-50)">
+            <g opacity=".3" filter="url(#bousGlow)">
+              <circle cx="720" cy="50" r="24" fill="none" stroke="#F5EDD8" stroke-width="2.5" />
+              <circle cx="720" cy="50" r="10" fill="none" stroke="#F5EDD8" stroke-width="2.5" />
+            </g>
+            <g opacity=".55">
+              <circle cx="720" cy="50" r="22" fill="none" stroke="#F5EDD8" stroke-width="1.2" />
+              <circle cx="720" cy="50" r="9" fill="none" stroke="#F5EDD8" stroke-width="1.2" />
+              <line x1="720" y1="28" x2="720" y2="72" stroke="#F5EDD8" stroke-width="1.2" />
+              <line x1="698" y1="50" x2="742" y2="50" stroke="#F5EDD8" stroke-width="1.2" />
+              <line x1="704.4" y1="34.4" x2="735.6" y2="65.6" stroke="#F5EDD8" stroke-width="1" />
+              <line x1="735.6" y1="34.4" x2="704.4" y2="65.6" stroke="#F5EDD8" stroke-width="1" />
+            </g>
+            <g opacity=".3">
+              <circle cx="720" cy="50" r="17" fill="none" stroke="#F5EDD8" stroke-width=".8" />
+              <circle cx="720" cy="50" r="13" fill="none" stroke="#F5EDD8" stroke-width=".8" />
+            </g>
+          </g>
+          <g opacity=".4" font-size="7" font-family="Inter, sans-serif" fill="#F5EDD8" text-anchor="middle">
+            <text x="720" y="17.5">N</text>
+            <text x="720" y="87.5">S</text>
+            <text x="757" y="53">E</text>
+            <text x="683" y="53">O</text>
+          </g>
+        </g>
       </svg>
     </div>
 
@@ -630,8 +700,8 @@
     <footer>
       <div class="container footer-inner">
         <div class="footer-logo">
-          AV
-          <span>Coach</span>
+          <img src="/images/logo-blanc.png" alt="AV Coach" class="nav-logo-img" />
+          <img src="/images/logo-texte.png" alt="" class="nav-logo-text" />
         </div>
         <ul class="footer-links">
           <li><a href="#apropos">À propos</a></li>
