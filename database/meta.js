@@ -5,10 +5,14 @@ function getMeta(key) {
 }
 
 function setMeta(key, value) {
-  getDb().prepare(`
+  getDb()
+    .prepare(
+      `
     INSERT INTO app_meta (key, value) VALUES (?, ?)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
-  `).run(key, value);
+  `
+    )
+    .run(key, value);
 }
 
 module.exports = { getMeta, setMeta };

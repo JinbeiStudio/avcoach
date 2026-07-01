@@ -56,7 +56,7 @@ function initDatabase() {
 
   // Seed des deux utilisateurs avec mot de passe temporaire aléatoire
   const users = [
-    { username: 'j.gabriel',   email: 'julien.gabriel@me.com', role: 'admin'  },
+    { username: 'j.gabriel', email: 'julien.gabriel@me.com', role: 'admin' },
     { username: 'a.vuillemin', email: 'julien.gabriel@me.com', role: 'editor' }
   ];
 
@@ -66,10 +66,12 @@ function initDatabase() {
     if (!existing) {
       const tempPassword = crypto.randomBytes(6).toString('base64url'); // ex: "aB3xK9mQ"
       const hash = bcrypt.hashSync(tempPassword, 12);
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role)
         VALUES (?, ?, ?, 1, 0, ?)
-      `).run(username, email, hash, role);
+      `
+      ).run(username, email, hash, role);
       console.log(`✓ Utilisateur créé : ${username} (${role}) — mot de passe temporaire généré`);
       newUsers.push({ username, email, tempPassword, role });
     } else {

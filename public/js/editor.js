@@ -7,10 +7,10 @@ const Editor = (() => {
 
   function captureSnapshot() {
     const snapshot = {};
-    document.querySelectorAll('[contenteditable]').forEach(el => {
+    document.querySelectorAll('[contenteditable]').forEach((el) => {
       if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
     });
-    document.querySelectorAll('img').forEach(img => {
+    document.querySelectorAll('img').forEach((img) => {
       if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.src;
     });
     return snapshot;
@@ -21,7 +21,7 @@ const Editor = (() => {
     document.body.classList.add('edit-mode');
     document.getElementById('edit-bar').classList.add('visible');
     if (typeof setEditButtonText === 'function') setEditButtonText('✕ Quitter');
-    document.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
+    document.querySelectorAll('[contenteditable]').forEach((el) => el.setAttribute('contenteditable', 'true'));
     document.querySelector('nav').style.top = '44px';
     // Si pas de V0, capture l'état HTML de base
     const check = await fetch('/api/content/base', { headers: Auth.authHeaders() });
@@ -45,12 +45,14 @@ const Editor = (() => {
     document.body.classList.remove('edit-mode');
     document.getElementById('edit-bar').classList.remove('visible');
     if (typeof setEditButtonText === 'function') setEditButtonText('✎ Éditer');
-    document.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+    document.querySelectorAll('[contenteditable]').forEach((el) => el.setAttribute('contenteditable', 'false'));
     document.querySelector('nav').style.top = '';
     loadContent();
   }
 
-  function isActive() { return active; }
+  function isActive() {
+    return active;
+  }
 
   async function save() {
     const current = captureSnapshot();
@@ -59,7 +61,10 @@ const Editor = (() => {
       if (baseline[key] !== value) delta[key] = value;
     }
 
-    if (!Object.keys(delta).length) { exit(); return; }
+    if (!Object.keys(delta).length) {
+      exit();
+      return;
+    }
 
     try {
       const res = await fetch('/api/content', {
@@ -79,11 +84,11 @@ const Editor = (() => {
       const res = await fetch('/api/content/latest');
       const { snapshot } = await res.json();
       if (!snapshot) return;
-      document.querySelectorAll('[contenteditable]').forEach(el => {
+      document.querySelectorAll('[contenteditable]').forEach((el) => {
         const key = 'el_' + el.dataset.editId;
         if (el.dataset.editId && snapshot[key] !== undefined) el.innerHTML = snapshot[key];
       });
-      document.querySelectorAll('img').forEach(img => {
+      document.querySelectorAll('img').forEach((img) => {
         const key = 'img_' + img.dataset.editId;
         if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
       });
@@ -106,18 +111,23 @@ const Editor = (() => {
         dropdown.innerHTML = '<div class="history-empty">Aucune version sauvegardée</div>';
         return;
       }
-      dropdown.innerHTML = versions.map((v, i) => {
-        const date = new Date(v.saved_at + 'Z');
-        const label = i === 0 ? ' (dernière)' : '';
-        const formatted = date.toLocaleDateString('fr-FR', {
-          day: '2-digit', month: '2-digit', year: 'numeric',
-          hour: '2-digit', minute: '2-digit'
-        });
-        return `<button class="history-item" onclick="Editor.restoreVersion(${v.id})">
+      dropdown.innerHTML = versions
+        .map((v, i) => {
+          const date = new Date(v.saved_at + 'Z');
+          const label = i === 0 ? ' (dernière)' : '';
+          const formatted = date.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          return `<button class="history-item" onclick="Editor.restoreVersion(${v.id})">
           <span class="history-num">V${versions.length - i}</span>
           <span class="history-date">${formatted}${label}</span>
         </button>`;
-      }).join('');
+        })
+        .join('');
     } catch {
       dropdown.innerHTML = '<div class="history-empty">Erreur de chargement</div>';
     }
@@ -129,18 +139,20 @@ const Editor = (() => {
       const res = await fetch(`/api/content/${id}`, { headers: Auth.authHeaders() });
       const { snapshot } = await res.json();
       if (!snapshot) return;
-      document.querySelectorAll('[contenteditable]').forEach(el => {
+      document.querySelectorAll('[contenteditable]').forEach((el) => {
         const key = 'el_' + el.dataset.editId;
         if (el.dataset.editId && snapshot[key] !== undefined) el.innerHTML = snapshot[key];
       });
-      document.querySelectorAll('img').forEach(img => {
+      document.querySelectorAll('img').forEach((img) => {
         const key = 'img_' + img.dataset.editId;
         if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
       });
       const span = document.querySelector('#edit-bar > span');
       const orig = span.textContent;
       span.textContent = '↩ Version restaurée — pensez à enregistrer';
-      setTimeout(() => { span.textContent = orig; }, 3000);
+      setTimeout(() => {
+        span.textContent = orig;
+      }, 3000);
     } catch {
       alert('Erreur lors de la restauration.');
     }
@@ -155,7 +167,7 @@ const Editor = (() => {
   fileInput.addEventListener('change', function () {
     if (!this.files?.[0] || !currentImgWrap) return;
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = (e) => {
       const img = currentImgWrap.querySelector('img');
       if (img) {
         img.src = e.target.result;

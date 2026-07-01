@@ -13,14 +13,14 @@ function walk(node, visit) {
 }
 
 function getAttr(node, name) {
-  return (node.attrs || []).find(a => a.name === name);
+  return (node.attrs || []).find((a) => a.name === name);
 }
 
 function parseIndexHtml(html) {
   const doc = parse5.parse(html, { sourceCodeLocationInfo: true });
   const editableEls = [];
   const imgEls = [];
-  walk(doc, node => {
+  walk(doc, (node) => {
     if (!node.tagName) return;
     if (getAttr(node, 'contenteditable')) editableEls.push(node);
     if (node.tagName === 'img') imgEls.push(node);
@@ -45,14 +45,14 @@ function readIndexSnapshot() {
   const { editableEls, imgEls } = parseIndexHtml(html);
   const snapshot = {};
 
-  editableEls.forEach(node => {
+  editableEls.forEach((node) => {
     const editId = getAttr(node, 'data-edit-id')?.value;
     const loc = node.sourceCodeLocation;
     if (!editId || !loc?.startTag || !loc?.endTag) return;
     snapshot['el_' + editId] = html.slice(loc.startTag.endOffset, loc.endTag.startOffset);
   });
 
-  imgEls.forEach(node => {
+  imgEls.forEach((node) => {
     const editId = getAttr(node, 'data-edit-id')?.value;
     const src = getAttr(node, 'src')?.value;
     if (!editId || !src) return;
@@ -74,7 +74,7 @@ function renderIndexHtml(snapshot) {
 
   const replacements = [];
 
-  editableEls.forEach(node => {
+  editableEls.forEach((node) => {
     const editId = getAttr(node, 'data-edit-id')?.value;
     if (!editId) return;
     const key = 'el_' + editId;
@@ -88,7 +88,7 @@ function renderIndexHtml(snapshot) {
     });
   });
 
-  imgEls.forEach(node => {
+  imgEls.forEach((node) => {
     const editId = getAttr(node, 'data-edit-id')?.value;
     if (!editId) return;
     const key = 'img_' + editId;
