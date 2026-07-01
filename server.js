@@ -242,11 +242,23 @@ app.delete('/api/users/:id', requireAuth, (req, res) => {
 
 // POST /api/content  (sauvegarder le contenu édité)
 app.post('/api/content', requireAuth, (req, res) => {
-  const { snapshot, isBase } = req.body;
-  if (!snapshot) return res.status(400).json({ error: 'Snapshot requis' });
+  const { snapshot: delta, isBase } = req.body;
+  if (!delta) return res.status(400).json({ error: 'Snapshot requis' });
   const db = getDb();
+
+  // Le client n'envoie que les champs réellement modifiés (delta). On le
+  // fusionne avec le dernier état complet connu pour que chaque ligne de
+  // content_saves reste un instantané complet (historique/diff/restauration
+  // continuent de fonctionner comme avant) — mais on n'écrit dans le fichier
+  // que ce qui a changé.
+  let fullSnapshot = delta;
+  if (!isBase) {
+    const latest = db.prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1').get();
+    fullSnapshot = latest ? { ...JSON.parse(latest.snapshot), ...delta } : delta;
+  }
+
   db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)')
-    .run(req.user.id, JSON.stringify(snapshot), isBase ? 1 : 0);
+    .run(req.user.id, JSON.stringify(fullSnapshot), isBase ? 1 : 0);
   // Garde V0 + les 5 dernières éditions
   db.prepare(`
     DELETE FROM content_saves
@@ -256,7 +268,7 @@ app.post('/api/content', requireAuth, (req, res) => {
     )
   `).run();
   try {
-    renderIndexHtml(snapshot);
+    renderIndexHtml(delta);
     setMeta('last_rendered_hash', hashIndexHtml());
   } catch (e) {
     console.error('Échec régénération index.html :', e.message);
