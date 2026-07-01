@@ -1,355 +1,718 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — AVCoach</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --navy: #0b1829; --navy-mid: #0f2236; --navy-light: #162d47;
-      --orange: #e87520; --text-light: #e2e8f0; --text-muted: #94a3b8;
-      --green: #4ade80; --red: #f87171;
-    }
-    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text-light); min-height: 100vh; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — AVCoach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --navy: #0b1829;
+        --navy-mid: #0f2236;
+        --navy-light: #162d47;
+        --orange: #e87520;
+        --text-light: #e2e8f0;
+        --text-muted: #94a3b8;
+        --green: #4ade80;
+        --red: #f87171;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background: var(--navy);
+        color: var(--text-light);
+        min-height: 100vh;
+      }
 
-    /* ── Auth gate ── */
-    #auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .auth-card {
-      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 360px;
-    }
-    .auth-card h1 { font-size: 1.4rem; margin-bottom: 1.5rem; }
-    .auth-card input {
-      width: 100%; padding: .7rem 1rem; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05);
-      color: var(--text-light); font-size: .95rem; margin-bottom: .75rem;
-    }
-    .auth-card button {
-      width: 100%; padding: .75rem; background: var(--orange); color: #fff;
-      border: none; border-radius: 8px; font-size: .95rem; font-weight: 600; cursor: pointer;
-    }
-    #auth-error { color: var(--red); font-size: .85rem; margin-top: .5rem; display: none; }
+      /* ── Auth gate ── */
+      #auth-gate {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .auth-card {
+        background: var(--navy-mid);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 360px;
+      }
+      .auth-card h1 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+      }
+      .auth-card input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+      }
+      .auth-card button {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--orange);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #auth-error {
+        color: var(--red);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
 
-    /* ── App ── */
-    #app { display: none; }
-    header {
-      background: var(--navy-mid); border-bottom: 1px solid rgba(255,255,255,0.07);
-      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
-    }
-    header h1 { font-size: 1.1rem; }
-    .header-right { display: flex; align-items: center; gap: 1rem; }
-    #user-label { color: var(--text-muted); font-size: .85rem; }
-    #btn-logout {
-      background: none; border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted);
-      padding: .35rem .9rem; border-radius: 6px; font-size: .8rem; cursor: pointer;
-    }
-    #btn-logout:hover { background: rgba(255,255,255,0.08); color: #fff; }
+      /* ── App ── */
+      #app {
+        display: none;
+      }
+      header {
+        background: var(--navy-mid);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header h1 {
+        font-size: 1.1rem;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      #user-label {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      #btn-logout {
+        background: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-muted);
+        padding: 0.35rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+      #btn-logout:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
 
-    /* ── Tabs ── */
-    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.07); padding: 0 2rem; background: var(--navy-mid); }
-    .tab {
-      padding: .85rem 1.5rem; font-size: .9rem; font-weight: 500; cursor: pointer;
-      border-bottom: 2px solid transparent; color: var(--text-muted); background: none; border-top: none; border-left: none; border-right: none;
-      transition: color .2s;
-    }
-    .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
-    .tab:hover:not(.active) { color: var(--text-light); }
-    .tab-badge {
-      background: var(--orange); color: #fff; border-radius: 20px;
-      font-size: .7rem; font-weight: 700; padding: .1rem .5rem; margin-left: .4rem;
-    }
+      /* ── Tabs ── */
+      .tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 0 2rem;
+        background: var(--navy-mid);
+      }
+      .tab {
+        padding: 0.85rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        transition: color 0.2s;
+      }
+      .tab.active {
+        color: var(--orange);
+        border-bottom-color: var(--orange);
+      }
+      .tab:hover:not(.active) {
+        color: var(--text-light);
+      }
+      .tab-badge {
+        background: var(--orange);
+        color: #fff;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.1rem 0.5rem;
+        margin-left: 0.4rem;
+      }
 
-    main { max-width: 960px; margin: 2rem auto; padding: 0 1.5rem; }
-    .panel { display: none; }
-    .panel.active { display: block; }
+      main {
+        max-width: 960px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+      }
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
 
-    /* ── Cards ── */
-    .card {
-      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
-    }
-    .card.unread { border-left: 3px solid var(--orange); }
-    .card-meta { display: flex; align-items: baseline; gap: 1rem; margin-bottom: .6rem; flex-wrap: wrap; }
-    .card-name { font-weight: 600; font-size: .95rem; }
-    .card-email { color: var(--orange); font-size: .85rem; text-decoration: none; }
-    .card-email:hover { text-decoration: underline; }
-    .card-date { color: var(--text-muted); font-size: .8rem; margin-left: auto; }
-    .card-body { color: var(--text-light); font-size: .9rem; line-height: 1.6; white-space: pre-wrap; }
-    .card-actions { display: flex; gap: .5rem; margin-top: .85rem; }
-    .btn-sm {
-      font-size: .8rem; padding: .3rem .8rem; border-radius: 6px;
-      border: none; cursor: pointer; font-weight: 500;
-    }
-    .btn-neutral { background: rgba(255,255,255,0.08); color: var(--text-light); }
-    .btn-neutral:hover { background: rgba(255,255,255,0.15); }
-    .btn-danger { background: rgba(248,113,113,0.1); color: var(--red); }
-    .btn-danger:hover { background: rgba(248,113,113,0.2); }
-    .btn-primary { background: var(--orange); color: #fff; }
-    .btn-primary:hover { opacity: .85; }
+      /* ── Cards ── */
+      .card {
+        background: var(--navy-mid);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .card.unread {
+        border-left: 3px solid var(--orange);
+      }
+      .card-meta {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .card-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .card-email {
+        color: var(--orange);
+        font-size: 0.85rem;
+        text-decoration: none;
+      }
+      .card-email:hover {
+        text-decoration: underline;
+      }
+      .card-date {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-left: auto;
+      }
+      .card-body {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+      }
+      .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.85rem;
+      }
+      .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .btn-neutral {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-light);
+      }
+      .btn-neutral:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .btn-danger {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--red);
+      }
+      .btn-danger:hover {
+        background: rgba(248, 113, 113, 0.2);
+      }
+      .btn-primary {
+        background: var(--orange);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        opacity: 0.85;
+      }
 
-    /* ── Historique éditions ── */
-    .version-card {
-      background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px; margin-bottom: 1rem; overflow: hidden;
-    }
-    .version-header {
-      display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
-      cursor: pointer; user-select: none;
-    }
-    .version-header:hover { background: rgba(255,255,255,0.03); }
-    .version-badge {
-      background: var(--orange); color: #fff; border-radius: 6px;
-      padding: .2rem .55rem; font-size: .8rem; font-weight: 700; flex-shrink: 0;
-    }
-    .version-info { flex: 1; }
-    .version-date { font-size: .9rem; font-weight: 500; }
-    .version-author { font-size: .8rem; color: var(--text-muted); margin-top: .1rem; }
-    .version-chevron { color: var(--text-muted); font-size: .8rem; transition: transform .2s; }
-    .version-card.open .version-chevron { transform: rotate(90deg); }
+      /* ── Historique éditions ── */
+      .version-card {
+        background: var(--navy-mid);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+      }
+      .version-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        user-select: none;
+      }
+      .version-header:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .version-badge {
+        background: var(--orange);
+        color: #fff;
+        border-radius: 6px;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .version-info {
+        flex: 1;
+      }
+      .version-date {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .version-author {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.1rem;
+      }
+      .version-chevron {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        transition: transform 0.2s;
+      }
+      .version-card.open .version-chevron {
+        transform: rotate(90deg);
+      }
 
-    .version-body { display: none; border-top: 1px solid rgba(255,255,255,0.06); padding: 1.25rem 1.5rem; }
-    .version-card.open .version-body { display: block; }
+      .version-body {
+        display: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 1.25rem 1.5rem;
+      }
+      .version-card.open .version-body {
+        display: block;
+      }
 
-    .diff-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
-    .diff-tab {
-      font-size: .8rem; padding: .3rem .8rem; border-radius: 6px; border: none;
-      cursor: pointer; font-weight: 500; background: rgba(255,255,255,0.06); color: var(--text-muted);
-    }
-    .diff-tab.active { background: var(--orange); color: #fff; }
+      .diff-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .diff-tab {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-muted);
+      }
+      .diff-tab.active {
+        background: var(--orange);
+        color: #fff;
+      }
 
-    .diff-content { display: none; }
-    .diff-content.active { display: block; }
+      .diff-content {
+        display: none;
+      }
+      .diff-content.active {
+        display: block;
+      }
 
-    .diff-block { margin-bottom: .75rem; }
-    .diff-id {
-      display: inline-block; font-size: .7rem; font-family: monospace; color: var(--orange);
-      background: rgba(232,117,32,0.1); border-radius: 4px; padding: .1rem .5rem; margin-bottom: .4rem;
-    }
-    .diff-label { font-size: .75rem; color: var(--text-muted); margin-bottom: .3rem; text-transform: uppercase; letter-spacing: .05em; }
-    .diff-text {
-      background: var(--navy-light); border-radius: 8px; padding: .75rem 1rem;
-      font-size: .85rem; line-height: 1.6; color: var(--text-light);
-    }
-    .diff-added { background: rgba(74,222,128,0.12); color: var(--green); border-radius: 3px; padding: 0 2px; }
-    .diff-removed { background: rgba(248,113,113,0.12); color: var(--red); border-radius: 3px; padding: 0 2px; text-decoration: line-through; }
-    .diff-unchanged { color: var(--text-muted); }
-    .no-change { color: var(--text-muted); font-style: italic; font-size: .85rem; }
+      .diff-block {
+        margin-bottom: 0.75rem;
+      }
+      .diff-id {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-family: monospace;
+        color: var(--orange);
+        background: rgba(232, 117, 32, 0.1);
+        border-radius: 4px;
+        padding: 0.1rem 0.5rem;
+        margin-bottom: 0.4rem;
+      }
+      .diff-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .diff-text {
+        background: var(--navy-light);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--text-light);
+      }
+      .diff-added {
+        background: rgba(74, 222, 128, 0.12);
+        color: var(--green);
+        border-radius: 3px;
+        padding: 0 2px;
+      }
+      .diff-removed {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--red);
+        border-radius: 3px;
+        padding: 0 2px;
+        text-decoration: line-through;
+      }
+      .diff-unchanged {
+        color: var(--text-muted);
+      }
+      .no-change {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.85rem;
+      }
 
-    .empty-state { text-align: center; padding: 4rem; color: var(--text-muted); }
-    .loading-state { text-align: center; padding: 4rem; color: var(--text-muted); }
-  </style>
-</head>
-<body>
-
-<!-- Auth gate -->
-<div id="auth-gate">
-  <div class="auth-card">
-    <h1>AVCoach — Admin</h1>
-    <input type="text" id="login-user" placeholder="Identifiant" autocomplete="username" />
-    <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password" />
-    <button onclick="doLogin()">Se connecter</button>
-    <div id="auth-error"></div>
-  </div>
-</div>
-
-<!-- App -->
-<div id="app">
-  <header>
-    <h1><a href="/" style="color:inherit;text-decoration:none">AVCoach</a> <span style="color:var(--text-muted);font-weight:400"> / Admin</span></h1>
-    <div class="header-right">
-      <span id="user-label"></span>
-      <button id="btn-logout" onclick="doLogout()">Déconnexion</button>
-    </div>
-  </header>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('stats')">Statistiques</button>
-    <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
-    <button class="tab" onclick="switchTab('messages')">
-      Messages <span id="unread-badge" class="tab-badge" style="display:none"></span>
-    </button>
-    <button class="tab" onclick="switchTab('users')">Utilisateurs</button>
-  </div>
-
-  <main>
-    <!-- Panel messages -->
-    <div id="panel-messages" class="panel">
-      <div class="loading-state" id="msg-loading">Chargement…</div>
-      <div id="message-list"></div>
-      <div class="empty-state" id="msg-empty" style="display:none">Aucun message pour l'instant.</div>
-    </div>
-
-    <!-- Panel statistiques -->
-    <div id="panel-stats" class="panel active">
-      <div class="loading-state" id="stats-loading">Chargement…</div>
-      <div id="stats-content" style="display:none">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem">
-          <div class="card" style="text-align:center">
-            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-total">—</div>
-            <div style="color:var(--text-muted);font-size:.8rem;margin-top:.25rem">Pages vues total</div>
-            <div style="font-size:1rem;font-weight:600;color:var(--text-light);margin-top:.5rem" id="stat-total-unique">—</div>
-            <div style="color:var(--text-muted);font-size:.75rem">visiteurs uniques</div>
-          </div>
-          <div class="card" style="text-align:center">
-            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-today">—</div>
-            <div style="color:var(--text-muted);font-size:.8rem;margin-top:.25rem">Pages vues aujourd'hui</div>
-            <div style="font-size:1rem;font-weight:600;color:var(--text-light);margin-top:.5rem" id="stat-today-unique">—</div>
-            <div style="color:var(--text-muted);font-size:.75rem">visiteurs uniques</div>
-          </div>
-          <div class="card" style="text-align:center">
-            <div style="font-size:2.5rem;font-weight:700;color:var(--orange)" id="stat-messages">—</div>
-            <div style="color:var(--text-muted);font-size:.85rem;margin-top:.25rem">Messages reçus</div>
-          </div>
-        </div>
-        <div class="card">
-          <div style="font-size:.85rem;font-weight:600;margin-bottom:1rem">Visiteurs — 30 derniers jours</div>
-          <div style="display:flex;gap:.5rem;margin-bottom:.75rem">
-    <button id="chart-btn-unique" onclick="renderChart('unique')"
-      style="font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer">
-      Uniques
-    </button>
-    <button id="chart-btn-all" onclick="renderChart('all')"
-      style="font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer">
-      Pages vues
-    </button>
-  </div>
-  <div id="chart" style="display:flex;align-items:flex-end;gap:3px;height:150px;overflow:visible"></div>
-          <div id="chart-labels" style="display:flex;gap:3px;margin-top:.35rem"></div>
-        </div>
+      .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: var(--text-muted);
+      }
+      .loading-state {
+        text-align: center;
+        padding: 4rem;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Auth gate -->
+    <div id="auth-gate">
+      <div class="auth-card">
+        <h1>AVCoach — Admin</h1>
+        <input type="text" id="login-user" placeholder="Identifiant" autocomplete="username" />
+        <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password" />
+        <button onclick="doLogin()">Se connecter</button>
+        <div id="auth-error"></div>
       </div>
     </div>
 
-    <!-- Panel historique éditions -->
-    <div id="panel-history" class="panel">
-      <div id="export-index-wrap" style="display:none;justify-content:flex-end;margin-bottom:1rem">
-        <a class="btn-sm btn-neutral" href="/index.html" download="index.html" style="text-decoration:none">
-          📥 Exporter index.html
-        </a>
-      </div>
-      <div class="loading-state" id="hist-loading">Chargement…</div>
-      <div id="version-list"></div>
-      <div class="empty-state" id="hist-empty" style="display:none">Aucune version sauvegardée.</div>
-    </div>
+    <!-- App -->
+    <div id="app">
+      <header>
+        <h1>
+          <a href="/" style="color: inherit; text-decoration: none">AVCoach</a>
+          <span style="color: var(--text-muted); font-weight: 400">/ Admin</span>
+        </h1>
+        <div class="header-right">
+          <span id="user-label"></span>
+          <button id="btn-logout" onclick="doLogout()">Déconnexion</button>
+        </div>
+      </header>
 
-    <!-- Panel utilisateurs -->
-    <div id="panel-users" class="panel">
-      <!-- Formulaire de création -->
-      <div class="card" style="margin-bottom:1.5rem">
-        <div style="font-size:.85rem;font-weight:600;margin-bottom:1rem">Créer un utilisateur</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;align-items:end">
-          <div>
-            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Identifiant</label>
-            <input id="new-username" type="text" placeholder="prenom.nom"
-              style="width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem">
-          </div>
-          <div>
-            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Email</label>
-            <input id="new-email" type="email" placeholder="email@example.com"
-              style="width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem">
-          </div>
-          <div>
-            <label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:.35rem">Rôle</label>
-            <select id="new-role"
-              style="padding:.6rem .8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text-light);font-size:.9rem;cursor:pointer">
-              <option value="editor">Editor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-        </div>
-        <div style="margin-top:.75rem;display:flex;align-items:center;gap:1rem">
-          <button class="btn-sm" id="btn-create-user" onclick="createUser()"
-            style="background:var(--orange);color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer">
-            + Créer et envoyer l'invitation
-          </button>
-          <span id="create-user-msg" style="font-size:.8rem;display:none"></span>
-        </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('stats')">Statistiques</button>
+        <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
+        <button class="tab" onclick="switchTab('messages')">
+          Messages
+          <span id="unread-badge" class="tab-badge" style="display: none"></span>
+        </button>
+        <button class="tab" onclick="switchTab('users')">Utilisateurs</button>
       </div>
 
-      <div class="loading-state" id="users-loading">Chargement…</div>
-      <div id="users-list"></div>
+      <main>
+        <!-- Panel messages -->
+        <div id="panel-messages" class="panel">
+          <div class="loading-state" id="msg-loading">Chargement…</div>
+          <div id="message-list"></div>
+          <div class="empty-state" id="msg-empty" style="display: none">Aucun message pour l'instant.</div>
+        </div>
+
+        <!-- Panel statistiques -->
+        <div id="panel-stats" class="panel active">
+          <div class="loading-state" id="stats-loading">Chargement…</div>
+          <div id="stats-content" style="display: none">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 1rem;
+                margin-bottom: 2rem;
+              "
+            >
+              <div class="card" style="text-align: center">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--orange)" id="stat-total">—</div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem">Pages vues total</div>
+                <div
+                  style="font-size: 1rem; font-weight: 600; color: var(--text-light); margin-top: 0.5rem"
+                  id="stat-total-unique"
+                >
+                  —
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.75rem">visiteurs uniques</div>
+              </div>
+              <div class="card" style="text-align: center">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--orange)" id="stat-today">—</div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem">
+                  Pages vues aujourd'hui
+                </div>
+                <div
+                  style="font-size: 1rem; font-weight: 600; color: var(--text-light); margin-top: 0.5rem"
+                  id="stat-today-unique"
+                >
+                  —
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.75rem">visiteurs uniques</div>
+              </div>
+              <div class="card" style="text-align: center">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--orange)" id="stat-messages">—</div>
+                <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem">Messages reçus</div>
+              </div>
+            </div>
+            <div class="card">
+              <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem">Visiteurs — 30 derniers jours</div>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem">
+                <button
+                  id="chart-btn-unique"
+                  onclick="renderChart('unique')"
+                  style="
+                    font-size: 0.75rem;
+                    padding: 0.2rem 0.6rem;
+                    border-radius: 4px;
+                    border: 1px solid var(--orange);
+                    background: var(--orange);
+                    color: #fff;
+                    cursor: pointer;
+                  "
+                >
+                  Uniques
+                </button>
+                <button
+                  id="chart-btn-all"
+                  onclick="renderChart('all')"
+                  style="
+                    font-size: 0.75rem;
+                    padding: 0.2rem 0.6rem;
+                    border-radius: 4px;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    background: none;
+                    color: var(--text-muted);
+                    cursor: pointer;
+                  "
+                >
+                  Pages vues
+                </button>
+              </div>
+              <div
+                id="chart"
+                style="display: flex; align-items: flex-end; gap: 3px; height: 150px; overflow: visible"
+              ></div>
+              <div id="chart-labels" style="display: flex; gap: 3px; margin-top: 0.35rem"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel historique éditions -->
+        <div id="panel-history" class="panel">
+          <div id="export-index-wrap" style="display: none; justify-content: flex-end; margin-bottom: 1rem">
+            <a class="btn-sm btn-neutral" href="/index.html" download="index.html" style="text-decoration: none">
+              📥 Exporter index.html
+            </a>
+          </div>
+          <div class="loading-state" id="hist-loading">Chargement…</div>
+          <div id="version-list"></div>
+          <div class="empty-state" id="hist-empty" style="display: none">Aucune version sauvegardée.</div>
+        </div>
+
+        <!-- Panel utilisateurs -->
+        <div id="panel-users" class="panel">
+          <!-- Formulaire de création -->
+          <div class="card" style="margin-bottom: 1.5rem">
+            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem">Créer un utilisateur</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end">
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem">
+                  Identifiant
+                </label>
+                <input
+                  id="new-username"
+                  type="text"
+                  placeholder="prenom.nom"
+                  style="
+                    width: 100%;
+                    padding: 0.6rem 0.8rem;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                    background: rgba(255, 255, 255, 0.05);
+                    color: var(--text-light);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem">
+                  Email
+                </label>
+                <input
+                  id="new-email"
+                  type="email"
+                  placeholder="email@example.com"
+                  style="
+                    width: 100%;
+                    padding: 0.6rem 0.8rem;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                    background: rgba(255, 255, 255, 0.05);
+                    color: var(--text-light);
+                    font-size: 0.9rem;
+                  "
+                />
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem">
+                  Rôle
+                </label>
+                <select
+                  id="new-role"
+                  style="
+                    padding: 0.6rem 0.8rem;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                    background: rgba(255, 255, 255, 0.05);
+                    color: var(--text-light);
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                  "
+                >
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 1rem">
+              <button
+                class="btn-sm"
+                id="btn-create-user"
+                onclick="createUser()"
+                style="
+                  background: var(--orange);
+                  color: #fff;
+                  border: none;
+                  padding: 0.5rem 1.2rem;
+                  border-radius: 8px;
+                  font-size: 0.85rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                + Créer et envoyer l'invitation
+              </button>
+              <span id="create-user-msg" style="font-size: 0.8rem; display: none"></span>
+            </div>
+          </div>
+
+          <div class="loading-state" id="users-loading">Chargement…</div>
+          <div id="users-list"></div>
+        </div>
+      </main>
     </div>
-  </main>
-</div>
 
-<script>
-let token = localStorage.getItem('avcoach_token');
-let allVersions = [];
+    <script>
+      let token = localStorage.getItem('avcoach_token');
+      let allVersions = [];
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
-async function doLogin() {
-  const username = document.getElementById('login-user').value.trim();
-  const password = document.getElementById('login-pass').value;
-  const errEl = document.getElementById('auth-error');
-  errEl.style.display = 'none';
-  try {
-    const res = await fetch('/api/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erreur');
-    if (data.firstLogin) { errEl.textContent = 'Définissez d\'abord votre mot de passe sur le site principal.'; errEl.style.display = 'block'; return; }
-    if (data.user.role !== 'admin' && data.user.role !== 'editor') { errEl.textContent = 'Accès non autorisé.'; errEl.style.display = 'block'; return; }
-    token = data.token;
-    localStorage.setItem('avcoach_token', token);
-    showApp(data.user);
-  } catch (err) {
-    errEl.textContent = err.message;
-    errEl.style.display = 'block';
-  }
-}
+      // ── Auth ─────────────────────────────────────────────────────────────────────
+      async function doLogin() {
+        const username = document.getElementById('login-user').value.trim();
+        const password = document.getElementById('login-pass').value;
+        const errEl = document.getElementById('auth-error');
+        errEl.style.display = 'none';
+        try {
+          const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Erreur');
+          if (data.firstLogin) {
+            errEl.textContent = "Définissez d'abord votre mot de passe sur le site principal.";
+            errEl.style.display = 'block';
+            return;
+          }
+          if (data.user.role !== 'admin' && data.user.role !== 'editor') {
+            errEl.textContent = 'Accès non autorisé.';
+            errEl.style.display = 'block';
+            return;
+          }
+          token = data.token;
+          localStorage.setItem('avcoach_token', token);
+          showApp(data.user);
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.style.display = 'block';
+        }
+      }
 
-function doLogout() {
-  localStorage.removeItem('avcoach_token');
-  token = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('auth-gate').style.display = 'flex';
-}
+      function doLogout() {
+        localStorage.removeItem('avcoach_token');
+        token = null;
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('auth-gate').style.display = 'flex';
+      }
 
-function showApp(user) {
-  document.getElementById('auth-gate').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('user-label').textContent = user?.username || '';
+      function showApp(user) {
+        document.getElementById('auth-gate').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('user-label').textContent = user?.username || '';
 
-  // Masquer l'onglet Utilisateurs et l'export pour les editors
-  document.querySelectorAll('.tab').forEach(t => {
-    if (t.textContent.trim() === 'Utilisateurs') t.style.display = user.role === 'admin' ? '' : 'none';
-  });
-  document.getElementById('export-index-wrap').style.display = user.role === 'admin' ? 'flex' : 'none';
+        // Masquer l'onglet Utilisateurs et l'export pour les editors
+        document.querySelectorAll('.tab').forEach((t) => {
+          if (t.textContent.trim() === 'Utilisateurs') t.style.display = user.role === 'admin' ? '' : 'none';
+        });
+        document.getElementById('export-index-wrap').style.display = user.role === 'admin' ? 'flex' : 'none';
 
-  loadMessages();
-  loadHistory();
-  loadStats();
-  if (user.role === 'admin') loadUsers();
-}
+        loadMessages();
+        loadHistory();
+        loadStats();
+        if (user.role === 'admin') loadUsers();
+      }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function switchTab(name) {
-  const names = ['stats', 'history', 'messages', 'users'];
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
-  ['messages','history','users','stats'].forEach(p =>
-    document.getElementById('panel-' + p).classList.toggle('active', p === name)
-  );
-}
+      // ── Tabs ──────────────────────────────────────────────────────────────────────
+      function switchTab(name) {
+        const names = ['stats', 'history', 'messages', 'users'];
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
+        ['messages', 'history', 'users', 'stats'].forEach((p) =>
+          document.getElementById('panel-' + p).classList.toggle('active', p === name)
+        );
+      }
 
-// ── Messages ─────────────────────────────────────────────────────────────────
-async function loadMessages() {
-  const res = await fetch('/api/messages', { headers: { Authorization: 'Bearer ' + token } });
-  const messages = await res.json();
-  document.getElementById('msg-loading').style.display = 'none';
+      // ── Messages ─────────────────────────────────────────────────────────────────
+      async function loadMessages() {
+        const res = await fetch('/api/messages', { headers: { Authorization: 'Bearer ' + token } });
+        const messages = await res.json();
+        document.getElementById('msg-loading').style.display = 'none';
 
-  const unread = messages.filter(m => !m.read).length;
-  const badge = document.getElementById('unread-badge');
-  if (unread) { badge.textContent = unread; badge.style.display = ''; } else badge.style.display = 'none';
+        const unread = messages.filter((m) => !m.read).length;
+        const badge = document.getElementById('unread-badge');
+        if (unread) {
+          badge.textContent = unread;
+          badge.style.display = '';
+        } else badge.style.display = 'none';
 
-  if (!messages.length) { document.getElementById('msg-empty').style.display = 'block'; return; }
+        if (!messages.length) {
+          document.getElementById('msg-empty').style.display = 'block';
+          return;
+        }
 
-  document.getElementById('message-list').innerHTML = messages.map(m => {
-    const date = fmtDate(m.received_at);
-    return `<div class="card ${m.read ? '' : 'unread'}" id="msg-${m.id}">
+        document.getElementById('message-list').innerHTML = messages
+          .map((m) => {
+            const date = fmtDate(m.received_at);
+            return `<div class="card ${m.read ? '' : 'unread'}" id="msg-${m.id}">
       <div class="card-meta">
         <span class="card-name">${esc(m.name)}</span>
         <a class="card-email" href="mailto:${esc(m.email)}">${esc(m.email)}</a>
@@ -361,40 +724,45 @@ async function loadMessages() {
         <button class="btn-sm btn-danger" onclick="deleteMsg(${m.id})">Supprimer</button>
       </div>
     </div>`;
-  }).join('');
-}
+          })
+          .join('');
+      }
 
-async function markRead(id) {
-  await fetch(`/api/messages/${id}/read`, { method: 'PATCH', headers: { Authorization: 'Bearer ' + token } });
-  const card = document.getElementById('msg-' + id);
-  card.classList.remove('unread');
-  card.querySelector('.btn-neutral')?.remove();
-  const unread = document.querySelectorAll('.card.unread').length;
-  const badge = document.getElementById('unread-badge');
-  unread ? badge.textContent = unread : badge.style.display = 'none';
-}
+      async function markRead(id) {
+        await fetch(`/api/messages/${id}/read`, { method: 'PATCH', headers: { Authorization: 'Bearer ' + token } });
+        const card = document.getElementById('msg-' + id);
+        card.classList.remove('unread');
+        card.querySelector('.btn-neutral')?.remove();
+        const unread = document.querySelectorAll('.card.unread').length;
+        const badge = document.getElementById('unread-badge');
+        unread ? (badge.textContent = unread) : (badge.style.display = 'none');
+      }
 
-async function deleteMsg(id) {
-  if (!confirm('Supprimer ce message ?')) return;
-  await fetch(`/api/messages/${id}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
-  document.getElementById('msg-' + id).remove();
-  if (!document.querySelector('.card')) document.getElementById('msg-empty').style.display = 'block';
-}
+      async function deleteMsg(id) {
+        if (!confirm('Supprimer ce message ?')) return;
+        await fetch(`/api/messages/${id}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+        document.getElementById('msg-' + id).remove();
+        if (!document.querySelector('.card')) document.getElementById('msg-empty').style.display = 'block';
+      }
 
-// ── Historique éditions ───────────────────────────────────────────────────────
-async function loadHistory() {
-  const res = await fetch('/api/content/history/full', { headers: { Authorization: 'Bearer ' + token } });
-  allVersions = await res.json();
-  document.getElementById('hist-loading').style.display = 'none';
+      // ── Historique éditions ───────────────────────────────────────────────────────
+      async function loadHistory() {
+        const res = await fetch('/api/content/history/full', { headers: { Authorization: 'Bearer ' + token } });
+        allVersions = await res.json();
+        document.getElementById('hist-loading').style.display = 'none';
 
-  if (!allVersions.length) { document.getElementById('hist-empty').style.display = 'block'; return; }
+        if (!allVersions.length) {
+          document.getElementById('hist-empty').style.display = 'block';
+          return;
+        }
 
-  // Compter les non-base pour le numéro d'édition
-  const editVersions = allVersions.filter(v => !v.is_base);
-  document.getElementById('version-list').innerHTML = allVersions.map((v, i) => {
-    const label = v.is_base ? 'V0' : `V${editVersions.length - editVersions.indexOf(v)}`;
-    const prev  = allVersions[i + 1] || null;
-    return `<div class="version-card" id="ver-${v.id}">
+        // Compter les non-base pour le numéro d'édition
+        const editVersions = allVersions.filter((v) => !v.is_base);
+        document.getElementById('version-list').innerHTML = allVersions
+          .map((v, i) => {
+            const label = v.is_base ? 'V0' : `V${editVersions.length - editVersions.indexOf(v)}`;
+            const prev = allVersions[i + 1] || null;
+            return `<div class="version-card" id="ver-${v.id}">
       <div class="version-header" onclick="toggleVersion(${v.id})">
         <span class="version-badge">${label}</span>
         <div class="version-info">
@@ -409,49 +777,60 @@ async function loadHistory() {
         ${renderVersionBody(v, prev, label)}
       </div>
     </div>`;
-  }).join('');
-}
+          })
+          .join('');
+      }
 
-function toggleVersion(id) {
-  document.getElementById('ver-' + id).classList.toggle('open');
-}
+      function toggleVersion(id) {
+        document.getElementById('ver-' + id).classList.toggle('open');
+      }
 
-async function restoreVersion(id, label) {
-  if (!confirm(`Restaurer la ${label} comme nouvelle version active ?`)) return;
-  const v = allVersions.find(v => v.id === id);
-  if (!v) return;
-  const res = await fetch('/api/content', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ snapshot: v.snapshot })
-  });
-  if (res.ok) {
-    alert(`${label} restaurée avec succès.`);
-    loadHistory();
-  } else {
-    alert('Erreur lors de la restauration.');
-  }
-}
+      async function restoreVersion(id, label) {
+        if (!confirm(`Restaurer la ${label} comme nouvelle version active ?`)) return;
+        const v = allVersions.find((v) => v.id === id);
+        if (!v) return;
+        const res = await fetch('/api/content', {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ snapshot: v.snapshot })
+        });
+        if (res.ok) {
+          alert(`${label} restaurée avec succès.`);
+          loadHistory();
+        } else {
+          alert('Erreur lors de la restauration.');
+        }
+      }
 
-function renderVersionBody(v, prev, label) {
-  const texts = extractTexts(v.snapshot);
+      function renderVersionBody(v, prev, label) {
+        const texts = extractTexts(v.snapshot);
 
-  if (!prev) {
-    // V1 : juste le contenu
-    return `<div class="diff-label">Contenu de base (${label})</div>` +
-      texts.map(({ key, text }) =>
-        text.trim() ? `<div class="diff-block"><div class="diff-id">${esc(idOf(key))}</div><div class="diff-text">${esc(text)}</div></div>` : ''
-      ).filter(Boolean).join('');
-  }
+        if (!prev) {
+          // V1 : juste le contenu
+          return (
+            `<div class="diff-label">Contenu de base (${label})</div>` +
+            texts
+              .map(({ key, text }) =>
+                text.trim()
+                  ? `<div class="diff-block"><div class="diff-id">${esc(idOf(key))}</div><div class="diff-text">${esc(text)}</div></div>`
+                  : ''
+              )
+              .filter(Boolean)
+              .join('')
+          );
+        }
 
-  const prevTexts = extractTexts(prev.snapshot);
-  const diffs = buildDiffs(texts, prevTexts);
-  const changed = diffs.filter(d => d.changed);
+        const prevTexts = extractTexts(prev.snapshot);
+        const diffs = buildDiffs(texts, prevTexts);
+        const changed = diffs.filter((d) => d.changed);
 
-  if (!changed.length) return `<div class="no-change">Aucune modification de texte détectée.</div>`;
+        if (!changed.length) return `<div class="no-change">Aucune modification de texte détectée.</div>`;
 
-  return `<div class="diff-label">${changed.length} bloc${changed.length > 1 ? 's' : ''} modifié${changed.length > 1 ? 's' : ''}</div>` +
-    changed.map(d => `
+        return (
+          `<div class="diff-label">${changed.length} bloc${changed.length > 1 ? 's' : ''} modifié${changed.length > 1 ? 's' : ''}</div>` +
+          changed
+            .map(
+              (d) => `
       <div class="diff-block">
         <div class="diff-id">${esc(idOf(d.key))}</div>
         <div class="diff-label" style="margin-bottom:.2rem">Avant</div>
@@ -459,143 +838,167 @@ function renderVersionBody(v, prev, label) {
         <div class="diff-label" style="margin:.4rem 0 .2rem">Après</div>
         <div class="diff-text">${wordDiff(d.before, d.after).after}</div>
       </div>`
-    ).join('');
-}
+            )
+            .join('')
+        );
+      }
 
-// el_hero-tag → hero-tag (identifiant data-edit-id lisible)
-function idOf(key) {
-  return key.replace(/^el_/, '');
-}
+      // el_hero-tag → hero-tag (identifiant data-edit-id lisible)
+      function idOf(key) {
+        return key.replace(/^el_/, '');
+      }
 
-function extractTexts(snapshot) {
-  return Object.entries(snapshot)
-    .filter(([k]) => k.startsWith('el_'))
-    .map(([key, html]) => ({ key, text: stripTags(html) }));
-}
+      function extractTexts(snapshot) {
+        return Object.entries(snapshot)
+          .filter(([k]) => k.startsWith('el_'))
+          .map(([key, html]) => ({ key, text: stripTags(html) }));
+      }
 
-function buildDiffs(current, previous) {
-  const prevByKey = new Map(previous.map(p => [p.key, p.text]));
-  return current.map(c => {
-    const before = prevByKey.get(c.key) ?? '';
-    const after  = c.text;
-    return { key: c.key, before, after, changed: before.trim() !== after.trim() };
-  });
-}
+      function buildDiffs(current, previous) {
+        const prevByKey = new Map(previous.map((p) => [p.key, p.text]));
+        return current.map((c) => {
+          const before = prevByKey.get(c.key) ?? '';
+          const after = c.text;
+          return { key: c.key, before, after, changed: before.trim() !== after.trim() };
+        });
+      }
 
-function wordDiff(before, after) {
-  const bWords = before.split(/(\s+)/);
-  const aWords = after.split(/(\s+)/);
-  const bSet = new Set(bWords);
-  const aSet = new Set(aWords);
+      function wordDiff(before, after) {
+        const bWords = before.split(/(\s+)/);
+        const aWords = after.split(/(\s+)/);
+        const bSet = new Set(bWords);
+        const aSet = new Set(aWords);
 
-  const beforeHtml = bWords.map(w =>
-    w.trim() && !aSet.has(w) ? `<span class="diff-removed">${esc(w)}</span>` : `<span class="diff-unchanged">${esc(w)}</span>`
-  ).join('');
+        const beforeHtml = bWords
+          .map((w) =>
+            w.trim() && !aSet.has(w)
+              ? `<span class="diff-removed">${esc(w)}</span>`
+              : `<span class="diff-unchanged">${esc(w)}</span>`
+          )
+          .join('');
 
-  const afterHtml = aWords.map(w =>
-    w.trim() && !bSet.has(w) ? `<span class="diff-added">${esc(w)}</span>` : `<span class="diff-unchanged">${esc(w)}</span>`
-  ).join('');
+        const afterHtml = aWords
+          .map((w) =>
+            w.trim() && !bSet.has(w)
+              ? `<span class="diff-added">${esc(w)}</span>`
+              : `<span class="diff-unchanged">${esc(w)}</span>`
+          )
+          .join('');
 
-  return { before: beforeHtml, after: afterHtml };
-}
+        return { before: beforeHtml, after: afterHtml };
+      }
 
-// ── Statistiques ─────────────────────────────────────────────────────────────
-async function loadStats() {
-  const res  = await fetch('/api/stats', { headers: { Authorization: 'Bearer ' + token } });
-  const data = await res.json();
-  document.getElementById('stats-loading').style.display = 'none';
-  document.getElementById('stats-content').style.display = 'block';
+      // ── Statistiques ─────────────────────────────────────────────────────────────
+      async function loadStats() {
+        const res = await fetch('/api/stats', { headers: { Authorization: 'Bearer ' + token } });
+        const data = await res.json();
+        document.getElementById('stats-loading').style.display = 'none';
+        document.getElementById('stats-content').style.display = 'block';
 
-  document.getElementById('stat-total').textContent        = data.total;
-  document.getElementById('stat-total-unique').textContent  = data.totalUnique;
-  document.getElementById('stat-today').textContent         = data.today;
-  document.getElementById('stat-today-unique').textContent  = data.todayUnique;
-  document.getElementById('stat-messages').textContent      = data.messages;
+        document.getElementById('stat-total').textContent = data.total;
+        document.getElementById('stat-total-unique').textContent = data.totalUnique;
+        document.getElementById('stat-today').textContent = data.today;
+        document.getElementById('stat-today-unique').textContent = data.todayUnique;
+        document.getElementById('stat-messages').textContent = data.messages;
 
-  // Barchart 30 jours
-  let _chartDays = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    const found = data.last30.find(r => r.date === key);
-    _chartDays.push({ date: key, count: found?.count || 0, unique: found?.unique_count || 0 });
-  }
-  window._chartDays = _chartDays;
+        // Barchart 30 jours
+        let _chartDays = [];
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const key = d.toISOString().slice(0, 10);
+          const found = data.last30.find((r) => r.date === key);
+          _chartDays.push({ date: key, count: found?.count || 0, unique: found?.unique_count || 0 });
+        }
+        window._chartDays = _chartDays;
 
-  function renderChart(mode) {
-    const days   = window._chartDays;
-    const key    = mode === 'unique' ? 'unique' : 'count';
-    const label  = mode === 'unique' ? 'visiteur unique' : 'page vue';
-    const max    = Math.max(...days.map(d => d[key]), 1);
-    document.getElementById('chart').innerHTML = days.map(d => {
-      const h = Math.max(4, Math.round((d[key] / max) * 120));
-      const showVal = d[key] > 0;
-      return `<div title="${d.date} : ${d[key]} ${label}${d[key] > 1 ? 's' : ''}"
+        function renderChart(mode) {
+          const days = window._chartDays;
+          const key = mode === 'unique' ? 'unique' : 'count';
+          const label = mode === 'unique' ? 'visiteur unique' : 'page vue';
+          const max = Math.max(...days.map((d) => d[key]), 1);
+          document.getElementById('chart').innerHTML = days
+            .map((d) => {
+              const h = Math.max(4, Math.round((d[key] / max) * 120));
+              const showVal = d[key] > 0;
+              return `<div title="${d.date} : ${d[key]} ${label}${d[key] > 1 ? 's' : ''}"
         style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:default">
         ${showVal ? `<span style="font-size:.65rem;font-weight:600;color:var(--text-light);margin-bottom:3px;line-height:1">${d[key]}</span>` : ''}
         <div style="width:100%;height:${h}px;background:var(--orange);border-radius:3px 3px 0 0;opacity:${d[key] ? 1 : 0.15}"></div>
       </div>`;
-    }).join('');
-    document.getElementById('chart-labels').innerHTML = days.map(d => {
-      const day = d.date.slice(8);
-      return `<div style="flex:1;font-size:.6rem;color:var(--text-muted);text-align:center">${day === '01' || day === '15' ? d.date.slice(5) : ''}</div>`;
-    }).join('');
-    document.getElementById('chart-btn-unique').style.cssText = mode === 'unique'
-      ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
-      : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
-    document.getElementById('chart-btn-all').style.cssText = mode === 'all'
-      ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
-      : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
-  }
-  window.renderChart = renderChart;
-  renderChart('unique');
-}
+            })
+            .join('');
+          document.getElementById('chart-labels').innerHTML = days
+            .map((d) => {
+              const day = d.date.slice(8);
+              return `<div style="flex:1;font-size:.6rem;color:var(--text-muted);text-align:center">${day === '01' || day === '15' ? d.date.slice(5) : ''}</div>`;
+            })
+            .join('');
+          document.getElementById('chart-btn-unique').style.cssText =
+            mode === 'unique'
+              ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
+              : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
+          document.getElementById('chart-btn-all').style.cssText =
+            mode === 'all'
+              ? 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer'
+              : 'font-size:.75rem;padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-muted);cursor:pointer';
+        }
+        window.renderChart = renderChart;
+        renderChart('unique');
+      }
 
-// ── Utilisateurs ─────────────────────────────────────────────────────────────
-async function createUser() {
-  const username = document.getElementById('new-username').value.trim();
-  const email    = document.getElementById('new-email').value.trim();
-  const role     = document.getElementById('new-role').value;
-  const msg      = document.getElementById('create-user-msg');
-  const btn      = document.getElementById('btn-create-user');
+      // ── Utilisateurs ─────────────────────────────────────────────────────────────
+      async function createUser() {
+        const username = document.getElementById('new-username').value.trim();
+        const email = document.getElementById('new-email').value.trim();
+        const role = document.getElementById('new-role').value;
+        const msg = document.getElementById('create-user-msg');
+        const btn = document.getElementById('btn-create-user');
 
-  if (!username || !email) {
-    msg.textContent = 'Identifiant et email requis.';
-    msg.style.color = 'var(--red)'; msg.style.display = 'inline';
-    return;
-  }
+        if (!username || !email) {
+          msg.textContent = 'Identifiant et email requis.';
+          msg.style.color = 'var(--red)';
+          msg.style.display = 'inline';
+          return;
+        }
 
-  btn.textContent = 'Création…'; btn.disabled = true;
-  msg.style.display = 'none';
+        btn.textContent = 'Création…';
+        btn.disabled = true;
+        msg.style.display = 'none';
 
-  try {
-    const res  = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify({ username, email, role })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+        try {
+          const res = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ username, email, role })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
 
-    msg.textContent = `✓ Invitation envoyée à ${email}`;
-    msg.style.color = 'var(--green)'; msg.style.display = 'inline';
-    document.getElementById('new-username').value = '';
-    document.getElementById('new-email').value    = '';
-    loadUsers();
-  } catch (err) {
-    msg.textContent = 'Erreur : ' + err.message;
-    msg.style.color = 'var(--red)'; msg.style.display = 'inline';
-  } finally {
-    btn.textContent = '+ Créer et envoyer l\'invitation'; btn.disabled = false;
-  }
-}
+          msg.textContent = `✓ Invitation envoyée à ${email}`;
+          msg.style.color = 'var(--green)';
+          msg.style.display = 'inline';
+          document.getElementById('new-username').value = '';
+          document.getElementById('new-email').value = '';
+          loadUsers();
+        } catch (err) {
+          msg.textContent = 'Erreur : ' + err.message;
+          msg.style.color = 'var(--red)';
+          msg.style.display = 'inline';
+        } finally {
+          btn.textContent = "+ Créer et envoyer l'invitation";
+          btn.disabled = false;
+        }
+      }
 
-async function loadUsers() {
-  const res   = await fetch('/api/users', { headers: { Authorization: 'Bearer ' + token } });
-  const users = await res.json();
-  document.getElementById('users-loading').style.display = 'none';
+      async function loadUsers() {
+        const res = await fetch('/api/users', { headers: { Authorization: 'Bearer ' + token } });
+        const users = await res.json();
+        document.getElementById('users-loading').style.display = 'none';
 
-  document.getElementById('users-list').innerHTML = users.map(u => `
+        document.getElementById('users-list').innerHTML = users
+          .map(
+            (u) => `
     <div class="card" id="user-${u.id}">
       <div class="card-meta">
         <span class="card-name">${esc(u.username)}</span>
@@ -608,64 +1011,84 @@ async function loadUsers() {
         </button>
       </div>
     </div>
-  `).join('');
-}
+  `
+          )
+          .join('');
+      }
 
-async function resetPassword(id, username) {
-  if (!confirm(`Réinitialiser le mot de passe de ${username} ?\n\nUn mot de passe temporaire sera envoyé par email.`)) return;
-  const btn = document.querySelector(`#user-${id} .btn-danger`);
-  btn.textContent = 'Envoi…'; btn.disabled = true;
-  try {
-    const res = await fetch(`/api/users/${id}/reset-password`, {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    btn.textContent = '✓ Email envoyé';
-    btn.style.background = 'rgba(74,222,128,0.1)';
-    btn.style.color = 'var(--green)';
-    setTimeout(() => {
-      btn.textContent = '↺ Réinitialiser le mot de passe';
-      btn.style = ''; btn.disabled = false;
-    }, 3000);
-  } catch (err) {
-    alert('Erreur : ' + err.message);
-    btn.textContent = '↺ Réinitialiser le mot de passe'; btn.disabled = false;
-  }
-}
+      async function resetPassword(id, username) {
+        if (
+          !confirm(
+            `Réinitialiser le mot de passe de ${username} ?\n\nUn mot de passe temporaire sera envoyé par email.`
+          )
+        )
+          return;
+        const btn = document.querySelector(`#user-${id} .btn-danger`);
+        btn.textContent = 'Envoi…';
+        btn.disabled = true;
+        try {
+          const res = await fetch(`/api/users/${id}/reset-password`, {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + token }
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          btn.textContent = '✓ Email envoyé';
+          btn.style.background = 'rgba(74,222,128,0.1)';
+          btn.style.color = 'var(--green)';
+          setTimeout(() => {
+            btn.textContent = '↺ Réinitialiser le mot de passe';
+            btn.style = '';
+            btn.disabled = false;
+          }, 3000);
+        } catch (err) {
+          alert('Erreur : ' + err.message);
+          btn.textContent = '↺ Réinitialiser le mot de passe';
+          btn.disabled = false;
+        }
+      }
 
-// ── Utilitaires ───────────────────────────────────────────────────────────────
-function stripTags(html) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  return d.textContent || '';
-}
+      // ── Utilitaires ───────────────────────────────────────────────────────────────
+      function stripTags(html) {
+        const d = document.createElement('div');
+        d.innerHTML = html;
+        return d.textContent || '';
+      }
 
-function fmtDate(str) {
-  return new Date(str + 'Z').toLocaleDateString('fr-FR', {
-    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  });
-}
+      function fmtDate(str) {
+        return new Date(str + 'Z').toLocaleDateString('fr-FR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
 
-function esc(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+      function esc(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
+      // ── Init ──────────────────────────────────────────────────────────────────────
+      document.getElementById('login-pass').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') doLogin();
+      });
+      document.getElementById('login-user').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('login-pass').focus();
+      });
 
-if (token) {
-  fetch('/api/verify', { headers: { Authorization: 'Bearer ' + token } })
-    .then(r => r.json())
-    .then(d => {
-      if (d.valid && (d.user.role === 'admin' || d.user.role === 'editor')) showApp(d.user);
-      else { localStorage.removeItem('avcoach_token'); token = null; }
-    })
-    .catch(() => {});
-}
-</script>
-</body>
+      if (token) {
+        fetch('/api/verify', { headers: { Authorization: 'Bearer ' + token } })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.valid && (d.user.role === 'admin' || d.user.role === 'editor')) showApp(d.user);
+            else {
+              localStorage.removeItem('avcoach_token');
+              token = null;
+            }
+          })
+          .catch(() => {});
+      }
+    </script>
+  </body>
 </html>

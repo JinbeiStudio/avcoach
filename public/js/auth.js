@@ -2,9 +2,15 @@
 const Auth = (() => {
   const TOKEN_KEY = 'avcoach_token';
 
-  function getToken() { return localStorage.getItem(TOKEN_KEY); }
-  function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
-  function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+  function setToken(t) {
+    localStorage.setItem(TOKEN_KEY, t);
+  }
+  function clearToken() {
+    localStorage.removeItem(TOKEN_KEY);
+  }
 
   async function login(username, password) {
     const res = await fetch('/api/login', {
@@ -49,7 +55,10 @@ const Auth = (() => {
       const res = await fetch('/api/verify', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) { clearToken(); return null; }
+      if (!res.ok) {
+        clearToken();
+        return null;
+      }
       const data = await res.json();
       return data.user;
     } catch {

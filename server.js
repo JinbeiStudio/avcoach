@@ -1,21 +1,21 @@
 require('dotenv').config();
 
-const express  = require('express');
-const bcrypt   = require('bcrypt');
-const jwt      = require('jsonwebtoken');
-const cors     = require('cors');
-const path     = require('path');
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const path = require('path');
 
-const nodemailer       = require('nodemailer');
-const { getDb }        = require('./database/db');
+const nodemailer = require('nodemailer');
+const { getDb } = require('./database/db');
 const { initDatabase } = require('./database/init');
 const { renderIndexHtml, readIndexSnapshot, hashIndexHtml } = require('./database/render');
 const { getMeta, setMeta } = require('./database/meta');
 
 function createTransporter() {
   return nodemailer.createTransport({
-    host:   process.env.SMTP_HOST   || 'smtp.mail.me.com',
-    port:   parseInt(process.env.SMTP_PORT || '587'),
+    host: process.env.SMTP_HOST || 'smtp.mail.me.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
     secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
@@ -24,8 +24,8 @@ function createTransporter() {
   });
 }
 
-const app    = express();
-const PORT   = process.env.PORT || 3456;
+const app = express();
+const PORT = process.env.PORT || 3456;
 const SECRET = process.env.JWT_SECRET;
 const EXPIRES = process.env.JWT_EXPIRES_IN || '8h';
 
@@ -36,9 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // GET /sitemap.xml — <lastmod> basé sur la dernière sauvegarde de contenu,
 // le signal que les crawlers utilisent pour prioriser le re-crawl.
 app.get('/sitemap.xml', (req, res) => {
-  const latest = getDb()
-    .prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1')
-    .get();
+  const latest = getDb().prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1').get();
   const lastmod = latest ? new Date(latest.saved_at + 'Z').toISOString() : new Date().toISOString();
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -72,7 +70,7 @@ app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   if (!username) return res.status(400).json({ error: 'Identifiant requis' });
 
-  const db   = getDb();
+  const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
   if (!user) return res.status(401).json({ error: 'Identifiant inconnu' });
 
@@ -90,11 +88,7 @@ app.post('/api/login', (req, res) => {
 
   db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
 
-  const token = jwt.sign(
-    { id: user.id, username: user.username, role: user.role },
-    SECRET,
-    { expiresIn: EXPIRES }
-  );
+  const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, SECRET, { expiresIn: EXPIRES });
 
   res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
@@ -109,7 +103,7 @@ app.post('/api/set-password', (req, res) => {
     return res.status(400).json({ error: 'Le mot de passe doit faire au moins 8 caractères' });
   }
 
-  const db   = getDb();
+  const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
   if (!user.must_set_password && user.password) {
@@ -117,15 +111,13 @@ app.post('/api/set-password', (req, res) => {
   }
 
   const hash = bcrypt.hashSync(newPassword, 12);
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE users SET password = ?, must_set_password = 0, last_login = datetime('now') WHERE id = ?
-  `).run(hash, user.id);
+  `
+  ).run(hash, user.id);
 
-  const token = jwt.sign(
-    { id: user.id, username: user.username, role: user.role },
-    SECRET,
-    { expiresIn: EXPIRES }
-  );
+  const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, SECRET, { expiresIn: EXPIRES });
 
   res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
@@ -143,9 +135,7 @@ app.post('/api/logout', requireAuth, (req, res) => {
 // GET /api/users  (admin seulement — liste des comptes)
 app.get('/api/users', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const users = getDb()
-    .prepare('SELECT id, username, role, created_at, last_login FROM users')
-    .all();
+  const users = getDb().prepare('SELECT id, username, role, created_at, last_login FROM users').all();
   res.json(users);
 });
 
@@ -165,7 +155,9 @@ app.post('/api/users', requireAuth, async (req, res) => {
 
   try {
     const result = getDb()
-      .prepare("INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role) VALUES (?, ?, ?, 1, 0, ?)")
+      .prepare(
+        'INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role) VALUES (?, ?, ?, 1, 0, ?)'
+      )
       .run(username, email, hash, userRole);
 
     const transporter = createTransporter();
@@ -204,13 +196,13 @@ app.put('/api/users/:id/password', requireAuth, (req, res) => {
 app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
   const targetId = parseInt(req.params.id);
-  const db   = getDb();
+  const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(targetId);
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
 
-  const crypto     = require('crypto');
+  const crypto = require('crypto');
   const tempPassword = crypto.randomBytes(6).toString('base64url');
-  const hash       = bcrypt.hashSync(tempPassword, 12);
+  const hash = bcrypt.hashSync(tempPassword, 12);
 
   db.prepare('UPDATE users SET password = ?, must_set_password = 1 WHERE id = ?').run(hash, targetId);
 
@@ -257,16 +249,21 @@ app.post('/api/content', requireAuth, (req, res) => {
     fullSnapshot = latest ? { ...JSON.parse(latest.snapshot), ...delta } : delta;
   }
 
-  db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)')
-    .run(req.user.id, JSON.stringify(fullSnapshot), isBase ? 1 : 0);
+  db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)').run(
+    req.user.id,
+    JSON.stringify(fullSnapshot),
+    isBase ? 1 : 0
+  );
   // Garde V0 + les 5 dernières éditions
-  db.prepare(`
+  db.prepare(
+    `
     DELETE FROM content_saves
     WHERE is_base = 0
     AND id NOT IN (
       SELECT id FROM content_saves WHERE is_base = 0 ORDER BY id DESC LIMIT 5
     )
-  `).run();
+  `
+  ).run();
   try {
     renderIndexHtml(delta);
     setMeta('last_rendered_hash', hashIndexHtml());
@@ -278,9 +275,7 @@ app.post('/api/content', requireAuth, (req, res) => {
 
 // GET /api/content/latest
 app.get('/api/content/latest', (req, res) => {
-  const row = getDb()
-    .prepare('SELECT snapshot, saved_at FROM content_saves ORDER BY id DESC LIMIT 1')
-    .get();
+  const row = getDb().prepare('SELECT snapshot, saved_at FROM content_saves ORDER BY id DESC LIMIT 1').get();
   if (!row) return res.json({ snapshot: null });
   res.json({ snapshot: JSON.parse(row.snapshot), saved_at: row.saved_at });
 });
@@ -302,20 +297,22 @@ app.get('/api/content/history', requireAuth, (req, res) => {
 // GET /api/content/history/full  (toutes les versions avec auteur — pour admin)
 app.get('/api/content/history/full', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
-  const rows = getDb().prepare(`
+  const rows = getDb()
+    .prepare(
+      `
     SELECT cs.id, cs.saved_at, cs.snapshot, cs.is_base, u.username
     FROM content_saves cs
     LEFT JOIN users u ON u.id = cs.saved_by
     ORDER BY cs.id DESC
-  `).all();
-  res.json(rows.map(r => ({ ...r, snapshot: JSON.parse(r.snapshot) })));
+  `
+    )
+    .all();
+  res.json(rows.map((r) => ({ ...r, snapshot: JSON.parse(r.snapshot) })));
 });
 
 // GET /api/content/:id  (récupérer une version spécifique)
 app.get('/api/content/:id', requireAuth, (req, res) => {
-  const row = getDb()
-    .prepare('SELECT snapshot, saved_at FROM content_saves WHERE id = ?')
-    .get(req.params.id);
+  const row = getDb().prepare('SELECT snapshot, saved_at FROM content_saves WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'Version introuvable' });
   res.json({ snapshot: JSON.parse(row.snapshot), saved_at: row.saved_at });
 });
@@ -323,19 +320,19 @@ app.get('/api/content/:id', requireAuth, (req, res) => {
 // POST /api/track  (enregistre une visite — public)
 app.post('/api/track', (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const ip    = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
-  const db    = getDb();
+  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+  const db = getDb();
 
-  const isNew = db.prepare(
-    'INSERT OR IGNORE INTO visitor_ips (date, ip) VALUES (?, ?)'
-  ).run(today, ip).changes > 0;
+  const isNew = db.prepare('INSERT OR IGNORE INTO visitor_ips (date, ip) VALUES (?, ?)').run(today, ip).changes > 0;
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO page_views (date, count, unique_count) VALUES (?, 1, ?)
     ON CONFLICT(date) DO UPDATE SET
       count        = count + 1,
       unique_count = unique_count + ?
-  `).run(today, isNew ? 1 : 0, isNew ? 1 : 0);
+  `
+  ).run(today, isNew ? 1 : 0, isNew ? 1 : 0);
 
   res.json({ ok: true });
 });
@@ -343,21 +340,25 @@ app.post('/api/track', (req, res) => {
 // GET /api/stats  (admin seulement)
 app.get('/api/stats', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const db    = getDb();
+  const db = getDb();
   const today = new Date().toISOString().slice(0, 10);
-  const totals  = db.prepare('SELECT SUM(count) as t, SUM(unique_count) as u FROM page_views').get();
+  const totals = db.prepare('SELECT SUM(count) as t, SUM(unique_count) as u FROM page_views').get();
   const todayRow = db.prepare('SELECT count, unique_count FROM page_views WHERE date = ?').get(today);
-  const last30  = db.prepare(`
+  const last30 = db
+    .prepare(
+      `
     SELECT date, count, unique_count FROM page_views
     WHERE date >= date('now', '-29 days')
     ORDER BY date ASC
-  `).all();
+  `
+    )
+    .all();
   const messages = db.prepare('SELECT COUNT(*) as n FROM contact_messages').get()?.n || 0;
   res.json({
-    total:        totals?.t || 0,
-    totalUnique:  totals?.u || 0,
-    today:        todayRow?.count || 0,
-    todayUnique:  todayRow?.unique_count || 0,
+    total: totals?.t || 0,
+    totalUnique: totals?.u || 0,
+    today: todayRow?.count || 0,
+    todayUnique: todayRow?.unique_count || 0,
     last30,
     messages
   });
@@ -393,9 +394,7 @@ app.post('/api/contact', async (req, res) => {
 // GET /api/messages  (liste des messages de contact — admin seulement)
 app.get('/api/messages', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
-  const rows = getDb()
-    .prepare('SELECT * FROM contact_messages ORDER BY id DESC')
-    .all();
+  const rows = getDb().prepare('SELECT * FROM contact_messages ORDER BY id DESC').all();
   res.json(rows);
 });
 
@@ -421,23 +420,27 @@ const { newUsers } = initDatabase();
 if (newUsers.length > 0) {
   const transporter = createTransporter();
   for (const { username, email, tempPassword } of newUsers) {
-    transporter.sendMail({
-      from: `"AV Coach" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: `Bienvenue sur AVCoach — vos identifiants`,
-      text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.\n\nCe mot de passe temporaire ne sera plus valable une fois changé.`,
-      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
-    }).then(() => {
-      console.log(`✓ Email de bienvenue envoyé à ${email} (${username})`);
-    }).catch(err => {
-      console.error(`✗ Échec envoi email ${username} :`, err.message);
-    });
+    transporter
+      .sendMail({
+        from: `"AV Coach" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: `Bienvenue sur AVCoach — vos identifiants`,
+        text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.\n\nCe mot de passe temporaire ne sera plus valable une fois changé.`,
+        html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
+      })
+      .then(() => {
+        console.log(`✓ Email de bienvenue envoyé à ${email} (${username})`);
+      })
+      .catch((err) => {
+        console.error(`✗ Échec envoi email ${username} :`, err.message);
+      });
   }
 }
 
 function captureBaseVersion() {
   getDb().exec('DELETE FROM content_saves');
-  getDb().prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
+  getDb()
+    .prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
     .run(JSON.stringify(readIndexSnapshot()));
 }
 
@@ -452,12 +455,12 @@ if (require.main === module) {
   // redémarrage sans changement), on ne touche à rien.
   try {
     const currentHash = hashIndexHtml();
-    const knownHash   = getMeta('last_rendered_hash');
+    const knownHash = getMeta('last_rendered_hash');
 
     if (knownHash === undefined) {
       captureBaseVersion();
     } else if (knownHash !== currentHash) {
-      console.log('⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l\'historique éditorial.');
+      console.log("⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l'historique éditorial.");
       captureBaseVersion();
     }
 

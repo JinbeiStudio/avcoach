@@ -1,65 +1,84 @@
 /* exported toggleMenu, toggleEdit, logout */
 // ── Navigation scroll ─────────────────────────────────────────────────────────
 const nav = document.getElementById('main-nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
-}, { passive: true });
+window.addEventListener(
+  'scroll',
+  () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  },
+  { passive: true }
+);
 
 // ── Reveal on scroll ──────────────────────────────────────────────────────────
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), i * 80);
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  },
+  { threshold: 0.1 }
+);
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
 // ── Mobile menu ───────────────────────────────────────────────────────────────
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
   const isOpen = links.dataset.open === '1';
   links.dataset.open = isOpen ? '0' : '1';
-  Object.assign(links.style, isOpen
-    ? { display: '' }
-    : {
-        display: 'flex', flexDirection: 'column', position: 'absolute',
-        top: '70px', left: '0', right: '0',
-        background: 'rgba(11,24,41,0.98)', padding: '1.5rem 2rem',
-        gap: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(10px)'
-      }
+  Object.assign(
+    links.style,
+    isOpen
+      ? { display: '' }
+      : {
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'absolute',
+          top: '70px',
+          left: '0',
+          right: '0',
+          background: 'rgba(11,24,41,0.98)',
+          padding: '1.5rem 2rem',
+          gap: '1.5rem',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          backdropFilter: 'blur(10px)'
+        }
   );
 }
 
 // ── Smooth scroll ─────────────────────────────────────────────────────────────
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
+document.querySelectorAll('a[href^="#"]').forEach((a) => {
+  a.addEventListener('click', (e) => {
     const target = document.querySelector(a.getAttribute('href'));
     if (!target) return;
     e.preventDefault();
     const offset = Editor.isActive() ? 44 + 70 : 70;
     window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
     const links = document.querySelector('.nav-links');
-    if (links) { links.style.display = ''; links.dataset.open = '0'; }
+    if (links) {
+      links.style.display = '';
+      links.dataset.open = '0';
+    }
   });
 });
 
 // ── Contact form ──────────────────────────────────────────────────────────────
-document.querySelector('.contact-form')?.addEventListener('submit', async e => {
+document.querySelector('.contact-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
-  const btn  = form.querySelector('.btn-submit');
-  const prenom  = form.querySelector('#prenom').value.trim();
-  const nom     = form.querySelector('#nom').value.trim();
-  const email   = form.querySelector('#email').value.trim();
-  const sujet   = form.querySelector('#sujet').value;
+  const btn = form.querySelector('.btn-submit');
+  const prenom = form.querySelector('#prenom').value.trim();
+  const nom = form.querySelector('#nom').value.trim();
+  const email = form.querySelector('#email').value.trim();
+  const sujet = form.querySelector('#sujet').value;
   const message = form.querySelector('#message').value.trim();
 
   if (!prenom || !nom || !email || !message) return;
 
-  btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+  btn.disabled = true;
 
   const name = `${prenom} ${nom}${sujet ? ' — ' + sujet : ''}`;
   try {
@@ -74,7 +93,8 @@ document.querySelector('.contact-form')?.addEventListener('submit', async e => {
   } catch {
     alert('Une erreur est survenue, veuillez réessayer ou contacter directement par email.');
   } finally {
-    btn.textContent = 'Envoyer le message'; btn.disabled = false;
+    btn.textContent = 'Envoyer le message';
+    btn.disabled = false;
   }
 });
 
@@ -102,30 +122,31 @@ function showLoginStep(n) {
   document.getElementById('setpwd-error').style.display = 'none';
 }
 
-document.getElementById('login-overlay').addEventListener('click', e => {
+document.getElementById('login-overlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('login-overlay')) closeLogin();
 });
-document.getElementById('login-user').addEventListener('keydown', e => {
+document.getElementById('login-user').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('login-pass').focus();
 });
-document.getElementById('login-pass').addEventListener('keydown', e => {
+document.getElementById('login-pass').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') doLogin();
 });
-document.getElementById('setpwd-new').addEventListener('keydown', e => {
+document.getElementById('setpwd-new').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('setpwd-confirm').focus();
 });
-document.getElementById('setpwd-confirm').addEventListener('keydown', e => {
+document.getElementById('setpwd-confirm').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') doSetPassword();
 });
 
 async function doLogin() {
   const username = document.getElementById('login-user').value.trim();
   const password = document.getElementById('login-pass').value;
-  const errEl    = document.getElementById('login-error');
-  const btn      = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
 
   errEl.style.display = 'none';
-  btn.textContent = 'Connexion…'; btn.disabled = true;
+  btn.textContent = 'Connexion…';
+  btn.disabled = true;
 
   try {
     const result = await Auth.login(username, password);
@@ -142,15 +163,16 @@ async function doLogin() {
     errEl.style.display = 'block';
     document.getElementById('login-pass').value = '';
   } finally {
-    btn.textContent = 'Se connecter'; btn.disabled = false;
+    btn.textContent = 'Se connecter';
+    btn.disabled = false;
   }
 }
 
 async function doSetPassword() {
   const newPassword = document.getElementById('setpwd-new').value;
-  const confirm     = document.getElementById('setpwd-confirm').value;
-  const errEl       = document.getElementById('setpwd-error');
-  const btn         = document.getElementById('setpwd-btn');
+  const confirm = document.getElementById('setpwd-confirm').value;
+  const errEl = document.getElementById('setpwd-error');
+  const btn = document.getElementById('setpwd-btn');
 
   errEl.style.display = 'none';
 
@@ -165,7 +187,8 @@ async function doSetPassword() {
     return;
   }
 
-  btn.textContent = 'Enregistrement…'; btn.disabled = true;
+  btn.textContent = 'Enregistrement…';
+  btn.disabled = true;
 
   try {
     await Auth.setPassword(_firstLoginUsername, newPassword);
@@ -175,7 +198,8 @@ async function doSetPassword() {
     errEl.textContent = err.message || 'Erreur lors de la définition du mot de passe';
     errEl.style.display = 'block';
   } finally {
-    btn.textContent = 'Définir le mot de passe'; btn.disabled = false;
+    btn.textContent = 'Définir le mot de passe';
+    btn.disabled = false;
   }
 }
 
@@ -204,16 +228,16 @@ function setEditButtonText(text) {
   const mob = document.getElementById('editToggleMobile');
   if (mob) mob.textContent = text;
   const loggedIn = text !== 'Connexion';
-  ['logoutBtn', 'logoutBtnMobile'].forEach(id => {
+  ['logoutBtn', 'logoutBtnMobile'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.style.display = loggedIn ? '' : 'none';
   });
 }
 
 // Ferme le dropdown historique si clic hors de la zone
-document.addEventListener('click', e => {
+document.addEventListener('click', (e) => {
   const wrap = document.querySelector('.history-wrap');
-  const dd   = document.getElementById('history-dropdown');
+  const dd = document.getElementById('history-dropdown');
   if (dd && dd.style.display === 'block' && wrap && !wrap.contains(e.target)) {
     dd.style.display = 'none';
   }

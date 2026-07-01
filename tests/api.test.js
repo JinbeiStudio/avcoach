@@ -3,8 +3,8 @@
  */
 
 const path = require('path');
-const os   = require('os');
-const fs   = require('fs');
+const os = require('os');
+const fs = require('fs');
 
 // ── Environnement de test (avant tout require) ────────────────────────────────
 const DB_FILE = path.join(os.tmpdir(), `avcoach-test-${process.pid}.sqlite`);
@@ -12,14 +12,14 @@ process.env.DATABASE_PATH = DB_FILE;
 const INDEX_HTML_FILE = path.join(os.tmpdir(), `avcoach-test-${process.pid}-index.html`);
 fs.copyFileSync(path.join(__dirname, '..', 'public', 'index.html'), INDEX_HTML_FILE);
 process.env.INDEX_HTML_PATH = INDEX_HTML_FILE;
-process.env.JWT_SECRET    = 'test-secret-key-ci';
+process.env.JWT_SECRET = 'test-secret-key-ci';
 process.env.JWT_EXPIRES_IN = '1h';
-process.env.SMTP_HOST     = 'localhost';
-process.env.SMTP_PORT     = '1025';
-process.env.SMTP_SECURE   = 'false';
-process.env.SMTP_USER     = 'test@test.com';
-process.env.SMTP_PASS     = 'test';
-process.env.CONTACT_TO    = 'test@test.com';
+process.env.SMTP_HOST = 'localhost';
+process.env.SMTP_PORT = '1025';
+process.env.SMTP_SECURE = 'false';
+process.env.SMTP_USER = 'test@test.com';
+process.env.SMTP_PASS = 'test';
+process.env.CONTACT_TO = 'test@test.com';
 
 // ── Mock nodemailer (avant require du serveur) ────────────────────────────────
 jest.mock('nodemailer', () => ({
@@ -28,9 +28,9 @@ jest.mock('nodemailer', () => ({
   })
 }));
 
-const http    = require('http');
+const http = require('http');
 const request = require('supertest');
-const bcrypt  = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const { resetDb } = require('../database/db');
 let server, adminToken, editorToken;
@@ -44,33 +44,41 @@ beforeAll(() => {
   // Créer des comptes de test avec mdp connu (bcryptRounds=1 pour la vitesse)
   const { getDb } = require('../database/db');
   const db = getDb();
-  const adminHash  = bcrypt.hashSync('Admin1234!', 1);
+  const adminHash = bcrypt.hashSync('Admin1234!', 1);
   const editorHash = bcrypt.hashSync('Editor1234!', 1);
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT OR REPLACE INTO users (username, email, password, must_set_password, welcome_email_sent, role)
     VALUES ('test.admin', 'admin@test.com', ?, 0, 1, 'admin')
-  `).run(adminHash);
-  db.prepare(`
+  `
+  ).run(adminHash);
+  db.prepare(
+    `
     INSERT OR REPLACE INTO users (username, email, password, must_set_password, welcome_email_sent, role)
     VALUES ('test.editor', 'editor@test.com', ?, 0, 1, 'editor')
-  `).run(editorHash);
+  `
+  ).run(editorHash);
 });
 
 beforeAll(async () => {
   // Obtenir les tokens après que les comptes soient créés
-  const resA = await request(server).post('/api/login').send({ username: 'test.admin',  password: 'Admin1234!' });
+  const resA = await request(server).post('/api/login').send({ username: 'test.admin', password: 'Admin1234!' });
   const resE = await request(server).post('/api/login').send({ username: 'test.editor', password: 'Editor1234!' });
-  adminToken  = resA.body.token;
+  adminToken = resA.body.token;
   editorToken = resE.body.token;
 });
 
 afterAll(() => {
   resetDb();
   for (const ext of ['', '-shm', '-wal']) {
-    try { fs.unlinkSync(DB_FILE + ext); } catch {}
+    try {
+      fs.unlinkSync(DB_FILE + ext);
+    } catch {}
   }
-  try { fs.unlinkSync(INDEX_HTML_FILE); } catch {}
+  try {
+    fs.unlinkSync(INDEX_HTML_FILE);
+  } catch {}
 });
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -93,13 +101,17 @@ describe('POST /api/login', () => {
 
   test('retourne firstLogin pour un mot de passe temporaire valide', async () => {
     const { getDb } = require('../database/db');
-    const crypto    = require('crypto');
-    const tmp       = crypto.randomBytes(6).toString('base64url');
-    const hash      = bcrypt.hashSync(tmp, 1);
-    getDb().prepare(`
+    const crypto = require('crypto');
+    const tmp = crypto.randomBytes(6).toString('base64url');
+    const hash = bcrypt.hashSync(tmp, 1);
+    getDb()
+      .prepare(
+        `
       INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role)
       VALUES ('tmp.user', 'tmp@test.com', ?, 1, 1, 'editor')
-    `).run(hash);
+    `
+      )
+      .run(hash);
     const res = await request(server).post('/api/login').send({ username: 'tmp.user', password: tmp });
     expect(res.status).toBe(200);
     expect(res.body.firstLogin).toBe(true);
@@ -108,7 +120,9 @@ describe('POST /api/login', () => {
 
 describe('POST /api/set-password', () => {
   test('définit le mot de passe définitif et retourne un token', async () => {
-    const res = await request(server).post('/api/set-password').send({ username: 'tmp.user', newPassword: 'NouveauMdp123!' });
+    const res = await request(server)
+      .post('/api/set-password')
+      .send({ username: 'tmp.user', newPassword: 'NouveauMdp123!' });
     expect(res.status).toBe(200);
     expect(res.body.token).toBeDefined();
   });
@@ -169,32 +183,24 @@ describe('Contenu', () => {
   });
 
   test('GET /api/content/base — confirme que V0 existe', async () => {
-    const res = await request(server)
-      .get('/api/content/base')
-      .set('Authorization', `Bearer ${adminToken}`);
+    const res = await request(server).get('/api/content/base').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(res.body.exists).toBe(true);
   });
 
   test('GET /api/content/history — accessible à un éditeur', async () => {
-    const res = await request(server)
-      .get('/api/content/history')
-      .set('Authorization', `Bearer ${editorToken}`);
+    const res = await request(server).get('/api/content/history').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
   test('GET /api/content/history/full — refusé pour un éditeur', async () => {
-    const res = await request(server)
-      .get('/api/content/history/full')
-      .set('Authorization', `Bearer ${editorToken}`);
+    const res = await request(server).get('/api/content/history/full').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(403);
   });
 
-  test('GET /api/content/history/full — accessible à l\'admin', async () => {
-    const res = await request(server)
-      .get('/api/content/history/full')
-      .set('Authorization', `Bearer ${adminToken}`);
+  test("GET /api/content/history/full — accessible à l'admin", async () => {
+    const res = await request(server).get('/api/content/history/full').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -205,17 +211,13 @@ describe('Utilisateurs', () => {
   let createdUserId;
 
   test('GET /api/users — admin obtient la liste', async () => {
-    const res = await request(server)
-      .get('/api/users')
-      .set('Authorization', `Bearer ${adminToken}`);
+    const res = await request(server).get('/api/users').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
   test('GET /api/users — refusé pour un éditeur', async () => {
-    const res = await request(server)
-      .get('/api/users')
-      .set('Authorization', `Bearer ${editorToken}`);
+    const res = await request(server).get('/api/users').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(403);
   });
 
@@ -258,24 +260,22 @@ describe('Messages de contact', () => {
 
   test('POST /api/contact — enregistre un message', async () => {
     const res = await request(server).post('/api/contact').send({
-      name: 'Jean Dupont', email: 'jean@test.com', message: 'Bonjour !'
+      name: 'Jean Dupont',
+      email: 'jean@test.com',
+      message: 'Bonjour !'
     });
     expect(res.status).toBe(200);
   });
 
   test('GET /api/messages — admin obtient la liste', async () => {
-    const res = await request(server)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${adminToken}`);
+    const res = await request(server).get('/api/messages').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
     messageId = res.body[0].id;
   });
 
   test('GET /api/messages — refusé pour un éditeur', async () => {
-    const res = await request(server)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${editorToken}`);
+    const res = await request(server).get('/api/messages').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(403);
   });
 
@@ -287,9 +287,7 @@ describe('Messages de contact', () => {
   });
 
   test('DELETE /api/messages/:id — supprime un message', async () => {
-    const res = await request(server)
-      .delete(`/api/messages/${messageId}`)
-      .set('Authorization', `Bearer ${adminToken}`);
+    const res = await request(server).delete(`/api/messages/${messageId}`).set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
   });
 });
@@ -303,18 +301,14 @@ describe('Statistiques', () => {
   });
 
   test('GET /api/stats — admin obtient les stats', async () => {
-    const res = await request(server)
-      .get('/api/stats')
-      .set('Authorization', `Bearer ${adminToken}`);
+    const res = await request(server).get('/api/stats').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(res.body.total).toBeGreaterThan(0);
     expect(typeof res.body.totalUnique).toBe('number');
   });
 
   test('GET /api/stats — refusé pour un éditeur', async () => {
-    const res = await request(server)
-      .get('/api/stats')
-      .set('Authorization', `Bearer ${editorToken}`);
+    const res = await request(server).get('/api/stats').set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(403);
   });
 });
