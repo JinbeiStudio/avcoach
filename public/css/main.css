@@ -532,7 +532,7 @@ nav.scrolled {
 }
 .hero-scroll {
   position: absolute;
-  bottom: 6.25vw;
+  bottom: clamp(3rem, 2vh, 3rem);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
