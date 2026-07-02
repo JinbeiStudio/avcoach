@@ -23,6 +23,39 @@ const observer = new IntersectionObserver(
 );
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
+// ── Aiguilles de boussole (rotation au scroll) ────────────────────────────────
+const compassNeedles = document.querySelectorAll('.cmp-needle');
+const compassNeedlesLocal = document.querySelectorAll('.cmp-needle-local');
+if (compassNeedles.length || compassNeedlesLocal.length) {
+  let needleTicking = false;
+  const rotateNeedle = (needle, angle) => {
+    const base = parseFloat(needle.dataset.base);
+    const cx = needle.dataset.cx;
+    const cy = needle.dataset.cy || 50;
+    needle.setAttribute('transform', `rotate(${base + angle},${cx},${cy})`);
+  };
+  const updateNeedles = () => {
+    const angle = window.scrollY * 0.15;
+    compassNeedles.forEach((needle) => rotateNeedle(needle, angle));
+    compassNeedlesLocal.forEach((needle) => {
+      const sep = needle.closest('.sep');
+      const progress = sep ? Math.max(0, window.innerHeight - sep.getBoundingClientRect().top) : 0;
+      rotateNeedle(needle, progress * 0.15);
+    });
+    needleTicking = false;
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (needleTicking) return;
+      needleTicking = true;
+      requestAnimationFrame(updateNeedles);
+    },
+    { passive: true }
+  );
+  updateNeedles();
+}
+
 // ── Mobile menu ───────────────────────────────────────────────────────────────
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
