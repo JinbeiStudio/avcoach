@@ -431,7 +431,7 @@ nav.scrolled {
 
 /* ── Hero ──────────────────────────────────────────────────────────────────── */
 #hero {
-  min-height: 100vh;
+  min-height: 105vh;
   display: flex;
   align-items: center;
   position: relative;
@@ -532,7 +532,7 @@ nav.scrolled {
 }
 .hero-scroll {
   position: absolute;
-  bottom: 6.25vw;
+  bottom: clamp(4rem, 2vh, 3rem);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
