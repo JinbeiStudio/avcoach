@@ -1086,6 +1086,9 @@ footer {
   .apropos-img {
     aspect-ratio: 16/9;
   }
+  .apropos-img img {
+    object-position: center 25%;
+  }
   .nav-edit-btn--desktop {
     display: none;
   }
@@ -1108,6 +1111,9 @@ footer {
 @media (max-width: 600px) {
   section {
     padding: 3.5rem 0;
+  }
+  .hero-scroll {
+    bottom: 1rem;
   }
   .hero-btns {
     flex-direction: column;
