@@ -32,6 +32,11 @@ function renderSiteIfMissing() {
   if (!fs.existsSync(RENDERED_PATH)) renderSite();
 }
 
+// Ignore les différences d'espacement (reformatage Prettier du template)
+function normalize(value) {
+  return value === undefined ? undefined : String(value).replace(/\s+/g, ' ').trim();
+}
+
 // Au démarrage : réconcilie le template (git) avec le contenu en base.
 // Par champ, la dernière modification gagne : si le développeur a changé le
 // défaut d'un champ depuis le dernier déploiement, sa version l'emporte.
@@ -54,7 +59,7 @@ function syncTemplate() {
     const next = { ...latest };
     for (const [key, value] of Object.entries(current)) {
       // Migration (pas de défauts connus) : on ne complète que les clés absentes
-      const changed = previous ? previous[key] !== value : next[key] === undefined;
+      const changed = previous ? normalize(previous[key]) !== normalize(value) : next[key] === undefined;
       if (changed) next[key] = value;
     }
 

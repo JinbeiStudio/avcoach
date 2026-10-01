@@ -77,6 +77,14 @@ describe('syncTemplate', () => {
     expect(last.saved_by).toBeNull();
   });
 
+  test('reformatage du template (espaces seuls) : le contenu client est conservé', () => {
+    syncTemplate();
+    clientSave({ el_a: 'A client' });
+    setTemplate({ a: '\n    A   défaut\n  ' });
+    syncTemplate();
+    expect(getLatestSnapshot().el_a).toBe('A client');
+  });
+
   test('conflit sur A : le développeur gagne, la version client reste dans l’historique', () => {
     syncTemplate();
     clientSave({ el_a: 'A client' });
