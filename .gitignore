@@ -7,3 +7,6 @@ database/*.sqlite-wal
 .claude/settings.local.json
 static/
 var/
+
+# Documents sources du client (contenu personnel)
+docs/*.docx

@@ -218,11 +218,11 @@ app.post('/api/users', requireAuth, async (req, res) => {
 
   try {
     await createTransporter().sendMail({
-      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      from: `"Avé Coach" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: `Bienvenue sur AVCoach — vos identifiants`,
-      text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.`,
-      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
+      subject: `Bienvenue sur Avé Coach — vos identifiants`,
+      text: `Bonjour,\n\nVotre compte Avé Coach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.`,
+      html: `<p>Bonjour,</p><p>Votre compte Avé Coach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
     });
     db.prepare('UPDATE users SET welcome_email_sent = 1 WHERE id = ?').run(id);
     res.status(201).json({ id, username, role: userRole, emailSent: true });
@@ -284,11 +284,11 @@ app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      from: `"Avé Coach" <${process.env.SMTP_USER}>`,
       to: user.email,
-      subject: `AVCoach — Réinitialisation de votre mot de passe`,
+      subject: `Avé Coach — Réinitialisation de votre mot de passe`,
       text: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nIdentifiant : ${user.username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous et définissez un nouveau mot de passe définitif.`,
-      html: `<p>Bonjour,</p><p>Votre mot de passe AVCoach a été réinitialisé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(user.username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous et définissez un nouveau mot de passe définitif.</p>`
+      html: `<p>Bonjour,</p><p>Votre mot de passe Avé Coach a été réinitialisé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(user.username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous et définissez un nouveau mot de passe définitif.</p>`
     });
     res.json({ message: 'Mot de passe réinitialisé et email envoyé' });
   } catch (err) {
@@ -473,10 +473,10 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"AV Coach" <${process.env.SMTP_USER}>`,
+      from: `"Avé Coach" <${process.env.SMTP_USER}>`,
       to: process.env.CONTACT_TO,
       replyTo: { name: safeName, address: email },
-      subject: `Message de ${safeName} via AVCoach`,
+      subject: `Message de ${safeName} via Avé Coach`,
       text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
       html: `<p><strong>Nom :</strong> ${escapeHtml(name)}<br><strong>Email :</strong> ${escapeHtml(email)}</p><p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`
     });
@@ -531,7 +531,7 @@ if (require.main === module) {
   }
 
   app.listen(PORT, () => {
-    console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);
+    console.log(`\n🚀 Avé Coach démarré sur http://localhost:${PORT}`);
     console.log(`   Base de données : ${process.env.DATABASE_PATH || 'database/avcoach.sqlite'}\n`);
   });
 }

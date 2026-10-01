@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AV Coach – Coaching Managérial & Accompagnement du Changement</title>
+    <title>Avé Coach – Coaching Managérial & Accompagnement du Changement</title>
     <meta
       name="description"
       content="Coaching individuel et collectif pour managers et équipes de TPE/PME. Posture managériale, accompagnement du changement. Prenez rendez-vous dès aujourd'hui."
@@ -13,7 +13,7 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://avcoach.fr/" />
-    <meta property="og:title" content="AV Coach – Coaching Managérial & Accompagnement du Changement" />
+    <meta property="og:title" content="Avé Coach – Coaching Managérial & Accompagnement du Changement" />
     <meta property="og:description" content="Coaching individuel et collectif pour managers et équipes de TPE/PME." />
     <meta property="og:image" content="https://avcoach.fr/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -22,10 +22,11 @@
       {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        "name": "AV Coach",
+        "name": "Avé Coach",
         "description": "Coaching managérial individuel et collectif pour managers et équipes de TPE/PME",
         "url": "https://avcoach.fr",
-        "telephone": "+33-6-00-00-00-00",
+        "sameAs": ["https://www.linkedin.com/in/avuillemin"],
+        "telephone": "+33-6-38-40-51-51",
         "address": { "@type": "PostalAddress", "addressCountry": "FR" },
         "serviceType": [
           "Coaching managérial",
@@ -43,6 +44,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
   </head>
   <body>
     <!-- [DYNAMIC:START] login modal -->
@@ -106,8 +109,8 @@
     <!-- NAVIGATION -->
     <nav id="main-nav">
       <div class="container nav-inner">
-        <a href="#" class="nav-logo" aria-label="AV Coach accueil">
-          <img src="/images/logo-blanc.png" alt="AV Coach" class="nav-logo-img" />
+        <a href="#" class="nav-logo" aria-label="Avé Coach accueil">
+          <img src="/images/logo-blanc.png" alt="Avé Coach" class="nav-logo-img" />
           <img src="/images/logo-texte.png" alt="" class="nav-logo-text" />
         </a>
         <ul class="nav-links">
@@ -168,15 +171,17 @@
       </svg>
       <div class="container">
         <div class="hero-content">
-          <div class="hero-tag" contenteditable="false" data-edit-id="hero-tag">Coaching professionnel certifié</div>
+          <div class="hero-tag" contenteditable="false" data-edit-id="hero-tag">
+            Coaching managérial pour dirigeants et managers
+          </div>
           <h1 contenteditable="false" data-edit-id="hero-title">
             Révélez votre
             <em>posture managériale</em>
             et conduisez le changement
           </h1>
           <p contenteditable="false" data-edit-id="hero-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Accompagnement individuel et collectif pour
-            managers et équipes de TPE/PME qui souhaitent grandir.
+            Renforcez votre posture, clarifiez vos décisions et communiquez avec impact. Accompagnement individuel et
+            collectif pour les leaders qui souhaitent grandir avec clarté, courage et cohérence.
           </p>
           <div class="hero-btns">
             <a href="#contact" class="btn-primary">Prendre rendez-vous</a>
@@ -187,28 +192,74 @@
       <div class="hero-scroll" aria-hidden="true">Découvrir</div>
     </section>
 
-    <!-- SEPARATOR: WAVE BLUE -->
+    <!-- SEPARATOR: VAGUES SUPERPOSÉES (hero → à propos) -->
     <div class="sep sep-hero" aria-hidden="true">
       <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="waveBlue" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#060E19" />
-            <stop offset="50%" stop-color="#0F2040" />
-            <stop offset="100%" stop-color="#060E19" />
+          <linearGradient id="wave-l1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#21457D" stop-opacity="0.0" />
+            <stop offset="22%" stop-color="#21457D" stop-opacity="0.16" />
+            <stop offset="45%" stop-color="#21457D" stop-opacity="0.096" />
+            <stop offset="70%" stop-color="#21457D" stop-opacity="0.035" />
+            <stop offset="100%" stop-color="#21457D" stop-opacity="0.0" />
           </linearGradient>
-          <linearGradient id="waveFade" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#0B1829" stop-opacity="0" />
-            <stop offset="100%" stop-color="#0B1829" stop-opacity="1" />
+          <linearGradient id="wave-l2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1A3A6B" stop-opacity="0.0" />
+            <stop offset="22%" stop-color="#1A3A6B" stop-opacity="0.16" />
+            <stop offset="45%" stop-color="#1A3A6B" stop-opacity="0.096" />
+            <stop offset="70%" stop-color="#1A3A6B" stop-opacity="0.035" />
+            <stop offset="100%" stop-color="#1A3A6B" stop-opacity="0.0" />
+          </linearGradient>
+          <linearGradient id="wave-l3" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#16305A" stop-opacity="0.0" />
+            <stop offset="22%" stop-color="#16305A" stop-opacity="0.16" />
+            <stop offset="45%" stop-color="#16305A" stop-opacity="0.096" />
+            <stop offset="70%" stop-color="#16305A" stop-opacity="0.035" />
+            <stop offset="100%" stop-color="#16305A" stop-opacity="0.0" />
           </linearGradient>
         </defs>
-        <path d="M0,0 C240,80 480,80 720,40 C960,0 1200,80 1440,40 L1440,90 L0,90 Z" fill="url(#waveBlue)" />
-        <path d="M0,20 C360,90 720,10 1080,60 C1260,80 1380,50 1440,60 L1440,90 L0,90 Z" fill="url(#waveFade)" />
+        <g class="wave-parallax" data-speed="0.02">
+          <g class="wave-layer wave-layer--l1">
+            <path
+              d="M0,20 C120,20 240,32 360,32 C480,32 600,24 720,24 C840,24 960,36 1080,36 C1200,36 1320,20 1440,20 C1560,20 1680,32 1800,32 C1920,32 2040,24 2160,24 C2280,24 2400,36 2520,36 C2640,36 2760,20 2880,20 L2880,90 L0,90 Z"
+              fill="url(#wave-l1)"
+            />
+          </g>
+        </g>
+        <g class="wave-parallax" data-speed="0.01">
+          <g class="wave-layer wave-layer--l2">
+            <path
+              d="M0,34 C120,34 240,46 360,46 C480,46 600,30 720,30 C840,30 960,48 1080,48 C1200,48 1320,34 1440,34 C1560,34 1680,46 1800,46 C1920,46 2040,30 2160,30 C2280,30 2400,48 2520,48 C2640,48 2760,34 2880,34 L2880,90 L0,90 Z"
+              fill="url(#wave-l2)"
+            />
+          </g>
+        </g>
+        <g class="wave-layer wave-layer--l3">
+          <path
+            d="M0,48 C120,48 240,58 360,58 C480,58 600,44 720,44 C840,44 960,60 1080,60 C1200,60 1320,48 1440,48 C1560,48 1680,58 1800,58 C1920,58 2040,44 2160,44 C2280,44 2400,60 2520,60 C2640,60 2760,48 2880,48 L2880,90 L0,90 Z"
+            fill="url(#wave-l3)"
+          />
+        </g>
       </svg>
     </div>
 
     <!-- À PROPOS -->
     <section id="apropos">
       <div class="container">
+        <div class="apropos-intro reveal">
+          <h2 class="section-title" contenteditable="false" data-edit-id="philo-title">
+            Le coach n’impose pas : il révèle
+          </h2>
+          <p class="quote-ref" contenteditable="false" data-edit-id="philo-ref">
+            Françoise Kourilsky — « Du désir au plaisir de changer »
+          </p>
+          <p class="section-lead" contenteditable="false" data-edit-id="philo-text">
+            Je ne cherche pas à transformer les personnes. Je les aide à révéler ce qu’elles portent déjà en elles :
+            leurs ressources, leurs valeurs, leur manière singulière de diriger, leur capacité à décider et à
+            communiquer autrement. Ainsi, je facilite l’émergence, je n’impose jamais. J’accompagne les dirigeants à
+            retrouver cette cohérence interne qui rend leurs décisions plus solides et leur posture plus sereine.
+          </p>
+        </div>
         <div class="apropos-grid reveal">
           <div class="apropos-img img-wrap" onclick="replaceImage(this)" title="Cliquer pour changer l'image">
             <img
@@ -221,20 +272,30 @@
           <div>
             <p class="section-label" contenteditable="false" data-edit-id="apropos-label">À propos</p>
             <h2 class="section-title" contenteditable="false" data-edit-id="apropos-title">
-              Une approche humaine au service de votre développement
+              Une approche humaine au service des managers et dirigeants
             </h2>
             <p class="section-lead" contenteditable="false" data-edit-id="apropos-lead">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+              J’accompagne celles et ceux qui portent des responsabilités, prennent des décisions difficiles et doivent
+              communiquer avec clarté dans des environnements exigeants. Mon rôle : leur offrir un espace de recul, de
+              lucidité et de transformation pour renforcer leur posture et fluidifier leurs relations professionnelles.
             </p>
-            <p
-              style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem"
-              contenteditable="false"
-              data-edit-id="apropos-sub"
-            >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in
-              voluptate velit esse cillum dolore.
-            </p>
+            <div class="text-block">
+              <h3 contenteditable="false" data-edit-id="apropos-conviction-title">Ma conviction</h3>
+              <p contenteditable="false" data-edit-id="apropos-sub">
+                Un manager ou un dirigeant ne grandit pas seulement en apprenant des outils. Il grandit lorsqu’il
+                comprend ses mécanismes internes, clarifie ses intentions et ose une communication plus alignée, plus
+                courageuse et plus cohérente. J’aide à faire ce chemin — avec exigence, humanité et structure.
+              </p>
+              <h3 contenteditable="false" data-edit-id="apropos-approche-title">Ma manière de coacher</h3>
+              <p class="quote-ref" contenteditable="false" data-edit-id="apropos-approche-quote">
+                Parce que la carte n’est pas le territoire, je veux œuvrer, comme l’explique Françoise Kourilsky, à
+                passer du désir au plaisir de changer.
+              </p>
+              <p contenteditable="false" data-edit-id="apropos-approche-text">
+                Je crée un cadre sécurisant où les dirigeants peuvent déposer leurs tensions, leurs doutes et leurs
+                enjeux. Je travaille avec eux sur trois leviers essentiels.
+              </p>
+            </div>
             <a href="#contact" class="btn-primary">Me contacter</a>
             <div class="stat-row">
               <div class="stat">
@@ -243,35 +304,117 @@
               </div>
               <div class="stat">
                 <strong contenteditable="false" data-edit-id="apropos-stat2-num">200+</strong>
-                <span contenteditable="false" data-edit-id="apropos-stat2-label">coachés accompagnés</span>
+                <span contenteditable="false" data-edit-id="apropos-stat2-label">
+                  managers et dirigeants accompagnés
+                </span>
               </div>
               <div class="stat">
-                <strong contenteditable="false" data-edit-id="apropos-stat3-num">95%</strong>
-                <span contenteditable="false" data-edit-id="apropos-stat3-label">de satisfaction</span>
+                <strong contenteditable="false" data-edit-id="apropos-stat3-num">35</strong>
+                <span contenteditable="false" data-edit-id="apropos-stat3-label">
+                  agences accompagnées dans le changement
+                </span>
               </div>
             </div>
           </div>
         </div>
+        <div class="leviers reveal">
+          <article class="levier">
+            <svg class="levier-icon" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="17" />
+              <path d="M24 11 L28 24 L24 37 L20 24 Z" fill="currentColor" fill-opacity=".25" />
+              <path d="M24 4v4M24 40v4M4 24h4M40 24h4" />
+            </svg>
+            <h3 contenteditable="false" data-edit-id="apropos-levier1-title">Clarté</h3>
+            <p contenteditable="false" data-edit-id="apropos-levier1-text">
+              Comprendre ce qui se joue, nommer les enjeux, structurer la pensée.
+            </p>
+          </article>
+          <article class="levier">
+            <svg class="levier-icon" viewBox="0 0 48 48" aria-hidden="true">
+              <path
+                d="M24 6c2 7 10 10 10 20a10 10 0 0 1-20 0c0-5 3-8 5-11 1 4 3 6 5 6-2-5-1-10 0-15z"
+                fill="currentColor"
+                fill-opacity=".25"
+              />
+            </svg>
+            <h3 contenteditable="false" data-edit-id="apropos-levier2-title">Courage</h3>
+            <p contenteditable="false" data-edit-id="apropos-levier2-text">
+              Dire les choses, assumer ses décisions, affirmer sa posture.
+            </p>
+          </article>
+          <article class="levier">
+            <svg class="levier-icon" viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M4 18c5-5 10-5 15 0s10 5 15 0 7-4 10-2" />
+              <path d="M4 27c5-5 10-5 15 0s10 5 15 0 7-4 10-2" />
+              <path d="M4 36c5-5 10-5 15 0s10 5 15 0 7-4 10-2" />
+            </svg>
+            <h3 contenteditable="false" data-edit-id="apropos-levier3-title">Cohérence</h3>
+            <p contenteditable="false" data-edit-id="apropos-levier3-text">
+              Aligner paroles, actions et intentions pour inspirer et fédérer.
+            </p>
+          </article>
+        </div>
+        <p class="leviers-note" contenteditable="false" data-edit-id="apropos-approche-result">
+          Un accompagnement à la fois
+          <strong>pragmatique, pédagogique et orienté transformation durable.</strong>
+        </p>
+        <figure class="mission reveal">
+          <p class="section-label" contenteditable="false" data-edit-id="apropos-mission-title">Ma mission</p>
+          <blockquote contenteditable="false" data-edit-id="apropos-mission">
+            Aider les managers et dirigeants à devenir des leaders plus lucides, plus alignés et plus sereins — capables
+            de communiquer avec impact, de décider avec confiance et de conduire le changement avec humanité.
+          </blockquote>
+        </figure>
       </div>
     </section>
 
-    <!-- SEPARATOR: FLAMME ORANGE -->
-    <div class="sep" aria-hidden="true">
+    <!-- SEPARATOR: FLAMME (à propos → offres) — s'allume au défilement -->
+    <div class="sep sep-flame" aria-hidden="true">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="flammeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#E87520" stop-opacity=".18" />
-            <stop offset="100%" stop-color="#0F2040" />
+          <linearGradient id="flammeLine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0%" stop-color="#E87520" stop-opacity="0" />
+            <stop offset="22%" stop-color="#E87520" stop-opacity=".85" />
+            <stop offset="50%" stop-color="#F7B548" />
+            <stop offset="78%" stop-color="#E87520" stop-opacity=".85" />
+            <stop offset="100%" stop-color="#E87520" stop-opacity="0" />
           </linearGradient>
+          <filter id="flammeGlow" x="-5%" y="-100%" width="110%" height="300%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
         </defs>
-        <path
-          d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50 L1440,0 L0,0 Z"
-          fill="#0B1829"
-        />
+        <rect width="1440" height="100" fill="#0B1829" />
         <path
           d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50 L1440,100 L0,100 Z"
-          fill="url(#flammeGrad)"
+          fill="#0F2040"
         />
+        <path
+          class="flame-glow"
+          d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50"
+          fill="none"
+          stroke="url(#flammeLine)"
+          stroke-width="6"
+          opacity=".45"
+          filter="url(#flammeGlow)"
+        />
+        <path
+          class="flame-line"
+          d="M0,60 C120,20 180,90 360,50 C420,30 480,80 720,40 C840,20 960,70 1080,45 C1200,22 1320,70 1440,50"
+          fill="none"
+          stroke="url(#flammeLine)"
+          stroke-width="2"
+          vector-effect="non-scaling-stroke"
+        />
+        <g class="flame-spark flame-spark--left" opacity="0">
+          <circle r="14" fill="#F7B548" opacity=".18" />
+          <circle r="6" fill="#F7B548" opacity=".5" />
+          <circle r="2.5" fill="#FFF1D6" />
+        </g>
+        <g class="flame-spark flame-spark--right" opacity="0">
+          <circle r="14" fill="#F7B548" opacity=".18" />
+          <circle r="6" fill="#F7B548" opacity=".5" />
+          <circle r="2.5" fill="#FFF1D6" />
+        </g>
       </svg>
     </div>
 
@@ -283,191 +426,312 @@
           <h2 class="section-title" contenteditable="false" data-edit-id="offres-title">
             Des programmes sur mesure pour vos besoins
           </h2>
-          <p class="section-lead" style="margin: 0 auto" contenteditable="false" data-edit-id="offres-lead">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation
-            ullamco laboris nisi.
-          </p>
         </div>
         <div class="offres-grid">
           <article class="offre-card reveal">
             <div class="offre-icon">🧭</div>
             <h3 contenteditable="false" data-edit-id="offre1-title">Coaching individuel</h3>
-            <p contenteditable="false" data-edit-id="offre1-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua ut enim.
+            <p class="offre-tagline" contenteditable="false" data-edit-id="offre1-tagline">Managers &amp; dirigeants</p>
+            <ul class="offre-chips">
+              <li contenteditable="false" data-edit-id="offre1-chip1">3 à 6 mois</li>
+              <li contenteditable="false" data-edit-id="offre1-chip2">Séances de 1h à 1h30</li>
+              <li contenteditable="false" data-edit-id="offre1-chip3">Mensuel ou bimensuel</li>
+            </ul>
+            <p class="offre-objectif" contenteditable="false" data-edit-id="offre1-text">
+              Renforcer la posture managériale, clarifier les décisions et fluidifier la communication.
             </p>
-            <a href="#contact" class="offre-link">En savoir plus</a>
+            <p class="offre-cible">
+              <span>Pour qui</span>
+              <span contenteditable="false" data-edit-id="offre1-cible">
+                Managers, chefs d’entreprise, cogérants, responsables d’équipe.
+              </span>
+            </p>
+            <p class="offre-result" contenteditable="false" data-edit-id="offre1-result">
+              Un manager plus solide, plus clair, plus impactant.
+            </p>
+            <details class="offre-details">
+              <summary>Voir le détail</summary>
+              <h4>Ce que l’accompagnement permet</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre1-benefices">
+                <li>Gagner en clarté dans les décisions.</li>
+                <li>Communiquer avec plus de cohérence et moins de tensions.</li>
+                <li>Développer une posture de leadership alignée et sereine.</li>
+                <li>Gérer les situations difficiles avec courage et lucidité.</li>
+              </ul>
+              <h4>Format</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre1-format">
+                <li>Séances individuelles (1h à 1h30)</li>
+                <li>Fréquence : mensuelle ou bimensuelle</li>
+                <li>Durée : 3 à 6 mois</li>
+                <li>Outils : analyse de posture, simulations, feedback, rituels de communication</li>
+              </ul>
+            </details>
+            <a href="#contact" class="offre-link">En parler ensemble</a>
           </article>
           <article class="offre-card reveal">
             <div class="offre-icon">🔥</div>
             <h3 contenteditable="false" data-edit-id="offre2-title">Coaching collectif</h3>
-            <p contenteditable="false" data-edit-id="offre2-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in
-              voluptate velit esse cillum.
+            <p class="offre-tagline" contenteditable="false" data-edit-id="offre2-tagline">Équipes de TPE/PME</p>
+            <ul class="offre-chips">
+              <li contenteditable="false" data-edit-id="offre2-chip1">Ateliers de 4h à 5h</li>
+              <li contenteditable="false" data-edit-id="offre2-chip2">Diagnostic de communication</li>
+            </ul>
+            <p class="offre-objectif" contenteditable="false" data-edit-id="offre2-text">
+              Développer la cohésion, fluidifier les relations et structurer la communication interne.
             </p>
-            <a href="#contact" class="offre-link">En savoir plus</a>
+            <p class="offre-cible">
+              <span>Pour qui</span>
+              <span contenteditable="false" data-edit-id="offre2-cible">
+                Équipes en croissance, cogérants, collectifs en tension ou en transformation.
+              </span>
+            </p>
+            <p class="offre-result" contenteditable="false" data-edit-id="offre2-result">
+              Une équipe plus alignée, plus fluide, plus performante.
+            </p>
+            <details class="offre-details">
+              <summary>Voir le détail</summary>
+              <h4>Ce que l’accompagnement permet</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre2-benefices">
+                <li>Clarifier les rôles et responsabilités.</li>
+                <li>Installer des modes de communication efficaces.</li>
+                <li>Réduire les tensions et les non-dits.</li>
+                <li>Améliorer la prise de décision collective.</li>
+              </ul>
+              <h4>Format</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre2-format">
+                <li>Ateliers de 4h à 5h</li>
+                <li>Diagnostics de communication</li>
+                <li>Plans d’action opérationnels</li>
+              </ul>
+            </details>
+            <a href="#contact" class="offre-link">En parler ensemble</a>
           </article>
           <article class="offre-card reveal">
             <div class="offre-icon">🌊</div>
             <h3 contenteditable="false" data-edit-id="offre3-title">Accompagnement du changement</h3>
-            <p contenteditable="false" data-edit-id="offre3-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident
-              sunt in culpa qui.
+            <p class="offre-tagline" contenteditable="false" data-edit-id="offre3-tagline">
+              Organisations en transition
             </p>
-            <a href="#contact" class="offre-link">En savoir plus</a>
+            <ul class="offre-chips">
+              <li contenteditable="false" data-edit-id="offre3-chip1">Diagnostic organisationnel</li>
+              <li contenteditable="false" data-edit-id="offre3-chip2">Coaching des leaders</li>
+            </ul>
+            <p class="offre-objectif" contenteditable="false" data-edit-id="offre3-text">
+              Accompagner les organisations dans leurs transitions : croissance, réorganisation, nouveaux rôles,
+              nouvelles pratiques.
+            </p>
+            <p class="offre-cible">
+              <span>Pour qui</span>
+              <span contenteditable="false" data-edit-id="offre3-cible">
+                Dirigeants, managers, structures en évolution.
+              </span>
+            </p>
+            <p class="offre-result" contenteditable="false" data-edit-id="offre3-result">
+              Un changement compris, porté et réussi.
+            </p>
+            <details class="offre-details">
+              <summary>Voir le détail</summary>
+              <h4>Ce que l’accompagnement permet</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre3-benefices">
+                <li>Préparer et sécuriser les étapes du changement.</li>
+                <li>Communiquer de manière claire et cohérente.</li>
+                <li>Engager les équipes dans la transition.</li>
+                <li>Installer des rituels et pratiques durables.</li>
+              </ul>
+              <h4>Format</h4>
+              <ul class="bullet-list" contenteditable="false" data-edit-id="offre3-format">
+                <li>Diagnostic organisationnel</li>
+                <li>Plan de communication interne</li>
+                <li>Coaching des leaders</li>
+                <li>Ateliers de mobilisation</li>
+              </ul>
+            </details>
+            <a href="#contact" class="offre-link">En parler ensemble</a>
           </article>
+        </div>
+        <div class="cta-band reveal">
+          <div>
+            <p class="cta-title" contenteditable="false" data-edit-id="cta-title">Ensemble, trouvons votre cap</p>
+            <p class="cta-text" contenteditable="false" data-edit-id="cta-text">
+              Une question sur un accompagnement ? Appelez-moi ou écrivez-moi pour en savoir plus.
+            </p>
+          </div>
+          <a href="#contact" class="btn-primary">Me contacter</a>
         </div>
       </div>
     </section>
-
-    <!-- SEPARATOR: BOUSSOLE BEIGE -->
-    <div class="sep" aria-hidden="true">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- SEPARATOR: RÈGLE DE CAP (offres → parcours) -->
+    <div class="sep sep-cap" aria-hidden="true">
+      <svg viewBox="0 0 1440 110" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="bousWaveFade" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#0F2040" stop-opacity="1" />
-            <stop offset="100%" stop-color="#0F2040" stop-opacity="0" />
+          <linearGradient id="capBg" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0F2040" />
+            <stop offset="100%" stop-color="#0B1829" />
           </linearGradient>
-          <filter id="bousGlow" x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="3" />
-          </filter>
-          <linearGradient id="bezelFade" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#F5EDD8" stop-opacity="0" />
-            <stop offset="15%" stop-color="#F5EDD8" stop-opacity=".5" />
-            <stop offset="50%" stop-color="#F5EDD8" stop-opacity=".6" />
-            <stop offset="85%" stop-color="#F5EDD8" stop-opacity=".5" />
-            <stop offset="100%" stop-color="#F5EDD8" stop-opacity="0" />
+          <linearGradient id="capFadeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="25%" stop-color="#fff" stop-opacity="1" />
+            <stop offset="75%" stop-color="#fff" stop-opacity="1" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
           </linearGradient>
+          <mask id="capFade" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="110">
+            <rect width="1440" height="110" fill="url(#capFadeGrad)" />
+          </mask>
+          <pattern id="capMinor" patternUnits="userSpaceOnUse" width="20" height="110">
+            <rect x="0" y="58" width="1" height="6" fill="#F5EDD8" opacity=".3" />
+          </pattern>
+          <pattern id="capMajor" patternUnits="userSpaceOnUse" width="60" height="110">
+            <rect x="0" y="52" width="1.2" height="12" fill="#F5EDD8" opacity=".5" />
+          </pattern>
+          <pattern id="capCardinal" patternUnits="userSpaceOnUse" width="180" height="110">
+            <rect x="-0.5" y="46" width="2" height="18" fill="#F5EDD8" opacity=".75" />
+          </pattern>
         </defs>
-        <path d="M0,0 L1440,0 L1440,100 L0,100 Z" fill="#0B1829" />
-        <path d="M0,30 C200,5 400,50 720,25 C900,10 1100,40 1440,15 L1440,0 L0,0 Z" fill="url(#bousWaveFade)" />
-        <g transform="translate(0,-8)">
-          <line x1="60" y1="50" x2="1380" y2="50" stroke="url(#bezelFade)" stroke-width="1" />
-          <g fill="#F5EDD8">
-            <g class="cmp-needle" data-base="-65" data-cx="120" transform="rotate(-65,120,50)">
-              <polygon points="120,39 123.6,50 116.4,50" opacity=".15" />
-              <polygon points="120,61 123.6,50 116.4,50" opacity=".07" />
-            </g>
-            <g class="cmp-needle" data-base="40" data-cx="200" transform="rotate(40,200,50)">
-              <polygon points="200,41 203,50 197,50" opacity=".18" />
-              <polygon points="200,59 203,50 197,50" opacity=".08" />
-            </g>
-            <g class="cmp-needle" data-base="-15" data-cx="280" transform="rotate(-15,280,50)">
-              <polygon points="280,41 283,50 277,50" opacity=".22" />
-              <polygon points="280,59 283,50 277,50" opacity=".1" />
-            </g>
-            <g class="cmp-needle" data-base="70" data-cx="360" transform="rotate(70,360,50)">
-              <polygon points="360,39 363.6,50 356.4,50" opacity=".28" />
-              <polygon points="360,61 363.6,50 356.4,50" opacity=".13" />
-            </g>
-            <g class="cmp-needle" data-base="-35" data-cx="440" transform="rotate(-35,440,50)">
-              <polygon points="440,41 443,50 437,50" opacity=".32" />
-              <polygon points="440,59 443,50 437,50" opacity=".14" />
-            </g>
-            <g class="cmp-needle" data-base="20" data-cx="520" transform="rotate(20,520,50)">
-              <polygon points="520,41 523,50 517,50" opacity=".38" />
-              <polygon points="520,59 523,50 517,50" opacity=".17" />
-            </g>
-            <g class="cmp-needle" data-base="-50" data-cx="600" transform="rotate(-50,600,50)">
-              <polygon points="600,39 603.6,50 596.4,50" opacity=".42" />
-              <polygon points="600,61 603.6,50 596.4,50" opacity=".19" />
-            </g>
-            <g class="cmp-needle" data-base="55" data-cx="840" transform="rotate(55,840,50)">
-              <polygon points="840,39 843.6,50 836.4,50" opacity=".42" />
-              <polygon points="840,61 843.6,50 836.4,50" opacity=".19" />
-            </g>
-            <g class="cmp-needle" data-base="-8" data-cx="920" transform="rotate(-8,920,50)">
-              <polygon points="920,41 923,50 917,50" opacity=".38" />
-              <polygon points="920,59 923,50 917,50" opacity=".17" />
-            </g>
-            <g class="cmp-needle" data-base="75" data-cx="1000" transform="rotate(75,1000,50)">
-              <polygon points="1000,41 1003,50 997,50" opacity=".32" />
-              <polygon points="1000,59 1003,50 997,50" opacity=".14" />
-            </g>
-            <g class="cmp-needle" data-base="-42" data-cx="1080" transform="rotate(-42,1080,50)">
-              <polygon points="1080,39 1083.6,50 1076.4,50" opacity=".28" />
-              <polygon points="1080,61 1083.6,50 1076.4,50" opacity=".13" />
-            </g>
-            <g class="cmp-needle" data-base="28" data-cx="1160" transform="rotate(28,1160,50)">
-              <polygon points="1160,41 1163,50 1157,50" opacity=".22" />
-              <polygon points="1160,59 1163,50 1157,50" opacity=".1" />
-            </g>
-            <g class="cmp-needle" data-base="-60" data-cx="1240" transform="rotate(-60,1240,50)">
-              <polygon points="1240,41 1243,50 1237,50" opacity=".18" />
-              <polygon points="1240,59 1243,50 1237,50" opacity=".08" />
-            </g>
-            <g class="cmp-needle" data-base="10" data-cx="1320" transform="rotate(10,1320,50)">
-              <polygon points="1320,39 1323.6,50 1316.4,50" opacity=".15" />
-              <polygon points="1320,61 1323.6,50 1316.4,50" opacity=".07" />
+        <rect width="1440" height="110" fill="url(#capBg)" />
+        <g mask="url(#capFade)">
+          <rect y="64" width="1440" height="1" fill="#F5EDD8" opacity=".25" />
+          <g class="cap-ruler">
+            <rect x="-1440" width="4320" height="110" fill="url(#capMinor)" />
+            <rect x="-1440" width="4320" height="110" fill="url(#capMajor)" />
+            <rect x="-1440" width="4320" height="110" fill="url(#capCardinal)" />
+            <g
+              font-family="Inter, sans-serif"
+              font-size="11"
+              letter-spacing="2"
+              text-anchor="middle"
+              fill="#F5EDD8"
+              opacity=".6"
+            >
+              <text x="-720" y="38" class="cap-north">N</text>
+              <text x="-540" y="38">NE</text>
+              <text x="-360" y="38">E</text>
+              <text x="-180" y="38">SE</text>
+              <text x="0" y="38">S</text>
+              <text x="180" y="38">SO</text>
+              <text x="360" y="38">O</text>
+              <text x="540" y="38">NO</text>
+              <text x="720" y="38" class="cap-north">N</text>
+              <text x="900" y="38">NE</text>
+              <text x="1080" y="38">E</text>
+              <text x="1260" y="38">SE</text>
+              <text x="1440" y="38">S</text>
+              <text x="1620" y="38">SO</text>
+              <text x="1800" y="38">O</text>
+              <text x="1980" y="38">NO</text>
+              <text x="2160" y="38" class="cap-north">N</text>
             </g>
           </g>
-          <g transform="translate(720,50) scale(1.25) translate(-720,-50)">
-            <g opacity=".3" filter="url(#bousGlow)">
-              <circle cx="720" cy="50" r="24" fill="none" stroke="#F5EDD8" stroke-width="2.5" />
-              <circle cx="720" cy="50" r="10" fill="none" stroke="#F5EDD8" stroke-width="2.5" />
-            </g>
-            <g opacity=".55">
-              <circle cx="720" cy="50" r="22" fill="none" stroke="#F5EDD8" stroke-width="1.2" />
-              <g class="cmp-needle-local" data-base="0" data-cx="720" fill="#F5EDD8">
-                <polygon points="720,28 723,48 720,44 717,48" />
-                <polygon points="720,72 723,52 720,56 717,52" />
-              </g>
-            </g>
-            <g opacity=".3">
-              <circle cx="720" cy="50" r="17" fill="none" stroke="#F5EDD8" stroke-width=".8" />
-              <circle cx="720" cy="50" r="13" fill="none" stroke="#F5EDD8" stroke-width=".8" />
-              <circle cx="720" cy="50" r="9" fill="none" stroke="#F5EDD8" stroke-width=".8" />
-              <line x1="698" y1="50" x2="742" y2="50" stroke="#F5EDD8" stroke-width=".8" />
-              <line x1="704.4" y1="34.4" x2="735.6" y2="65.6" stroke="#F5EDD8" stroke-width=".8" />
-              <line x1="735.6" y1="34.4" x2="704.4" y2="65.6" stroke="#F5EDD8" stroke-width=".8" />
-            </g>
-          </g>
-          <g opacity=".4" font-size="7" font-family="Inter, sans-serif" fill="#F5EDD8" text-anchor="middle">
-            <text x="720" y="17.5">N</text>
-            <text x="720" y="87.5">S</text>
-            <text x="757" y="53">E</text>
-            <text x="683" y="53">O</text>
-          </g>
+        </g>
+        <g fill="#E87520">
+          <circle cx="720" cy="80" r="12" opacity=".12" />
+          <path d="M713,86 L727,86 L720,74 Z" />
+          <rect x="719.25" y="44" width="1.5" height="30" opacity=".85" />
         </g>
       </svg>
     </div>
-
     <!-- PARCOURS -->
     <section id="parcours">
       <div class="container">
+        <div class="parcours-intro reveal">
+          <p class="section-label" contenteditable="false" data-edit-id="parcours-label">Parcours</p>
+          <h2 class="section-title" contenteditable="false" data-edit-id="parcours-title">
+            Des expériences qui m’ont façonnée
+          </h2>
+          <p class="section-lead" contenteditable="false" data-edit-id="parcours-lead">
+            Depuis 18 ans, j’ai accompagné des managers en prise de poste, des dirigeants de TPE/PME, des cogérants
+            confrontés à des décisions difficiles. À chaque fois, j’ai vu la même chose : derrière les enjeux
+            opérationnels, il y a des humains qui cherchent à faire de leur mieux, mais qui manquent parfois de clarté,
+            de recul ou de courage relationnel.
+          </p>
+          <div class="parcours-blocks text-block">
+            <div>
+              <h3 contenteditable="false" data-edit-id="parcours-expertise-title">
+                Une expertise construite au cœur des enjeux managériaux
+              </h3>
+              <p contenteditable="false" data-edit-id="parcours-expertise-text">
+                Avec plus de dix ans d’expérience dans l’accompagnement de ces managers, dirigeants et équipes de
+                TPE/PME, j’ai développé une expertise solide en communication managériale, posture de leadership et
+                conduite du changement. Mon parcours s’est construit dans des environnements où la clarté, la cohérence
+                et la prise de décision sont essentielles à la performance.
+              </p>
+              <p contenteditable="false" data-edit-id="parcours-expertise-text2">
+                Ces expériences m’ont permis d’affiner une approche rigoureuse, centrée sur l’efficacité opérationnelle,
+                la qualité relationnelle et la transformation durable. Elles ont façonné ma manière de coacher :
+                directe, humaine, structurante.
+              </p>
+            </div>
+            <div>
+              <h3 contenteditable="false" data-edit-id="parcours-anime-title">Ce qui m’anime aujourd’hui</h3>
+              <p contenteditable="false" data-edit-id="parcours-anime-text">
+                Créer un espace où un manager ou un chef d’entreprise peut déposer ce qu’il ne dit nulle part ailleurs.
+                Un espace pour penser, comprendre, se réaligner. Un espace pour retrouver de la cohérence, du courage et
+                de la sérénité dans sa posture.
+              </p>
+              <p contenteditable="false" data-edit-id="parcours-anime-text2">
+                Mon parcours est au service de cette mission.
+              </p>
+            </div>
+          </div>
+        </div>
         <div class="parcours-grid reveal">
           <div>
-            <p class="section-label" contenteditable="false" data-edit-id="parcours-label">Parcours</p>
-            <h2 class="section-title" contenteditable="false" data-edit-id="parcours-title">
-              Un parcours au service de votre transformation
-            </h2>
-            <p class="section-lead" contenteditable="false" data-edit-id="parcours-lead">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.
-            </p>
+            <p class="section-label" contenteditable="false" data-edit-id="parcours-xp-label">Expériences</p>
             <div class="timeline">
               <div class="timeline-item">
                 <div class="timeline-year" contenteditable="false" data-edit-id="parcours-item1-year">
-                  2015 – Aujourd'hui
+                  2025 – Aujourd’hui
                 </div>
-                <h3 contenteditable="false" data-edit-id="parcours-item1-title">Coach certifiée &amp; consultante</h3>
-                <p contenteditable="false" data-edit-id="parcours-item1-text">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
-                </p>
+                <h3 contenteditable="false" data-edit-id="parcours-item1-title">
+                  Coach ICF, formatrice et consultante
+                </h3>
+                <ul class="bullet-list" contenteditable="false" data-edit-id="parcours-item1-list">
+                  <li>
+                    Accompagnement individuel d’entrepreneurs et de chefs d’entreprise pour définir leurs objectifs et
+                    obtenir les résultats souhaités.
+                  </li>
+                  <li>
+                    Accompagnement de collaborateurs clés : montée en compétences, évolution professionnelle,
+                    accompagnement au changement.
+                  </li>
+                  <li>Développement des compétences commerciales, relationnelles et managériales.</li>
+                  <li>
+                    Sessions collectives ou individuelles pour renforcer la cohésion, avec ajustement des plans de
+                    coaching.
+                  </li>
+                  <li>Formation des équipes commerciales aux méthodes de vente pour améliorer les résultats.</li>
+                  <li>
+                    Accompagnement des chefs d’entreprise (TPE, PME) dans la création ou le développement de leur
+                    structure.
+                  </li>
+                </ul>
               </div>
               <div class="timeline-item">
-                <div class="timeline-year" contenteditable="false" data-edit-id="parcours-item2-year">2010 – 2015</div>
-                <h3 contenteditable="false" data-edit-id="parcours-item2-title">Responsable RH en TPE/PME</h3>
+                <div class="timeline-year" contenteditable="false" data-edit-id="parcours-item2-year">2019 – 2026</div>
+                <h3 contenteditable="false" data-edit-id="parcours-item2-title">
+                  Responsable commercial du marché des Professionnels – SG
+                </h3>
                 <p contenteditable="false" data-edit-id="parcours-item2-text">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud
-                  exercitation.
+                  Accompagnement du changement organisationnel du groupe de Boulogne-Billancourt (35 agences), à la
+                  suite de la fusion avec le Crédit du Nord :
                 </p>
+                <ul class="bullet-list" contenteditable="false" data-edit-id="parcours-item2-list">
+                  <li>Formation et accompagnement des managers.</li>
+                  <li>Coaching des directeurs d’agence et des conseillers professionnels.</li>
+                  <li>
+                    Coaching des équipes commerciales et formations spécifiques pour améliorer la performance globale
+                    dans un contexte de transformation du modèle relationnel.
+                  </li>
+                  <li>
+                    Collaboration avec les équipes dirigeantes pour définir les objectifs et les plans d’action pour une
+                    autonomie des agences.
+                  </li>
+                  <li>Formation et accompagnement des alternants et des nouveaux embauchés.</li>
+                </ul>
               </div>
               <div class="timeline-item">
-                <div class="timeline-year" contenteditable="false" data-edit-id="parcours-item3-year">2005 – 2010</div>
-                <h3 contenteditable="false" data-edit-id="parcours-item3-title">Manager opérationnel</h3>
-                <p contenteditable="false" data-edit-id="parcours-item3-text">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit.
-                </p>
+                <div class="timeline-year" contenteditable="false" data-edit-id="parcours-item3-year">2008 – 2019</div>
+                <h3 contenteditable="false" data-edit-id="parcours-item3-title">Manager opérationnel – SG</h3>
+                <p contenteditable="false" data-edit-id="parcours-item3-text">Directrice d’agence importante.</p>
               </div>
             </div>
           </div>
@@ -476,53 +740,80 @@
             <h2 class="section-title" contenteditable="false" data-edit-id="certif-title">
               Formations &amp; accréditations
             </h2>
-            <div class="certif-grid">
-              <div class="certif-card">
-                <div class="certif-icon">🏆</div>
-                <div>
-                  <h4 contenteditable="false" data-edit-id="certif1-title">ICF – Coaching certifié</h4>
-                  <p contenteditable="false" data-edit-id="certif1-text">Lorem ipsum dolor sit amet consectetur.</p>
-                </div>
-              </div>
-              <div class="certif-card">
-                <div class="certif-icon">📋</div>
-                <div>
-                  <h4 contenteditable="false" data-edit-id="certif2-title">Process Communication Model</h4>
-                  <p contenteditable="false" data-edit-id="certif2-text">Lorem ipsum dolor sit amet consectetur.</p>
-                </div>
-              </div>
-              <div class="certif-card">
-                <div class="certif-icon">🧠</div>
-                <div>
-                  <h4 contenteditable="false" data-edit-id="certif3-title">Intelligence émotionnelle</h4>
-                  <p contenteditable="false" data-edit-id="certif3-text">Lorem ipsum dolor sit amet consectetur.</p>
-                </div>
-              </div>
-              <div class="certif-card">
-                <div class="certif-icon">🌐</div>
-                <div>
-                  <h4 contenteditable="false" data-edit-id="certif4-title">Master Coach RNCP</h4>
-                  <p contenteditable="false" data-edit-id="certif4-text">Lorem ipsum dolor sit amet consectetur.</p>
-                </div>
-              </div>
-            </div>
+            <ol class="certif-list">
+              <li>
+                <span class="certif-date" contenteditable="false" data-edit-id="certif1-date">02/2026 – 11/2026</span>
+                <h4 contenteditable="false" data-edit-id="certif1-title">Coaching Professionnel M3 – Niveau 2</h4>
+                <p contenteditable="false" data-edit-id="certif1-text">
+                  École de Coaching CEGOS · Formation de 9 mois en vue de la certification ICF
+                </p>
+              </li>
+              <li>
+                <span class="certif-date" contenteditable="false" data-edit-id="certif2-date">01/2026</span>
+                <h4 contenteditable="false" data-edit-id="certif2-title">Formateur occasionnel</h4>
+                <p contenteditable="false" data-edit-id="certif2-text">CEGOS · Concevoir et animer une formation</p>
+              </li>
+              <li>
+                <span class="certif-date" contenteditable="false" data-edit-id="certif3-date">02/2025 – 12/2025</span>
+                <h4 contenteditable="false" data-edit-id="certif3-title">Coaching collectif</h4>
+                <p contenteditable="false" data-edit-id="certif3-text">CEGOS</p>
+              </li>
+              <li>
+                <span class="certif-date" contenteditable="false" data-edit-id="certif4-date">02/2025 – 07/2025</span>
+                <h4 contenteditable="false" data-edit-id="certif4-title">Coach Professionnel – Niveau 2</h4>
+                <p contenteditable="false" data-edit-id="certif4-text">
+                  École de Coaching CEGOS · Formation certifiée ICF
+                </p>
+              </li>
+            </ol>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- SEPARATOR: WAVE BLUE 2 -->
+    <!-- SEPARATOR: CHEMIN (parcours → témoignages) -->
     <div class="sep" aria-hidden="true">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 1440 110" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="waveBlue2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <linearGradient id="cheminBg" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stop-color="#0B1829" />
-            <stop offset="50%" stop-color="#162A4A" />
-            <stop offset="100%" stop-color="#0B1829" />
+            <stop offset="100%" stop-color="#0F2040" />
+          </linearGradient>
+          <linearGradient id="cheminFade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0%" stop-color="#F5EDD8" stop-opacity="0" />
+            <stop offset="20%" stop-color="#F5EDD8" stop-opacity="1" />
+            <stop offset="80%" stop-color="#F5EDD8" stop-opacity="1" />
+            <stop offset="100%" stop-color="#F5EDD8" stop-opacity="0" />
           </linearGradient>
         </defs>
-        <path d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,30 1440,40 L1440,80 L0,80 Z" fill="url(#waveBlue2)" />
-        <path d="M0,60 C240,20 600,80 960,40 C1200,10 1380,60 1440,50 L1440,80 L0,80 Z" fill="#0F2040" opacity=".7" />
+        <rect width="1440" height="110" fill="url(#cheminBg)" />
+        <path
+          d="M0,80 C160,80 200,32 360,34 S560,88 720,70 S900,22 1080,40 S1320,82 1440,64"
+          fill="none"
+          stroke="url(#cheminFade)"
+          stroke-width="12"
+          stroke-linecap="round"
+          opacity=".06"
+        />
+        <path
+          d="M0,80 C160,80 200,32 360,34 S560,88 720,70 S900,22 1080,40 S1320,82 1440,64"
+          fill="none"
+          stroke="url(#cheminFade)"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-dasharray="1 11"
+          opacity=".45"
+          class="trail-path"
+        />
+        <g fill="#E87520">
+          <circle class="trail-step" cx="360" cy="34" r="4" />
+          <circle class="trail-step" cx="720" cy="70" r="4" />
+          <circle class="trail-step" cx="1080" cy="40" r="4" />
+        </g>
+        <g class="trail-walker" fill="#E87520" transform="translate(720,70)">
+          <circle r="14" opacity=".15" />
+          <circle r="7" opacity=".3" />
+          <circle r="4.5" fill="#F09040" />
+        </g>
       </svg>
     </div>
 
@@ -532,77 +823,118 @@
         <div style="text-align: center; margin-bottom: 3.5rem" class="reveal">
           <p class="section-label" contenteditable="false" data-edit-id="temoignages-label">Témoignages</p>
           <h2 class="section-title" contenteditable="false" data-edit-id="temoignages-title">
-            Ce que disent mes clients
+            Ce que mes clients disent de moi
           </h2>
         </div>
-        <div class="temoignages-grid">
-          <article class="temoignage-card reveal">
-            <div class="stars" aria-label="5 étoiles">★★★★★</div>
-            <blockquote contenteditable="false" data-edit-id="temoignage1-quote">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
-            </blockquote>
-            <div class="temoignage-author">
-              <div class="author-avatar" contenteditable="false" data-edit-id="temoignage1-avatar">M</div>
-              <div>
-                <div class="author-name" contenteditable="false" data-edit-id="temoignage1-name">Marie D.</div>
-                <div class="author-role" contenteditable="false" data-edit-id="temoignage1-role">
-                  Directrice, PME industrielle
-                </div>
-              </div>
-            </div>
-          </article>
-          <article class="temoignage-card reveal">
-            <div class="stars" aria-label="5 étoiles">★★★★★</div>
-            <blockquote contenteditable="false" data-edit-id="temoignage2-quote">
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat.
-            </blockquote>
-            <div class="temoignage-author">
-              <div class="author-avatar" contenteditable="false" data-edit-id="temoignage2-avatar">T</div>
-              <div>
-                <div class="author-name" contenteditable="false" data-edit-id="temoignage2-name">Thomas R.</div>
-                <div class="author-role" contenteditable="false" data-edit-id="temoignage2-role">
-                  Manager, équipe de 12 personnes
-                </div>
-              </div>
-            </div>
-          </article>
-          <article class="temoignage-card reveal">
-            <div class="stars" aria-label="5 étoiles">★★★★★</div>
-            <blockquote contenteditable="false" data-edit-id="temoignage3-quote">
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur
-              excepteur.
-            </blockquote>
-            <div class="temoignage-author">
-              <div class="author-avatar" contenteditable="false" data-edit-id="temoignage3-avatar">S</div>
-              <div>
-                <div class="author-name" contenteditable="false" data-edit-id="temoignage3-name">Sophie L.</div>
-                <div class="author-role" contenteditable="false" data-edit-id="temoignage3-role">
-                  CEO, startup en hypercroissance
-                </div>
-              </div>
-            </div>
-          </article>
+        <div class="quotes">
+          <blockquote class="quote reveal" contenteditable="false" data-edit-id="temoignage1-quote">
+            Elle met de l’ordre dans le chaos.
+          </blockquote>
+          <blockquote class="quote reveal" contenteditable="false" data-edit-id="temoignage2-quote">
+            Je vois enfin ce que je ne voyais pas.
+          </blockquote>
+          <blockquote class="quote reveal" contenteditable="false" data-edit-id="temoignage3-quote">
+            Je sais comment dire les choses sans créer de tensions.
+          </blockquote>
+          <blockquote class="quote reveal" contenteditable="false" data-edit-id="temoignage4-quote">
+            Je me sens plus clair, plus aligné, plus solide.
+          </blockquote>
+          <div class="quotes-compass" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="22" />
+              <circle cx="32" cy="32" r="16" stroke-opacity=".4" />
+              <path d="M32 6v6M32 52v6M6 32h6M52 32h6" />
+              <g class="cmp-needle" data-base="0" data-cx="32" data-cy="32">
+                <path class="needle-n" d="M32 14 L36 32 L28 32 Z" />
+                <path class="needle-s" d="M32 50 L36 32 L28 32 Z" />
+                <path class="needle-ew" d="M14 32 L32 29.5 L32 34.5 Z M50 32 L32 29.5 L32 34.5 Z" />
+              </g>
+              <circle cx="32" cy="32" r="2" class="needle-pin" />
+            </svg>
+          </div>
         </div>
       </div>
     </section>
-
-    <!-- SEPARATOR: FLAMME INVERSE -->
-    <div class="sep" aria-hidden="true">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- SEPARATOR: BRAISES (témoignages → contact) -->
+    <div class="sep sep-embers" aria-hidden="true">
+      <svg class="fire-crest" viewBox="0 0 1440 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="flamme2" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#0F2040" />
-            <stop offset="100%" stop-color="#0B1829" stop-opacity=".8" />
+          <linearGradient id="fireHeat" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E87520" stop-opacity=".22" />
+            <stop offset="35%" stop-color="#E87520" stop-opacity=".08" />
+            <stop offset="100%" stop-color="#E87520" stop-opacity="0" />
           </linearGradient>
+          <linearGradient id="fireStroke" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#E87520" />
+            <stop offset="50%" stop-color="#F7B548" />
+            <stop offset="100%" stop-color="#E87520" />
+          </linearGradient>
+          <linearGradient id="fireFadeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="20%" stop-color="#fff" />
+            <stop offset="80%" stop-color="#fff" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <mask id="fireFade" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="150">
+            <rect width="1440" height="150" fill="url(#fireFadeGrad)" />
+          </mask>
+          <filter id="fireBlur" x="-5%" y="-100%" width="110%" height="300%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
         </defs>
-        <path
-          d="M0,30 C200,70 400,10 600,50 C800,85 1000,20 1200,55 C1320,75 1400,35 1440,40 L1440,80 L0,80 Z"
-          fill="url(#flamme2)"
-        />
-        <path d="M0,0 L1440,0 L1440,30 C1200,10 800,60 400,20 C200,5 100,40 0,25 Z" fill="#0F2040" />
+        <g mask="url(#fireFade)">
+          <g class="fire-drift">
+            <g class="fire-sway">
+              <path
+                d="M0,78 C120,78 240,100 360,100 C480,100 600,72 720,72 C840,72 960,104 1080,104 C1200,104 1320,78 1440,78 C1560,78 1680,100 1800,100 C1920,100 2040,72 2160,72 C2280,72 2400,104 2520,104 C2640,104 2760,78 2880,78 L2880,150 L0,150 Z"
+                fill="url(#fireHeat)"
+              />
+              <path
+                class="fire-glow"
+                d="M0,78 C120,78 240,100 360,100 C480,100 600,72 720,72 C840,72 960,104 1080,104 C1200,104 1320,78 1440,78 C1560,78 1680,100 1800,100 C1920,100 2040,72 2160,72 C2280,72 2400,104 2520,104 C2640,104 2760,78 2880,78"
+                fill="none"
+                stroke="url(#fireStroke)"
+                stroke-width="8"
+                filter="url(#fireBlur)"
+              />
+              <path
+                d="M0,78 C120,78 240,100 360,100 C480,100 600,72 720,72 C840,72 960,104 1080,104 C1200,104 1320,78 1440,78 C1560,78 1680,100 1800,100 C1920,100 2040,72 2160,72 C2280,72 2400,104 2520,104 C2640,104 2760,78 2880,78"
+                fill="none"
+                stroke="url(#fireStroke)"
+                stroke-width="1.6"
+                vector-effect="non-scaling-stroke"
+              />
+            </g>
+          </g>
+        </g>
       </svg>
+      <span style="--x: 4%; --s: 4px; --d: 5.8s; --delay: -2.7s; --drift: -15px; --rise: -75px"></span>
+      <span style="--x: 9%; --s: 4.3px; --d: 3.6s; --delay: -1.6s; --drift: -12px; --rise: -82px"></span>
+      <span style="--x: 14%; --s: 4.9px; --d: 3.1s; --delay: -3s; --drift: 30px; --rise: -89px"></span>
+      <span style="--x: 18%; --s: 4.9px; --d: 5.5s; --delay: -0.3s; --drift: -16px; --rise: -82px"></span>
+      <span style="--x: 23%; --s: 5.3px; --d: 4s; --delay: -2.4s; --drift: -26px; --rise: -87px"></span>
+      <span style="--x: 27%; --s: 5.1px; --d: 5s; --delay: -2.3s; --drift: 23px; --rise: -102px"></span>
+      <span style="--x: 31%; --s: 6.7px; --d: 5.1s; --delay: -1.6s; --drift: -26px; --rise: -98px"></span>
+      <span style="--x: 35%; --s: 3.9px; --d: 3.3s; --delay: -0.4s; --drift: 22px; --rise: -96px"></span>
+      <span style="--x: 38%; --s: 7.2px; --d: 3s; --delay: -0.6s; --drift: -25px; --rise: -109px"></span>
+      <span style="--x: 41%; --s: 6.8px; --d: 3.2s; --delay: -2s; --drift: 20px; --rise: -102px"></span>
+      <span style="--x: 44%; --s: 4.1px; --d: 4.2s; --delay: -3.9s; --drift: -17px; --rise: -106px"></span>
+      <span style="--x: 46%; --s: 3.7px; --d: 4.5s; --delay: -3.1s; --drift: -24px; --rise: -122px"></span>
+      <span style="--x: 48%; --s: 4.8px; --d: 3.4s; --delay: -2.2s; --drift: -22px; --rise: -121px"></span>
+      <span style="--x: 50%; --s: 7px; --d: 5.6s; --delay: -5.5s; --drift: 10px; --rise: -116px"></span>
+      <span style="--x: 52%; --s: 5.2px; --d: 4.8s; --delay: -2.8s; --drift: -14px; --rise: -114px"></span>
+      <span style="--x: 54%; --s: 4.6px; --d: 4.8s; --delay: -4s; --drift: 12px; --rise: -108px"></span>
+      <span style="--x: 56%; --s: 4.2px; --d: 3.7s; --delay: -2.2s; --drift: 29px; --rise: -117px"></span>
+      <span style="--x: 59%; --s: 4.3px; --d: 5.5s; --delay: -0.7s; --drift: 15px; --rise: -120px"></span>
+      <span style="--x: 62%; --s: 4.8px; --d: 5.5s; --delay: -1.4s; --drift: -15px; --rise: -117px"></span>
+      <span style="--x: 65%; --s: 5.9px; --d: 5.9s; --delay: -5.2s; --drift: -23px; --rise: -94px"></span>
+      <span style="--x: 69%; --s: 3.3px; --d: 5.9s; --delay: -1.4s; --drift: 18px; --rise: -102px"></span>
+      <span style="--x: 73%; --s: 5.7px; --d: 3.9s; --delay: -0.7s; --drift: -14px; --rise: -92px"></span>
+      <span style="--x: 77%; --s: 4.9px; --d: 4.8s; --delay: -0.4s; --drift: -16px; --rise: -80px"></span>
+      <span style="--x: 82%; --s: 3.7px; --d: 3.7s; --delay: -0.2s; --drift: 21px; --rise: -91px"></span>
+      <span style="--x: 86%; --s: 3.8px; --d: 4.1s; --delay: -3.7s; --drift: 26px; --rise: -88px"></span>
+      <span style="--x: 91%; --s: 4.6px; --d: 5.8s; --delay: -2.8s; --drift: 19px; --rise: -66px"></span>
+      <span style="--x: 96%; --s: 4px; --d: 4.4s; --delay: -3.2s; --drift: 14px; --rise: -61px"></span>
     </div>
 
     <!-- CONTACT -->
@@ -612,8 +944,8 @@
           <p class="section-label" contenteditable="false" data-edit-id="contact-label">Contact</p>
           <h2 class="section-title" contenteditable="false" data-edit-id="contact-title">Parlons de votre projet</h2>
           <p class="section-lead" style="margin: 0 auto" contenteditable="false" data-edit-id="contact-lead">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Prenez un premier rendez-vous découverte gratuit et
-            sans engagement.
+            Une décision à clarifier, une posture à affirmer, une équipe à fédérer ? Appelez-moi ou écrivez-moi pour en
+            savoir plus sur l’accompagnement qui vous correspond.
           </p>
         </div>
         <div class="contact-grid reveal">
@@ -634,9 +966,7 @@
               <div>
                 <h4>Téléphone</h4>
                 <p>
-                  <a href="tel:+33600000000" contenteditable="false" data-edit-id="contact-telephone">
-                    +33 6 00 00 00 00
-                  </a>
+                  <a href="tel:+33638405151" contenteditable="false" data-edit-id="contact-telephone">06 38 40 51 51</a>
                 </p>
               </div>
             </div>
@@ -647,6 +977,23 @@
                 <p>
                   <a href="mailto:contact@avcoach.fr" contenteditable="false" data-edit-id="contact-email">
                     contact@avcoach.fr
+                  </a>
+                </p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">
+                <svg class="contact-linkedin" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.2c0-1.24-.02-2.84-1.73-2.84-1.73 0-2 1.35-2 2.75V21h-4z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h4>LinkedIn</h4>
+                <p>
+                  <a href="https://www.linkedin.com/in/avuillemin" target="_blank" rel="noopener noreferrer">
+                    Aurélia Vuillemin
                   </a>
                 </p>
               </div>
@@ -703,9 +1050,12 @@
 
     <!-- FOOTER -->
     <footer>
+      <div class="container footer-signature">
+        <img src="/images/signature.png" alt="Ensemble, trouvons votre cap" width="491" height="180" />
+      </div>
       <div class="container footer-inner">
         <div class="footer-logo">
-          <img src="/images/logo-blanc.png" alt="AV Coach" class="nav-logo-img" />
+          <img src="/images/logo-blanc.png" alt="Avé Coach" class="nav-logo-img" />
           <img src="/images/logo-texte.png" alt="" class="nav-logo-text" />
         </div>
         <ul class="footer-links">

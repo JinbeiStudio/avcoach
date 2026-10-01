@@ -29,6 +29,8 @@ function transformHtml(html) {
   html = html.replace(/href="\/css\//g, 'href="css/');
   html = html.replace(/src="\/js\//g, 'src="js/');
   html = html.replace(/src="\/images\//g, 'src="images/');
+  html = html.replace(/href="\/images\//g, 'href="images/');
+  html = html.replace(/href="\/favicon\.ico"/g, 'href="favicon.ico"');
 
   // Supprime les attributs d'édition
   html = html.replace(/ contenteditable="false"/g, '');
@@ -56,6 +58,7 @@ fs.mkdirSync(DEST, { recursive: true });
 
 copyDir(path.join(SRC, 'css'), path.join(DEST, 'css'));
 copyDir(path.join(SRC, 'images'), path.join(DEST, 'images'));
+fs.copyFileSync(path.join(SRC, 'favicon.ico'), path.join(DEST, 'favicon.ico'));
 
 const html = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
 fs.writeFileSync(path.join(DEST, 'index.html'), transformHtml(html));
