@@ -133,6 +133,7 @@ document.querySelector('.contact-form')?.addEventListener('submit', async (e) =>
 
 // ── Login modal ───────────────────────────────────────────────────────────────
 let _firstLoginUsername = null;
+let _firstLoginTempPassword = null;
 
 function openLogin() {
   document.getElementById('login-overlay').classList.add('open');
@@ -143,6 +144,7 @@ function closeLogin() {
   document.getElementById('login-overlay').classList.remove('open');
   showLoginStep(1);
   _firstLoginUsername = null;
+  _firstLoginTempPassword = null;
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('setpwd-new').value = '';
@@ -185,6 +187,7 @@ async function doLogin() {
     const result = await Auth.login(username, password);
     if (result.firstLogin) {
       _firstLoginUsername = result.username;
+      _firstLoginTempPassword = password;
       showLoginStep(2);
       setTimeout(() => document.getElementById('setpwd-new').focus(), 50);
     } else {
@@ -224,7 +227,7 @@ async function doSetPassword() {
   btn.disabled = true;
 
   try {
-    await Auth.setPassword(_firstLoginUsername, newPassword);
+    await Auth.setPassword(_firstLoginUsername, _firstLoginTempPassword, newPassword);
     closeLogin();
     setEditButtonText('✎ Éditer');
   } catch (err) {
@@ -283,5 +286,4 @@ fetch('/api/track', { method: 'POST' }).catch(() => {});
 (async () => {
   const user = await Auth.verify();
   if (user) setEditButtonText('✎ Éditer');
-  Editor.loadContent();
 })();

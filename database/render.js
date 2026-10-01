@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const parse5 = require('parse5');
 
-const INDEX_PATH = process.env.INDEX_HTML_PATH || path.join(__dirname, '..', 'public', 'index.html');
+const TEMPLATE_PATH = process.env.INDEX_HTML_PATH || path.join(__dirname, '..', 'public', 'index.html');
+const RENDERED_PATH = process.env.RENDERED_HTML_PATH || path.join(__dirname, '..', 'var', 'index.html');
 
 // Parcourt l'arbre dans l'ordre du document (même ordre que
 // querySelectorAll côté client), comme editor.js.
@@ -28,20 +28,9 @@ function parseIndexHtml(html) {
   return { editableEls, imgEls };
 }
 
-// Empreinte du fichier tel qu'il est actuellement sur disque — sert à
-// détecter qu'un déploiement a remplacé index.html (push) depuis la
-// dernière écriture connue du serveur.
-function hashIndexHtml() {
-  const html = fs.readFileSync(INDEX_PATH, 'utf8');
-  return crypto.createHash('sha256').update(html).digest('hex');
-}
-
-// Lit le contenu actuel de index.html et le transforme en snapshot
-// { el_<id>: innerHTML, img_<id>: src } — l'inverse de renderIndexHtml.
-// Utilisé pour capturer une nouvelle V0 quand un déploiement a pushé un
-// nouveau index.html (nouvelle structure et/ou nouveau contenu de base).
-function readIndexSnapshot() {
-  const html = fs.readFileSync(INDEX_PATH, 'utf8');
+// Transforme un HTML en snapshot { el_<id>: innerHTML, img_<id>: src } —
+// l'inverse de renderHtml.
+function readSnapshot(html) {
   const { editableEls, imgEls } = parseIndexHtml(html);
   const snapshot = {};
 
@@ -62,14 +51,11 @@ function readIndexSnapshot() {
   return snapshot;
 }
 
-// Réécrit index.html en remplaçant uniquement le contenu des éléments
-// [contenteditable] (el_<data-edit-id>) et les src des <img> (img_<data-edit-id>),
-// identifiés par un attribut stable plutôt que par position — pour rester
-// valide même si la structure de la page change (ajout/suppression
-// d'éléments) — sans toucher au reste du fichier (formatage, attributs…),
-// pour ne produire que des diffs minimaux.
-function renderIndexHtml(snapshot) {
-  const html = fs.readFileSync(INDEX_PATH, 'utf8');
+// Retourne le HTML où seul le contenu des éléments [contenteditable]
+// (el_<data-edit-id>) et les src des <img> (img_<data-edit-id>) est remplacé
+// par le snapshot, identifiés par un attribut stable plutôt que par position.
+// Le reste du fichier (formatage, attributs…) n'est pas touché.
+function renderHtml(html, snapshot) {
   const { editableEls, imgEls } = parseIndexHtml(html);
 
   const replacements = [];
@@ -110,7 +96,19 @@ function renderIndexHtml(snapshot) {
     out = out.slice(0, start) + text + out.slice(end);
   }
 
-  fs.writeFileSync(INDEX_PATH, out);
+  return out;
 }
 
-module.exports = { renderIndexHtml, readIndexSnapshot, hashIndexHtml };
+function readTemplate() {
+  return fs.readFileSync(TEMPLATE_PATH, 'utf8');
+}
+
+// Écriture atomique : fichier temporaire puis renommage.
+function writeRendered(html) {
+  fs.mkdirSync(path.dirname(RENDERED_PATH), { recursive: true });
+  const tmp = RENDERED_PATH + '.tmp';
+  fs.writeFileSync(tmp, html);
+  fs.renameSync(tmp, RENDERED_PATH);
+}
+
+module.exports = { readSnapshot, renderHtml, readTemplate, writeRendered, TEMPLATE_PATH, RENDERED_PATH };

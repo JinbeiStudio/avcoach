@@ -25,11 +25,11 @@ const Auth = (() => {
     return data.user;
   }
 
-  async function setPassword(username, newPassword) {
+  async function setPassword(username, tempPassword, newPassword) {
     const res = await fetch('/api/set-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, newPassword })
+      body: JSON.stringify({ username, tempPassword, newPassword })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur');
@@ -70,5 +70,5 @@ const Auth = (() => {
     return { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
   }
 
-  return { login, setPassword, logout, verify, getToken, authHeaders };
+  return { login, setPassword, logout, verify, getToken, setToken, clearToken, authHeaders };
 })();
