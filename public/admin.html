@@ -518,6 +518,9 @@
 
         <!-- Panel historique éditions -->
         <div id="panel-history" class="panel">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem">
+            <button class="btn-sm btn-neutral" onclick="exportContent()">📥 Exporter le contenu</button>
+          </div>
           <div id="export-index-wrap" style="display: none; justify-content: flex-end; margin-bottom: 1rem">
             <a class="btn-sm btn-neutral" href="/index.html" download="index.html" style="text-decoration: none">
               📥 Exporter index.html
@@ -767,7 +770,7 @@
         <span class="version-badge">${label}</span>
         <div class="version-info">
           <div class="version-date">${fmtDate(v.saved_at)}</div>
-          <div class="version-author">par ${esc(v.username || (v.is_base ? 'Déploiement' : '—'))}</div>
+          <div class="version-author">par ${esc(v.username || 'Déploiement')}</div>
         </div>
         <button class="btn-sm btn-primary" style="margin-left:auto;margin-right:.75rem;flex-shrink:0"
           onclick="event.stopPropagation();restoreVersion(${v.id},'${label}')">↩ Restaurer</button>
@@ -779,6 +782,17 @@
     </div>`;
           })
           .join('');
+      }
+
+      async function exportContent() {
+        const res = await fetch('/api/content/export', { headers: { Authorization: 'Bearer ' + token } });
+        if (!res.ok) return alert("Échec de l'export du contenu.");
+        const url = URL.createObjectURL(await res.blob());
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `avcoach-contenu-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
       }
 
       function toggleVersion(id) {
@@ -975,8 +989,13 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
 
-          msg.textContent = `✓ Invitation envoyée à ${email}`;
-          msg.style.color = 'var(--green)';
+          if (data.warning) {
+            msg.textContent = '⚠ ' + data.warning;
+            msg.style.color = 'var(--red)';
+          } else {
+            msg.textContent = `✓ Invitation envoyée à ${email}`;
+            msg.style.color = 'var(--green)';
+          }
           msg.style.display = 'inline';
           document.getElementById('new-username').value = '';
           document.getElementById('new-email').value = '';

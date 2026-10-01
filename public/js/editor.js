@@ -23,13 +23,26 @@ const Editor = (() => {
     if (typeof setEditButtonText === 'function') setEditButtonText('✕ Quitter');
     document.querySelectorAll('[contenteditable]').forEach((el) => el.setAttribute('contenteditable', 'true'));
     document.querySelector('nav').style.top = '44px';
-    // Si pas de V0, capture l'état HTML de base
-    const check = await fetch('/api/content/base', { headers: Auth.authHeaders() });
-    const { exists } = await check.json();
-    if (!exists) await saveInitialVersion();
-    await loadContent();
-    // Référence pour ne détecter/envoyer que les champs réellement modifiés
-    baseline = captureSnapshot();
+    try {
+      // Si pas de V0, capture l'état HTML de base
+      const check = await fetch('/api/content/base', { headers: Auth.authHeaders() });
+      if (!check.ok) {
+        const err = new Error('Accès refusé');
+        err.status = check.status;
+        throw err;
+      }
+      const { exists } = await check.json();
+      if (!exists) await saveInitialVersion();
+      await loadContent();
+      // Référence pour ne détecter/envoyer que les champs réellement modifiés
+      baseline = captureSnapshot();
+    } catch (err) {
+      exit();
+      if (err.status === 401) {
+        Auth.clearToken();
+        if (typeof setEditButtonText === 'function') setEditButtonText('Connexion');
+      }
+    }
   }
 
   async function saveInitialVersion() {
@@ -106,13 +119,7 @@ const Editor = (() => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = currentImgWrap.querySelector('img');
-      if (img) {
-        img.src = e.target.result;
-      } else {
-        currentImgWrap.style.backgroundImage = `url(${e.target.result})`;
-        currentImgWrap.style.backgroundSize = 'cover';
-        currentImgWrap.style.backgroundPosition = 'center';
-      }
+      if (img) img.src = e.target.result;
     };
     reader.readAsDataURL(this.files[0]);
     this.value = '';

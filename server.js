@@ -1,37 +1,87 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
+const crypto = require('crypto');
+const { rateLimit } = require('express-rate-limit');
 const path = require('path');
 
-const nodemailer = require('nodemailer');
 const { getDb } = require('./database/db');
+const { createTransporter, escapeHtml, sendWelcomeEmails } = require('./lib/mail');
 const { initDatabase } = require('./database/init');
-const { renderIndexHtml, readIndexSnapshot, hashIndexHtml } = require('./database/render');
-const { getMeta, setMeta } = require('./database/meta');
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.mail.me.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
-}
+const { RENDERED_PATH } = require('./database/render');
+const { getMeta } = require('./database/meta');
+const { renderSite, renderSiteIfMissing, syncTemplate, pruneSaves } = require('./database/content');
 
 const app = express();
 const PORT = process.env.PORT || 3456;
 const SECRET = process.env.JWT_SECRET;
 const EXPIRES = process.env.JWT_EXPIRES_IN || '8h';
 
-app.use(cors());
+// Échec immédiat au démarrage réel si le secret JWT est absent
+if (require.main === module && !SECRET) {
+  console.error('✗ JWT_SECRET manquant : définissez-le dans les variables d’environnement.');
+  process.exit(1);
+}
+
+// L'app tourne derrière le proxy Infomaniak : req.ip doit être l'IP du client
+app.set('trust proxy', 1);
+
+// Limites désactivées sous Jest sauf si ENABLE_RATE_LIMIT=true (test dédié)
+const skipInTest = () => process.env.NODE_ENV === 'test' && process.env.ENABLE_RATE_LIMIT !== 'true';
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  skip: skipInTest,
+  message: { error: 'Trop de tentatives, réessayez plus tard' }
+});
+
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: skipInTest,
+  message: { error: 'Trop de messages envoyés, réessayez plus tard' }
+});
+
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Page servie = template + contenu en base (générée), jamais le template brut
+app.get(['/', '/index.html'], (req, res, next) => {
+  try {
+    renderSiteIfMissing();
+  } catch (e) {
+    return next(e);
+  }
+  res.sendFile(RENDERED_PATH, (err) => err && next(err));
+});
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+// Retourne un entier positif, ou null si l'identifiant n'est pas valide
+function parseId(value) {
+  return /^\d+$/.test(String(value)) ? Number(value) : null;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const GENERIC_LOGIN_ERROR = 'Identifiant ou mot de passe incorrect';
+
+function signToken(user) {
+  return jwt.sign({ id: user.id, username: user.username, role: user.role, tv: user.token_version }, SECRET, {
+    expiresIn: EXPIRES
+  });
+}
+
+function generateTempPassword() {
+  return crypto.randomBytes(6).toString('base64url');
+}
 
 // GET /sitemap.xml — <lastmod> basé sur la dernière sauvegarde de contenu,
 // le signal que les crawlers utilisent pour prioriser le re-crawl.
@@ -55,49 +105,50 @@ function requireAuth(req, res, next) {
   if (!header || !header.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Non authentifié' });
   }
+  let payload;
   try {
-    req.user = jwt.verify(header.slice(7), SECRET);
-    next();
+    payload = jwt.verify(header.slice(7), SECRET);
   } catch {
-    res.status(401).json({ error: 'Token invalide ou expiré' });
+    return res.status(401).json({ error: 'Token invalide ou expiré' });
   }
+  // Le token doit correspondre à la version courante du compte (révocation)
+  const user = getDb().prepare('SELECT id, username, role, token_version FROM users WHERE id = ?').get(payload.id);
+  if (!user || user.token_version !== payload.tv) {
+    return res.status(401).json({ error: 'Token invalide ou expiré' });
+  }
+  req.user = { id: user.id, username: user.username, role: user.role };
+  next();
 }
 
 // ── Routes API ───────────────────────────────────────────────────────────────
 
 // POST /api/login
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  if (!username) return res.status(400).json({ error: 'Identifiant requis' });
+app.post('/api/login', authLimiter, async (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || typeof username !== 'string') return res.status(400).json({ error: 'Identifiant requis' });
 
   const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user) return res.status(401).json({ error: 'Identifiant inconnu' });
+  if (!user) return res.status(401).json({ error: GENERIC_LOGIN_ERROR });
 
-  // Première connexion : valider le mot de passe temporaire puis demander le définitif
+  const valid = typeof password === 'string' && user.password && (await bcrypt.compare(password, user.password));
+  if (!valid) return res.status(401).json({ error: GENERIC_LOGIN_ERROR });
+
+  // Première connexion : le mot de passe temporaire est valide, on demande le définitif
   if (user.must_set_password) {
-    if (!password || !user.password || !bcrypt.compareSync(password, user.password)) {
-      return res.status(401).json({ error: 'Identifiant ou mot de passe temporaire incorrect' });
-    }
     return res.json({ firstLogin: true, username: user.username });
-  }
-
-  if (!password || !bcrypt.compareSync(password, user.password)) {
-    return res.status(401).json({ error: 'Mot de passe incorrect' });
   }
 
   db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
 
-  const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, SECRET, { expiresIn: EXPIRES });
-
-  res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
+  res.json({ token: signToken(user), user: { id: user.id, username: user.username, role: user.role } });
 });
 
 // POST /api/set-password  (définir le mot de passe à la première connexion)
-app.post('/api/set-password', (req, res) => {
-  const { username, newPassword } = req.body;
-  if (!username || !newPassword) {
-    return res.status(400).json({ error: 'Identifiant et nouveau mot de passe requis' });
+app.post('/api/set-password', authLimiter, async (req, res) => {
+  const { username, tempPassword, newPassword } = req.body || {};
+  if (typeof username !== 'string' || typeof tempPassword !== 'string' || typeof newPassword !== 'string') {
+    return res.status(400).json({ error: 'Identifiant, mot de passe temporaire et nouveau mot de passe requis' });
   }
   if (newPassword.length < 8) {
     return res.status(400).json({ error: 'Le mot de passe doit faire au moins 8 caractères' });
@@ -105,21 +156,19 @@ app.post('/api/set-password', (req, res) => {
 
   const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
-  if (!user.must_set_password && user.password) {
-    return res.status(403).json({ error: 'Mot de passe déjà défini' });
-  }
+  const tempOk = user && user.must_set_password && user.password && (await bcrypt.compare(tempPassword, user.password));
+  if (!tempOk) return res.status(401).json({ error: 'Identifiant ou mot de passe temporaire incorrect' });
 
-  const hash = bcrypt.hashSync(newPassword, 12);
+  const hash = await bcrypt.hash(newPassword, 12);
   db.prepare(
     `
-    UPDATE users SET password = ?, must_set_password = 0, last_login = datetime('now') WHERE id = ?
+    UPDATE users SET password = ?, must_set_password = 0, token_version = token_version + 1,
+      last_login = datetime('now') WHERE id = ?
   `
   ).run(hash, user.id);
 
-  const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, SECRET, { expiresIn: EXPIRES });
-
-  res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
+  const fresh = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+  res.json({ token: signToken(fresh), user: { id: fresh.id, username: fresh.username, role: fresh.role } });
 });
 
 // GET /api/verify
@@ -127,8 +176,9 @@ app.get('/api/verify', requireAuth, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
 
-// POST /api/logout  (côté client : supprimer le token suffit, mais on trace)
+// POST /api/logout  (révoque tous les tokens du compte)
 app.post('/api/logout', requireAuth, (req, res) => {
+  getDb().prepare('UPDATE users SET token_version = token_version + 1 WHERE id = ?').run(req.user.id);
   res.json({ message: 'Déconnecté' });
 });
 
@@ -142,69 +192,93 @@ app.get('/api/users', requireAuth, (req, res) => {
 // POST /api/users  (créer un utilisateur — admin seulement)
 app.post('/api/users', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const { username, email, role } = req.body;
-  if (!username || !email) {
+  const { username, email, role } = req.body || {};
+  if (!username || !email || typeof username !== 'string' || typeof email !== 'string') {
     return res.status(400).json({ error: 'Identifiant et email requis' });
   }
   const validRoles = ['admin', 'editor'];
   const userRole = validRoles.includes(role) ? role : 'editor';
 
-  const crypto = require('crypto');
-  const tempPassword = crypto.randomBytes(6).toString('base64url');
-  const hash = bcrypt.hashSync(tempPassword, 12);
+  const tempPassword = generateTempPassword();
+  const hash = await bcrypt.hash(tempPassword, 12);
+  const db = getDb();
 
+  let id;
   try {
-    const result = getDb()
+    id = db
       .prepare(
         'INSERT INTO users (username, email, password, must_set_password, welcome_email_sent, role) VALUES (?, ?, ?, 1, 0, ?)'
       )
-      .run(username, email, hash, userRole);
+      .run(username, email, hash, userRole).lastInsertRowid;
+  } catch (e) {
+    if (e.message?.includes('UNIQUE')) return res.status(409).json({ error: 'Identifiant déjà utilisé' });
+    console.error('Erreur création utilisateur :', e.message);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
 
-    const transporter = createTransporter();
-    await transporter.sendMail({
+  try {
+    await createTransporter().sendMail({
       from: `"AV Coach" <${process.env.SMTP_USER}>`,
       to: email,
       subject: `Bienvenue sur AVCoach — vos identifiants`,
       text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.`,
-      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
+      html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
     });
-
-    res.status(201).json({ id: result.lastInsertRowid, username, role: userRole });
-  } catch (e) {
-    if (e.message?.includes('UNIQUE')) return res.status(409).json({ error: 'Identifiant déjà utilisé' });
-    console.error('Erreur création utilisateur :', e.message);
-    res.status(500).json({ error: 'Erreur serveur' });
+    db.prepare('UPDATE users SET welcome_email_sent = 1 WHERE id = ?').run(id);
+    res.status(201).json({ id, username, role: userRole, emailSent: true });
+  } catch (err) {
+    console.error('Échec envoi email création :', err.message);
+    res.status(201).json({
+      id,
+      username,
+      role: userRole,
+      emailSent: false,
+      warning: 'Utilisateur créé mais échec envoi email'
+    });
   }
 });
 
 // PUT /api/users/:id/password  (changer son propre mot de passe)
-app.put('/api/users/:id/password', requireAuth, (req, res) => {
-  const targetId = parseInt(req.params.id);
+app.put('/api/users/:id/password', requireAuth, async (req, res) => {
+  const targetId = parseId(req.params.id);
+  if (targetId === null) return res.status(400).json({ error: 'Identifiant invalide' });
   if (req.user.id !== targetId && req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Interdit' });
   }
-  const { password } = req.body;
-  if (!password || password.length < 8) {
+  const { password } = req.body || {};
+  if (typeof password !== 'string' || password.length < 8) {
     return res.status(400).json({ error: 'Mot de passe trop court (min. 8 caractères)' });
   }
-  const hash = bcrypt.hashSync(password, 12);
-  getDb().prepare('UPDATE users SET password = ? WHERE id = ?').run(hash, targetId);
+  const db = getDb();
+  if (!db.prepare('SELECT id FROM users WHERE id = ?').get(targetId)) {
+    return res.status(404).json({ error: 'Utilisateur introuvable' });
+  }
+  const hash = await bcrypt.hash(password, 12);
+  db.prepare('UPDATE users SET password = ?, token_version = token_version + 1 WHERE id = ?').run(hash, targetId);
+
+  // Changement de son propre mot de passe : nouveau token pour garder la session
+  if (req.user.id === targetId) {
+    const fresh = db.prepare('SELECT * FROM users WHERE id = ?').get(targetId);
+    return res.json({ message: 'Mot de passe mis à jour', token: signToken(fresh) });
+  }
   res.json({ message: 'Mot de passe mis à jour' });
 });
 
 // POST /api/users/:id/reset-password  (admin — réinitialise avec un mot de passe temporaire)
 app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const targetId = parseInt(req.params.id);
+  const targetId = parseId(req.params.id);
+  if (targetId === null) return res.status(400).json({ error: 'Identifiant invalide' });
   const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(targetId);
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
 
-  const crypto = require('crypto');
-  const tempPassword = crypto.randomBytes(6).toString('base64url');
-  const hash = bcrypt.hashSync(tempPassword, 12);
+  const tempPassword = generateTempPassword();
+  const hash = await bcrypt.hash(tempPassword, 12);
 
-  db.prepare('UPDATE users SET password = ?, must_set_password = 1 WHERE id = ?').run(hash, targetId);
+  db.prepare(
+    'UPDATE users SET password = ?, must_set_password = 1, token_version = token_version + 1 WHERE id = ?'
+  ).run(hash, targetId);
 
   const transporter = createTransporter();
 
@@ -214,7 +288,7 @@ app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
       to: user.email,
       subject: `AVCoach — Réinitialisation de votre mot de passe`,
       text: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nIdentifiant : ${user.username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous et définissez un nouveau mot de passe définitif.`,
-      html: `<p>Bonjour,</p><p>Votre mot de passe AVCoach a été réinitialisé.</p><table><tr><td><strong>Identifiant</strong></td><td>${user.username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous et définissez un nouveau mot de passe définitif.</p>`
+      html: `<p>Bonjour,</p><p>Votre mot de passe AVCoach a été réinitialisé.</p><table><tr><td><strong>Identifiant</strong></td><td>${escapeHtml(user.username)}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${escapeHtml(tempPassword)}</code></td></tr></table><p>Connectez-vous et définissez un nouveau mot de passe définitif.</p>`
     });
     res.json({ message: 'Mot de passe réinitialisé et email envoyé' });
   } catch (err) {
@@ -226,49 +300,50 @@ app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
 // DELETE /api/users/:id
 app.delete('/api/users/:id', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
-  const targetId = parseInt(req.params.id);
+  const targetId = parseId(req.params.id);
+  if (targetId === null) return res.status(400).json({ error: 'Identifiant invalide' });
   if (req.user.id === targetId) return res.status(400).json({ error: 'Impossible de se supprimer soi-même' });
   getDb().prepare('DELETE FROM users WHERE id = ?').run(targetId);
   res.json({ message: 'Utilisateur supprimé' });
 });
 
+// Un snapshot valide est un objet { el_<id>|img_<id>: string }
+function isValidSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) return false;
+  return Object.entries(snapshot).every(([key, value]) => /^(el|img)_[\w-]+$/.test(key) && typeof value === 'string');
+}
+
 // POST /api/content  (sauvegarder le contenu édité)
 app.post('/api/content', requireAuth, (req, res) => {
-  const { snapshot: delta, isBase } = req.body;
+  const { snapshot: delta, isBase } = req.body || {};
   if (!delta) return res.status(400).json({ error: 'Snapshot requis' });
+  if (!isValidSnapshot(delta)) return res.status(400).json({ error: 'Snapshot invalide' });
   const db = getDb();
 
   // Le client n'envoie que les champs réellement modifiés (delta). On le
   // fusionne avec le dernier état complet connu pour que chaque ligne de
-  // content_saves reste un instantané complet (historique/diff/restauration
-  // continuent de fonctionner comme avant) — mais on n'écrit dans le fichier
-  // que ce qui a changé.
-  let fullSnapshot = delta;
-  if (!isBase) {
-    const latest = db.prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1').get();
-    fullSnapshot = latest ? { ...JSON.parse(latest.snapshot), ...delta } : delta;
-  }
+  // content_saves reste un instantané complet (historique/diff/restauration).
+  const save = db.transaction(() => {
+    let fullSnapshot = delta;
+    if (!isBase) {
+      const latest = db.prepare('SELECT snapshot FROM content_saves ORDER BY id DESC LIMIT 1').get();
+      fullSnapshot = latest ? { ...JSON.parse(latest.snapshot), ...delta } : delta;
+    }
 
-  db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)').run(
-    req.user.id,
-    JSON.stringify(fullSnapshot),
-    isBase ? 1 : 0
-  );
-  // Garde V0 + les 5 dernières éditions
-  db.prepare(
-    `
-    DELETE FROM content_saves
-    WHERE is_base = 0
-    AND id NOT IN (
-      SELECT id FROM content_saves WHERE is_base = 0 ORDER BY id DESC LIMIT 5
-    )
-  `
-  ).run();
+    db.prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (?, ?, ?)').run(
+      req.user.id,
+      JSON.stringify(fullSnapshot),
+      isBase ? 1 : 0
+    );
+    pruneSaves(db);
+  });
+  save();
+
   try {
-    renderIndexHtml(delta);
-    setMeta('last_rendered_hash', hashIndexHtml());
+    renderSite();
   } catch (e) {
-    console.error('Échec régénération index.html :', e.message);
+    console.error('Échec régénération de la page :', e.message);
+    return res.status(500).json({ error: 'Contenu sauvegardé mais échec de la mise à jour de la page' });
   }
   res.json({ message: 'Contenu sauvegardé' });
 });
@@ -302,13 +377,41 @@ app.get('/api/content/history/full', requireAuth, (req, res) => {
   res.json(rows.map((r) => ({ ...r, snapshot: JSON.parse(r.snapshot) })));
 });
 
+// GET /api/content/export  (admin — sauvegarde complète du contenu en JSON)
+app.get('/api/content/export', requireAuth, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+  const rows = getDb()
+    .prepare(
+      `
+    SELECT cs.id, cs.saved_at, cs.snapshot, cs.is_base, u.username
+    FROM content_saves cs
+    LEFT JOIN users u ON u.id = cs.saved_by
+    ORDER BY cs.id DESC
+  `
+    )
+    .all();
+  const defaults = getMeta('template_defaults');
+  const now = new Date();
+  res.setHeader('Content-Disposition', `attachment; filename="avcoach-contenu-${now.toISOString().slice(0, 10)}.json"`);
+  res.json({
+    exported_at: now.toISOString(),
+    template_defaults: defaults ? JSON.parse(defaults) : null,
+    saves: rows.map((r) => ({ ...r, snapshot: JSON.parse(r.snapshot) }))
+  });
+});
+
 // POST /api/track  (enregistre une visite — public)
 app.post('/api/track', (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+  // IP hachée avec la date : pas de stockage d'IP brute, unicité valable un jour
+  const ipHash = crypto
+    .createHash('sha256')
+    .update(today + (req.ip || 'unknown') + SECRET)
+    .digest('hex');
   const db = getDb();
 
-  const isNew = db.prepare('INSERT OR IGNORE INTO visitor_ips (date, ip) VALUES (?, ?)').run(today, ip).changes > 0;
+  db.prepare('DELETE FROM visitor_ips WHERE date < ?').run(today);
+  const isNew = db.prepare('INSERT OR IGNORE INTO visitor_ips (date, ip) VALUES (?, ?)').run(today, ipHash).changes > 0;
 
   db.prepare(
     `
@@ -350,22 +453,32 @@ app.get('/api/stats', requireAuth, (req, res) => {
 });
 
 // POST /api/contact
-app.post('/api/contact', async (req, res) => {
-  const { name, email, message } = req.body;
+app.post('/api/contact', contactLimiter, async (req, res) => {
+  const { name, email, message } = req.body || {};
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Tous les champs sont requis' });
   }
+  if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
+    return res.status(400).json({ error: 'Champs invalides' });
+  }
+  if (name.length > 200 || email.length > 254 || message.length > 5000) {
+    return res.status(400).json({ error: 'Un des champs est trop long' });
+  }
+  if (!EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: 'Adresse email invalide' });
+  }
 
   const transporter = createTransporter();
+  const safeName = name.replace(/[\r\n]+/g, ' ');
 
   try {
     await transporter.sendMail({
       from: `"AV Coach" <${process.env.SMTP_USER}>`,
       to: process.env.CONTACT_TO,
-      replyTo: `"${name}" <${email}>`,
-      subject: `Message de ${name} via AVCoach`,
+      replyTo: { name: safeName, address: email },
+      subject: `Message de ${safeName} via AVCoach`,
       text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
-      html: `<p><strong>Nom :</strong> ${name}<br><strong>Email :</strong> ${email}</p><p>${message.replace(/\n/g, '<br>')}</p>`
+      html: `<p><strong>Nom :</strong> ${escapeHtml(name)}<br><strong>Email :</strong> ${escapeHtml(email)}</p><p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`
     });
   } catch (err) {
     console.error('Erreur email :', err.message);
@@ -386,14 +499,18 @@ app.get('/api/messages', requireAuth, (req, res) => {
 // PATCH /api/messages/:id/read
 app.patch('/api/messages/:id/read', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
-  getDb().prepare('UPDATE contact_messages SET read = 1 WHERE id = ?').run(req.params.id);
+  const id = parseId(req.params.id);
+  if (id === null) return res.status(400).json({ error: 'Identifiant invalide' });
+  getDb().prepare('UPDATE contact_messages SET read = 1 WHERE id = ?').run(id);
   res.json({ ok: true });
 });
 
 // DELETE /api/messages/:id
 app.delete('/api/messages/:id', requireAuth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
-  getDb().prepare('DELETE FROM contact_messages WHERE id = ?').run(req.params.id);
+  const id = parseId(req.params.id);
+  if (id === null) return res.status(400).json({ error: 'Identifiant invalide' });
+  getDb().prepare('DELETE FROM contact_messages WHERE id = ?').run(id);
   res.json({ ok: true });
 });
 
@@ -401,62 +518,21 @@ app.delete('/api/messages/:id', requireAuth, (req, res) => {
 
 const { newUsers } = initDatabase();
 
-// Envoi des emails de bienvenue pour les nouveaux utilisateurs
-if (newUsers.length > 0) {
-  const transporter = createTransporter();
-  for (const { username, email, tempPassword } of newUsers) {
-    transporter
-      .sendMail({
-        from: `"AV Coach" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: `Bienvenue sur AVCoach — vos identifiants`,
-        text: `Bonjour,\n\nVotre compte AVCoach a été créé.\n\nIdentifiant : ${username}\nMot de passe temporaire : ${tempPassword}\n\nConnectez-vous sur le site et définissez votre mot de passe définitif.\n\nCe mot de passe temporaire ne sera plus valable une fois changé.`,
-        html: `<p>Bonjour,</p><p>Votre compte AVCoach a été créé.</p><table><tr><td><strong>Identifiant</strong></td><td>${username}</td></tr><tr><td><strong>Mot de passe temporaire</strong></td><td><code>${tempPassword}</code></td></tr></table><p>Connectez-vous sur le site et définissez votre mot de passe définitif.</p>`
-      })
-      .then(() => {
-        console.log(`✓ Email de bienvenue envoyé à ${email} (${username})`);
-      })
-      .catch((err) => {
-        console.error(`✗ Échec envoi email ${username} :`, err.message);
-      });
-  }
-}
-
-function captureBaseVersion() {
-  getDb().exec('DELETE FROM content_saves');
-  getDb()
-    .prepare('INSERT INTO content_saves (saved_by, snapshot, is_base) VALUES (NULL, ?, 1)')
-    .run(JSON.stringify(readIndexSnapshot()));
-}
+sendWelcomeEmails(newUsers);
 
 if (require.main === module) {
-  // Détecte si index.html a changé depuis la dernière écriture connue du
-  // serveur (= un déploiement a pushé un nouveau fichier). Si oui, ce
-  // fichier devient la nouvelle référence : on efface l'historique
-  // d'édition (les positions/ids du contenu sauvegardé peuvent ne plus
-  // correspondre) et on recapture une V0 à partir de ce qui vient d'être
-  // pushé. Au tout premier démarrage (aucun hash connu), on capture
-  // directement une V0 pour ne jamais démarrer sans. Sinon (simple
-  // redémarrage sans changement), on ne touche à rien.
+  // Réconcilie le template avec la base puis génère la page servie
   try {
-    const currentHash = hashIndexHtml();
-    const knownHash = getMeta('last_rendered_hash');
-
-    if (knownHash === undefined) {
-      captureBaseVersion();
-    } else if (knownHash !== currentHash) {
-      console.log("⚙️  Nouveau contenu détecté dans index.html — réinitialisation de l'historique éditorial.");
-      captureBaseVersion();
-    }
-
-    setMeta('last_rendered_hash', hashIndexHtml());
+    syncTemplate();
+    renderSite();
   } catch (e) {
-    console.error('Échec de la synchronisation index.html au démarrage :', e.message);
+    console.error('✗ Échec de la génération de la page au démarrage :', e.message);
+    process.exit(1);
   }
 
   app.listen(PORT, () => {
     console.log(`\n🚀 AV Coach démarré sur http://localhost:${PORT}`);
-    console.log(`   Base de données : database/avcoach.sqlite\n`);
+    console.log(`   Base de données : ${process.env.DATABASE_PATH || 'database/avcoach.sqlite'}\n`);
   });
 }
 
