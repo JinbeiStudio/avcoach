@@ -67,7 +67,7 @@ DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
 
 1. Lancer le build puis démarrer l'application depuis le tableau de bord du site.
 2. Dans la console d'exécution, vérifier :
-   - `🚀 AV Coach démarré sur …` et le chemin de base attendu ;
+   - `🚀 Avé Coach démarré sur …` et le chemin de base attendu ;
    - `✓ Utilisateur créé : <ADMIN_USERNAME> (admin)` ;
    - `✓ Email de bienvenue envoyé à …`.
 3. **Si l'email échoue** (SMTP mal configuré), le mot de passe temporaire est écrit dans la console :

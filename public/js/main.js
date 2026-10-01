@@ -25,8 +25,11 @@ document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
 // ── Aiguilles de boussole (rotation au scroll) ────────────────────────────────
 const compassNeedles = document.querySelectorAll('.cmp-needle');
-const compassNeedlesLocal = document.querySelectorAll('.cmp-needle-local');
-if (compassNeedles.length || compassNeedlesLocal.length) {
+const capRulers = document.querySelectorAll('.cap-ruler');
+const trailPaths = document.querySelectorAll('.trail-path');
+const waveLayers = document.querySelectorAll('.wave-parallax');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (compassNeedles.length || capRulers.length || trailPaths.length || waveLayers.length) {
   let needleTicking = false;
   const rotateNeedle = (needle, angle) => {
     const base = parseFloat(needle.dataset.base);
@@ -34,14 +37,39 @@ if (compassNeedles.length || compassNeedlesLocal.length) {
     const cy = needle.dataset.cy || 50;
     needle.setAttribute('transform', `rotate(${base + angle},${cx},${cy})`);
   };
+  // Règle de cap : défile de ±90° et se cale sur le Nord quand le séparateur est au centre de l'écran
+  const slideRuler = (ruler) => {
+    const rect = ruler.closest('.sep').getBoundingClientRect();
+    const progress = (rect.top + rect.height / 2) / window.innerHeight - 0.5;
+    const offset = Math.max(-1, Math.min(1, progress * 2)) * 360;
+    ruler.setAttribute('transform', `translate(${offset.toFixed(1)},0)`);
+  };
+  // Chemin : le point avance le long du tracé pendant que le séparateur traverse l'écran
+  const walkTrail = (path) => {
+    const svg = path.ownerSVGElement;
+    const rect = svg.getBoundingClientRect();
+    const t = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (window.innerHeight + rect.height)));
+    const progress = Math.max(0, Math.min(1, (t - 0.15) / 0.7));
+    const point = path.getPointAtLength(progress * path.getTotalLength());
+    svg
+      .querySelector('.trail-walker')
+      .setAttribute('transform', `translate(${point.x.toFixed(1)},${point.y.toFixed(1)})`);
+    svg.querySelectorAll('.trail-step').forEach((step) => {
+      step.classList.toggle('passed', point.x >= parseFloat(step.getAttribute('cx')) - 1);
+    });
+  };
   const updateNeedles = () => {
     const angle = window.scrollY * 0.15;
     compassNeedles.forEach((needle) => rotateNeedle(needle, angle));
-    compassNeedlesLocal.forEach((needle) => {
-      const sep = needle.closest('.sep');
-      const progress = sep ? Math.max(0, window.innerHeight - sep.getBoundingClientRect().top) : 0;
-      rotateNeedle(needle, progress * 0.15);
-    });
+    if (!reduceMotion) {
+      capRulers.forEach(slideRuler);
+      trailPaths.forEach(walkTrail);
+      // Vagues du hero : les couches arrière remontent moins vite (parallaxe), limitée à la sortie du hero
+      const lift = Math.min(window.scrollY, 600);
+      waveLayers.forEach((layer) => {
+        layer.setAttribute('transform', `translate(0,${(-lift * parseFloat(layer.dataset.speed)).toFixed(1)})`);
+      });
+    }
     needleTicking = false;
   };
   window.addEventListener(
@@ -55,6 +83,62 @@ if (compassNeedles.length || compassNeedlesLocal.length) {
   );
   updateNeedles();
 }
+
+// ── Flamme : la ligne s'allume du centre vers les bords (le « déclic ») ──────
+document.querySelectorAll('.sep-flame').forEach((sep) => {
+  const paths = sep.querySelectorAll('.flame-line, .flame-glow');
+  const ref = sep.querySelector('.flame-line');
+  const sparks = [sep.querySelector('.flame-spark--left'), sep.querySelector('.flame-spark--right')];
+  const total = ref.getTotalLength();
+  const draw = (t) => {
+    const len = total * t;
+    paths.forEach((p) => {
+      p.style.strokeDasharray = `${len} ${total}`;
+      p.style.strokeDashoffset = `${-(total - len) / 2}`;
+    });
+    [total / 2 - len / 2, total / 2 + len / 2].forEach((at, i) => {
+      const pt = ref.getPointAtLength(at);
+      sparks[i].setAttribute('transform', `translate(${pt.x.toFixed(1)},${pt.y.toFixed(1)})`);
+      sparks[i].setAttribute('opacity', t < 1 ? Math.min(1, t * 6) * (1 - t ** 4) : 0);
+    });
+  };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    sep.classList.add('lit');
+    return;
+  }
+  // Rejoué à chaque retour : réinitialisé quand le séparateur sort entièrement de l'écran
+  let frame = null;
+  let state = 'idle';
+  const reset = () => {
+    cancelAnimationFrame(frame);
+    sep.classList.remove('lit');
+    draw(0);
+    state = 'idle';
+  };
+  const play = () => {
+    state = 'playing';
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / 1200);
+      draw(1 - (1 - t) ** 3);
+      if (t < 1) frame = requestAnimationFrame(step);
+      else {
+        paths.forEach((p) => (p.style.strokeDasharray = 'none'));
+        sep.classList.add('lit');
+        state = 'done';
+      }
+    };
+    frame = requestAnimationFrame(step);
+  };
+  reset();
+  new IntersectionObserver(
+    ([entry]) => {
+      if (entry.intersectionRatio >= 0.6 && state === 'idle') play();
+      else if (!entry.isIntersecting && state !== 'idle') reset();
+    },
+    { threshold: [0, 0.6] }
+  ).observe(sep);
+});
 
 // ── Mobile menu ───────────────────────────────────────────────────────────────
 function toggleMenu() {
