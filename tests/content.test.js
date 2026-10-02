@@ -197,3 +197,29 @@ describe('liens qui suivent le texte édité', () => {
     expect(hrefFromText('tel', '12')).toBeNull();
   });
 });
+
+describe('sync-check compareSnapshots', () => {
+  const { compareSnapshots } = require('../scripts/sync-check');
+  const base = { el_a: 'A', el_b: 'B', el_c: 'C' };
+
+  test('conflit : la PR change un champ modifié en production', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_a: 'A client' });
+    expect(r.conflicts).toEqual(['el_a']);
+  });
+
+  test('pas de conflit si la PR part du contenu synchronisé', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_a: 'A dev' });
+    expect(r.conflicts).toEqual([]);
+  });
+
+  test('champ modifié en production non touché par la PR : simple avertissement', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_b: 'B client' });
+    expect(r.conflicts).toEqual([]);
+    expect(r.outdated).toEqual(['el_b']);
+  });
+
+  test("différences d'espacement ignorées", () => {
+    const r = compareSnapshots(base, { ...base, el_a: '  A ' }, { ...base });
+    expect(r).toEqual({ conflicts: [], outdated: [] });
+  });
+});
