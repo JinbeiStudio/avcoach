@@ -2,6 +2,8 @@
 const fs = require('fs');
 const { readSnapshot, renderHtml, TEMPLATE_PATH } = require('../database/render');
 
+const DEFAULT_SYNC_URL = 'https://ave-coach.fr';
+
 // Applique le snapshot au HTML et liste les champs réellement modifiés
 function applySnapshot(html, snapshot) {
   const before = readSnapshot(html);
@@ -12,11 +14,8 @@ function applySnapshot(html, snapshot) {
 }
 
 async function main() {
-  const url = process.env.SYNC_URL || process.env.SITE_URL;
-  if (!url) {
-    console.error('✗ Définissez SYNC_URL (ou SITE_URL) : adresse du site de production, ex. https://mon-domaine.fr');
-    process.exit(1);
-  }
+  // Site de production par défaut ; SYNC_URL (ou SITE_URL) permet de cibler un autre serveur
+  const url = process.env.SYNC_URL || process.env.SITE_URL || DEFAULT_SYNC_URL;
   const base = url.replace(/\/$/, '');
   let snapshot;
   try {

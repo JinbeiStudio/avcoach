@@ -91,7 +91,7 @@ DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
 
 1. (Recommandé) Récupérer le contenu actuel du client dans le template local :
    ```bash
-   npm run sync:pull            # depuis SITE_URL (défini dans .env)
+   npm run sync:pull            # depuis https://ave-coach.fr (par défaut)
    SYNC_URL=https://… npm run sync:pull   # autre URL
    ```
 2. Modifier `public/index.html`, le CSS, le JS… puis commit, PR, merge sur `main`.

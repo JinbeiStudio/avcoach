@@ -85,6 +85,18 @@ function generateTempPassword() {
 
 // GET /sitemap.xml — <lastmod> basé sur la dernière sauvegarde de contenu,
 // le signal que les crawlers utilisent pour prioriser le re-crawl.
+// GET /robots.txt — indexation ouverte, sauf l'administration et l'API ; sitemap sur le domaine courant
+app.get('/robots.txt', (req, res) => {
+  const base = (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+  res.type('text/plain').send(`User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+
+Sitemap: ${base}/sitemap.xml
+`);
+});
+
 app.get('/sitemap.xml', (req, res) => {
   const latest = getDb().prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1').get();
   const lastmod = latest ? new Date(latest.saved_at + 'Z').toISOString() : new Date().toISOString();

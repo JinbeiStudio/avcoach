@@ -24,6 +24,8 @@ function copyDir(src, dest) {
 function transformHtml(html) {
   // Domaine non défini pour la version statique : balises canonical / og / url retirées
   html = html.replace(/^.*__SITE_URL__.*\n/gm, '');
+  // La copie GitHub Pages ne doit pas être indexée (doublon du site de production)
+  html = html.replace('<head>', '<head>\n    <meta name="robots" content="noindex, nofollow" />');
 
   // Supprime tous les blocs dynamiques
   html = html.replace(/[ \t]*<!-- \[DYNAMIC:START\][^>]*-->[\s\S]*?<!-- \[DYNAMIC:END\] -->\n?/gm, '');

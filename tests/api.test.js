@@ -590,3 +590,17 @@ describe('GET /sitemap.xml', () => {
     expect(res.text).toContain('<loc>http://site.test/</loc>');
   });
 });
+
+describe('GET /robots.txt', () => {
+  afterEach(() => delete process.env.SITE_URL);
+
+  test("autorise l'indexation, exclut l'admin et l'API, pointe vers le sitemap", async () => {
+    process.env.SITE_URL = 'https://exemple.fr';
+    const res = await request(server).get('/robots.txt');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('Allow: /');
+    expect(res.text).toContain('Disallow: /admin.html');
+    expect(res.text).toContain('Disallow: /api/');
+    expect(res.text).toContain('Sitemap: https://exemple.fr/sitemap.xml');
+  });
+});
