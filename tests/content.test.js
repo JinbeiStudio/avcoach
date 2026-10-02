@@ -17,7 +17,7 @@ process.env.RENDERED_HTML_PATH = RENDERED;
 const { getDb, resetDb } = require('../database/db');
 const { initDatabase } = require('../database/init');
 const { getMeta } = require('../database/meta');
-const { readSnapshot, renderHtml } = require('../database/render');
+const { readSnapshot, renderHtml, applySiteUrl, hrefFromText } = require('../database/render');
 const { syncTemplate, renderSite, getLatestSnapshot } = require('../database/content');
 const { applySnapshot } = require('../scripts/sync-pull');
 
@@ -154,5 +154,46 @@ describe('sync-pull applySnapshot', () => {
     const { html, changed } = applySnapshot(page(), { el_a: 'Nouveau', el_b: 'B défaut', el_zzz: 'x' });
     expect(html).toContain('>Nouveau</h1>');
     expect(changed).toEqual(['el_a']);
+  });
+});
+
+describe('applySiteUrl', () => {
+  const head =
+    '<link rel="canonical" href="__SITE_URL__/" />\n<title>T</title>\n<meta content="__SITE_URL__/og.jpg" />\n';
+
+  test('remplace le jeton par le domaine (sans / final)', () => {
+    const out = applySiteUrl(head, 'https://exemple.fr/');
+    expect(out).toContain('href="https://exemple.fr/"');
+    expect(out).toContain('content="https://exemple.fr/og.jpg"');
+    expect(out).not.toContain('__SITE_URL__');
+  });
+
+  test('sans domaine : retire les lignes qui utilisent le jeton', () => {
+    expect(applySiteUrl(head, undefined)).toBe('<title>T</title>\n');
+  });
+});
+
+describe('liens qui suivent le texte édité', () => {
+  const tpl =
+    '<p><a href="mailto:old@x.fr" data-href-from="mailto" contenteditable="false" data-edit-id="mail">old@x.fr</a></p>' +
+    '<p><a href="tel:+33600000000" data-href-from="tel" contenteditable="false" data-edit-id="tel">06 00 00 00 00</a></p>' +
+    '<p><a href="https://old.example" data-href-from="url" contenteditable="false" data-edit-id="li">old.example</a></p>';
+
+  test('le href est reconstruit depuis le texte du snapshot', () => {
+    const out = renderHtml(tpl, {
+      el_mail: 'nouveau@site.fr',
+      el_tel: '06 38 40 51 51',
+      el_li: 'linkedin.com/in/test'
+    });
+    expect(out).toContain('href="mailto:nouveau@site.fr"');
+    expect(out).toContain('href="tel:+33638405151"');
+    expect(out).toContain('href="https://linkedin.com/in/test"');
+    expect(out).toContain('>nouveau@site.fr</a>');
+  });
+
+  test('texte invalide : le href existant est conservé', () => {
+    const out = renderHtml(tpl, { el_mail: 'pas un email' });
+    expect(out).toContain('href="mailto:old@x.fr"');
+    expect(hrefFromText('tel', '12')).toBeNull();
   });
 });

@@ -1091,7 +1091,8 @@ section {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .timeline-item::before {
+  .timeline-item::before,
+  .certif-list li::before {
     animation: none;
   }
 }
@@ -1265,12 +1266,23 @@ section {
 .certif-list li::before {
   content: '';
   position: absolute;
-  left: -4px;
-  top: 0.45rem;
-  width: 7px;
-  height: 7px;
+  left: -5.5px;
+  top: 0.4rem;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--orange);
+  /* même braise lumineuse que la frise des expériences, en plus petit */
+  background: radial-gradient(circle, #ffd29a 0%, var(--orange) 60%);
+  animation: timeline-glow 3.2s ease-in-out infinite;
+}
+.certif-list li:nth-child(2)::before {
+  animation-delay: -0.8s;
+}
+.certif-list li:nth-child(3)::before {
+  animation-delay: -1.6s;
+}
+.certif-list li:nth-child(4)::before {
+  animation-delay: -2.4s;
 }
 .certif-date {
   font-size: 0.75rem;
@@ -1361,6 +1373,41 @@ section {
 }
 .quotes-compass .needle-pin {
   fill: var(--cream);
+  stroke: none;
+}
+/* séparateurs boussole entre les citations : visibles seulement sur mobile (une colonne) */
+.quote-divider {
+  display: none;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0 1rem;
+}
+.quote-divider::before,
+.quote-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+.quote-divider::before {
+  background: linear-gradient(90deg, transparent, rgba(245, 237, 216, 0.22));
+}
+.quote-divider::after {
+  background: linear-gradient(90deg, rgba(245, 237, 216, 0.22), transparent);
+}
+.quote-divider svg {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: rgba(245, 237, 216, 0.45);
+  stroke-width: 1;
+}
+.quote-divider .needle-n {
+  fill: var(--orange);
+  stroke: none;
+}
+.quote-divider .needle-s {
+  fill: rgba(245, 237, 216, 0.55);
   stroke: none;
 }
 .quote {
@@ -1518,6 +1565,10 @@ section {
   color: var(--orange-light);
   font-weight: 500;
 }
+/* visible en mode édition pour pouvoir modifier le message */
+body.edit-mode #form-success {
+  display: block;
+}
 
 /* ── Footer ────────────────────────────────────────────────────────────────── */
 footer {
@@ -1615,8 +1666,14 @@ footer {
   .quotes-compass {
     display: none;
   }
-  .quote:not(:last-of-type) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  .quote-divider {
+    display: flex;
+  }
+  .quote {
+    padding: 1.75rem 0.5rem 1.75rem 3.5rem;
+  }
+  .quote::before {
+    left: 0.5rem;
   }
   .cta-band {
     flex-direction: column;

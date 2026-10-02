@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { getDb } = require('./db');
 const { getMeta, setMeta } = require('./meta');
-const { readSnapshot, renderHtml, readTemplate, writeRendered, RENDERED_PATH } = require('./render');
+const { readSnapshot, renderHtml, readTemplate, writeRendered, applySiteUrl, RENDERED_PATH } = require('./render');
 
 const KEEP_EDITS = 5;
 
@@ -25,7 +25,7 @@ function getLatestSnapshot() {
 
 // Génère la page servie : template + dernier snapshot
 function renderSite() {
-  writeRendered(renderHtml(readTemplate(), getLatestSnapshot() || {}));
+  writeRendered(applySiteUrl(renderHtml(readTemplate(), getLatestSnapshot() || {}), process.env.SITE_URL));
 }
 
 function renderSiteIfMissing() {

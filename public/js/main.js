@@ -153,7 +153,7 @@ function toggleMenu() {
           display: 'flex',
           flexDirection: 'column',
           position: 'absolute',
-          top: '70px',
+          top: '100%',
           left: '0',
           right: '0',
           background: 'rgba(11,24,41,0.98)',

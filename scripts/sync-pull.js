@@ -12,7 +12,12 @@ function applySnapshot(html, snapshot) {
 }
 
 async function main() {
-  const base = (process.env.SYNC_URL || 'https://avcoach.fr').replace(/\/$/, '');
+  const url = process.env.SYNC_URL || process.env.SITE_URL;
+  if (!url) {
+    console.error('✗ Définissez SYNC_URL (ou SITE_URL) : adresse du site de production, ex. https://mon-domaine.fr');
+    process.exit(1);
+  }
+  const base = url.replace(/\/$/, '');
   let snapshot;
   try {
     const res = await fetch(`${base}/api/content/latest`);

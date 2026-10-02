@@ -574,3 +574,19 @@ describe('Rate limiting', () => {
     expect((await send()).status).toBe(429);
   });
 });
+
+describe('GET /sitemap.xml', () => {
+  afterEach(() => delete process.env.SITE_URL);
+
+  test('utilise SITE_URL quand il est défini', async () => {
+    process.env.SITE_URL = 'https://exemple.fr/';
+    const res = await request(server).get('/sitemap.xml');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('<loc>https://exemple.fr/</loc>');
+  });
+
+  test('sans SITE_URL : domaine de la requête', async () => {
+    const res = await request(server).get('/sitemap.xml').set('Host', 'site.test');
+    expect(res.text).toContain('<loc>http://site.test/</loc>');
+  });
+});
