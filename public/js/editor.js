@@ -11,7 +11,8 @@ const Editor = (() => {
       if (el.dataset.editId) snapshot['el_' + el.dataset.editId] = el.innerHTML;
     });
     document.querySelectorAll('img').forEach((img) => {
-      if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.src;
+      // attribut brut (chemin relatif) plutôt que img.src, résolu en URL absolue par le navigateur
+      if (img.dataset.editId) snapshot['img_' + img.dataset.editId] = img.getAttribute('src');
     });
     return snapshot;
   }
@@ -131,15 +132,27 @@ const Editor = (() => {
     fileInput.click();
   }
 
-  fileInput.addEventListener('change', function () {
-    if (!this.files?.[0] || !currentImgWrap) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = currentImgWrap.querySelector('img');
-      if (img) img.src = e.target.result;
-    };
-    reader.readAsDataURL(this.files[0]);
+  // L'image est envoyée au serveur (optimisée, sans métadonnées) ; seule son adresse est enregistrée
+  fileInput.addEventListener('change', async function () {
+    const file = this.files?.[0];
     this.value = '';
+    const img = currentImgWrap?.querySelector('img');
+    if (!file || !img) return;
+    img.style.opacity = '0.4';
+    try {
+      const res = await fetch('/api/images', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${Auth.getToken()}`, 'Content-Type': file.type },
+        body: file
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Échec de l’envoi');
+      img.src = data.url;
+    } catch (err) {
+      alert(`Image non enregistrée : ${err.message}`);
+    } finally {
+      img.style.opacity = '';
+    }
   });
 
   return { enter, exit, isActive, save, loadContent, replaceImage };

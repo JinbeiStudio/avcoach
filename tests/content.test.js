@@ -197,3 +197,74 @@ describe('liens qui suivent le texte édité', () => {
     expect(hrefFromText('tel', '12')).toBeNull();
   });
 });
+
+describe('sync-check compareSnapshots', () => {
+  const { compareSnapshots } = require('../scripts/sync-check');
+  const base = { el_a: 'A', el_b: 'B', el_c: 'C' };
+
+  test('conflit : la PR change un champ modifié en production', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_a: 'A client' });
+    expect(r.conflicts).toEqual(['el_a']);
+  });
+
+  test('pas de conflit si la PR part du contenu synchronisé', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_a: 'A dev' });
+    expect(r.conflicts).toEqual([]);
+  });
+
+  test('champ modifié en production non touché par la PR : simple avertissement', () => {
+    const r = compareSnapshots(base, { ...base, el_a: 'A dev' }, { ...base, el_b: 'B client' });
+    expect(r.conflicts).toEqual([]);
+    expect(r.outdated).toEqual(['el_b']);
+  });
+
+  test("différences d'espacement ignorées", () => {
+    const r = compareSnapshots(base, { ...base, el_a: '  A ' }, { ...base });
+    expect(r).toEqual({ conflicts: [], outdated: [] });
+  });
+});
+
+describe('données structurées du template', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const tpl = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+  const jsonLd = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+
+  test('JSON-LD valide avec un domaine', () => {
+    const data = jsonLd(applySiteUrl(tpl, 'https://exemple.fr'));
+    expect(data.url).toBe('https://exemple.fr');
+    expect(data.founder.name).toBe('Aurélia Vuillemin');
+  });
+
+  test('JSON-LD toujours valide sans domaine (lignes retirées)', () => {
+    const data = jsonLd(applySiteUrl(tpl, undefined));
+    expect(data.url).toBeUndefined();
+    expect(data.name).toBe('Avé Coach');
+  });
+});
+
+describe('images envoyées en production', () => {
+  const { compareSnapshots } = require('../scripts/sync-check');
+  const { localizeUploads } = require('../scripts/sync-pull');
+
+  test('sync-check : /uploads/NOM et /images/NOM sont la même image', () => {
+    const base = { img_photo: '/images/ancienne.webp' };
+    const head = { img_photo: '/images/abc.webp' };
+    const prod = { img_photo: '/uploads/abc.webp' };
+    expect(compareSnapshots(base, head, prod)).toEqual({ conflicts: [], outdated: [] });
+  });
+
+  test('sync-pull : télécharge l’image et réécrit son adresse', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'avcoach-imgs-'));
+    const download = jest.fn().mockResolvedValue(Buffer.from('webp'));
+    const snap = { img_photo: '/uploads/abc123.webp', img_logo: '/images/logo.png', el_a: 'A' };
+    const res = await localizeUploads(snap, download, dir);
+    expect(res.snapshot.img_photo).toBe('/images/abc123.webp');
+    expect(res.snapshot.img_logo).toBe('/images/logo.png');
+    expect(download).toHaveBeenCalledWith('/uploads/abc123.webp');
+    expect(fs.existsSync(path.join(dir, 'abc123.webp'))).toBe(true);
+    await localizeUploads(snap, download, dir);
+    expect(download).toHaveBeenCalledTimes(1);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+});

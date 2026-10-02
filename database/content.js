@@ -1,7 +1,15 @@
 const fs = require('fs');
 const { getDb } = require('./db');
 const { getMeta, setMeta } = require('./meta');
-const { readSnapshot, renderHtml, readTemplate, writeRendered, applySiteUrl, RENDERED_PATH } = require('./render');
+const {
+  readSnapshot,
+  renderHtml,
+  readTemplate,
+  writeRendered,
+  applySiteUrl,
+  normalize,
+  RENDERED_PATH
+} = require('./render');
 
 const KEEP_EDITS = 5;
 
@@ -30,11 +38,6 @@ function renderSite() {
 
 function renderSiteIfMissing() {
   if (!fs.existsSync(RENDERED_PATH)) renderSite();
-}
-
-// Ignore les différences d'espacement (reformatage Prettier du template)
-function normalize(value) {
-  return value === undefined ? undefined : String(value).replace(/\s+/g, ' ').trim();
 }
 
 // Au démarrage : réconcilie le template (git) avec le contenu en base.

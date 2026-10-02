@@ -8,6 +8,8 @@
     "dev": "node --watch server.js",
     "build": "npm install --omit=dev",
     "sync:pull": "node scripts/sync-pull.js",
+    "sync:check": "node scripts/sync-check.js",
+    "backup": "node scripts/backup.js",
     "build:static": "node build-static.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
     "lint": "eslint .",
@@ -33,9 +35,11 @@
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.0.13",
-    "parse5": "^8.0.1"
+    "parse5": "^8.0.1",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

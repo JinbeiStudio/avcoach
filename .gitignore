@@ -10,3 +10,6 @@ var/
 
 # Documents sources du client (contenu personnel)
 docs/*.docx
+
+# Images envoyées depuis le CMS (en local)
+uploads/

@@ -24,6 +24,8 @@ function copyDir(src, dest) {
 function transformHtml(html) {
   // Domaine non défini pour la version statique : balises canonical / og / url retirées
   html = html.replace(/^.*__SITE_URL__.*\n/gm, '');
+  // La copie GitHub Pages ne doit pas être indexée (doublon du site de production)
+  html = html.replace('<head>', '<head>\n    <meta name="robots" content="noindex, nofollow" />');
 
   // Supprime tous les blocs dynamiques
   html = html.replace(/[ \t]*<!-- \[DYNAMIC:START\][^>]*-->[\s\S]*?<!-- \[DYNAMIC:END\] -->\n?/gm, '');
@@ -33,6 +35,9 @@ function transformHtml(html) {
   html = html.replace(/src="\/js\//g, 'src="js/');
   html = html.replace(/src="\/images\//g, 'src="images/');
   html = html.replace(/href="\/images\//g, 'href="images/');
+  html = html.replace(/href="\/fonts\//g, 'href="fonts/');
+  html = html.replace(/href="\/mentions-legales\.html/g, 'href="mentions-legales.html');
+  html = html.replace(/href="\/"/g, 'href="./"');
   html = html.replace(/href="\/favicon\.ico"/g, 'href="favicon.ico"');
 
   // Supprime les attributs d'édition
@@ -61,10 +66,14 @@ fs.mkdirSync(DEST, { recursive: true });
 
 copyDir(path.join(SRC, 'css'), path.join(DEST, 'css'));
 copyDir(path.join(SRC, 'images'), path.join(DEST, 'images'));
+copyDir(path.join(SRC, 'fonts'), path.join(DEST, 'fonts'));
 fs.copyFileSync(path.join(SRC, 'favicon.ico'), path.join(DEST, 'favicon.ico'));
 
 const html = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
 fs.writeFileSync(path.join(DEST, 'index.html'), transformHtml(html));
+
+const legal = fs.readFileSync(path.join(SRC, 'mentions-legales.html'), 'utf8');
+fs.writeFileSync(path.join(DEST, 'mentions-legales.html'), transformHtml(legal));
 
 fs.mkdirSync(path.join(DEST, 'js'), { recursive: true });
 const mainJs = fs.readFileSync(path.join(SRC, 'js', 'main.js'), 'utf8');

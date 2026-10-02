@@ -88,3 +88,30 @@ describe('initDatabase — premier admin', () => {
     resetDb();
   });
 });
+
+describe('npm run backup', () => {
+  test('copie cohérente, rotation et images', async () => {
+    const { backup } = require('../scripts/backup');
+    const Database = require('better-sqlite3');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'avcoach-backup-'));
+    const dbPath = path.join(dir, 'site.sqlite');
+    const db = new Database(dbPath);
+    db.exec("CREATE TABLE t (v TEXT); INSERT INTO t VALUES ('ok')");
+    db.close();
+    const uploads = path.join(dir, 'uploads');
+    fs.mkdirSync(uploads);
+    fs.writeFileSync(path.join(uploads, 'a.webp'), 'img');
+    const backupDir = path.join(dir, 'backups');
+
+    for (let d = 1; d <= 4; d++) {
+      await backup({ dbPath, uploadsPath: uploads, backupDir, keep: 2, now: new Date(`2026-10-0${d}T12:00:00Z`) });
+    }
+    const copies = fs.readdirSync(path.join(backupDir, 'db')).sort();
+    expect(copies).toEqual(['site-2026-10-03.sqlite', 'site-2026-10-04.sqlite']);
+    const check = new Database(path.join(backupDir, 'db', copies[1]), { readonly: true });
+    expect(check.prepare('SELECT v FROM t').get().v).toBe('ok');
+    check.close();
+    expect(fs.existsSync(path.join(backupDir, 'uploads', 'a.webp'))).toBe(true);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+});

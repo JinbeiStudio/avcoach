@@ -1,6 +1,7 @@
 require('dotenv').config({ quiet: true });
 
 const express = require('express');
+const helmet = require('helmet');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -12,6 +13,7 @@ const { createTransporter, escapeHtml, sendWelcomeEmails } = require('./lib/mail
 const { initDatabase } = require('./database/init');
 const { RENDERED_PATH } = require('./database/render');
 const { getMeta } = require('./database/meta');
+const { processUpload, UPLOADS_DIR } = require('./lib/images');
 const { renderSite, renderSiteIfMissing, syncTemplate, pruneSaves } = require('./database/content');
 
 const app = express();
@@ -50,6 +52,24 @@ const contactLimiter = rateLimit({
   message: { error: 'Trop de messages envoyés, réessayez plus tard' }
 });
 
+// En-têtes de sécurité ; polices auto-hébergées ; scripts et attributs onclick inline encore utilisés par les pages
+app.disable('x-powered-by');
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrcAttr: ["'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:'],
+        frameAncestors: ["'none'"]
+      }
+    },
+    frameguard: { action: 'deny' }
+  })
+);
+
 app.use(express.json({ limit: '10mb' }));
 
 // Page servie = template + contenu en base (générée), jamais le template brut
@@ -62,6 +82,8 @@ app.get(['/', '/index.html'], (req, res, next) => {
   res.sendFile(RENDERED_PATH, (err) => err && next(err));
 });
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+// Images envoyées depuis le CMS : stockées hors du dossier de l'application, noms aléatoires immuables
+app.use('/uploads', express.static(UPLOADS_DIR, { index: false, maxAge: '365d', immutable: true }));
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -85,6 +107,18 @@ function generateTempPassword() {
 
 // GET /sitemap.xml — <lastmod> basé sur la dernière sauvegarde de contenu,
 // le signal que les crawlers utilisent pour prioriser le re-crawl.
+// GET /robots.txt — indexation ouverte, sauf l'administration et l'API ; sitemap sur le domaine courant
+app.get('/robots.txt', (req, res) => {
+  const base = (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+  res.type('text/plain').send(`User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+
+Sitemap: ${base}/sitemap.xml
+`);
+});
+
 app.get('/sitemap.xml', (req, res) => {
   const latest = getDb().prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1').get();
   const lastmod = latest ? new Date(latest.saved_at + 'Z').toISOString() : new Date().toISOString();
@@ -316,6 +350,24 @@ function isValidSnapshot(snapshot) {
 }
 
 // POST /api/content  (sauvegarder le contenu édité)
+// POST /api/images — envoi d'une image depuis le mode édition (corps brut, 10 Mo max)
+app.post(
+  '/api/images',
+  requireAuth,
+  express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '10mb' }),
+  async (req, res) => {
+    if (!Buffer.isBuffer(req.body) || !req.body.length) {
+      return res.status(415).json({ error: 'Format accepté : JPEG, PNG ou WebP' });
+    }
+    try {
+      res.status(201).json({ url: await processUpload(req.body) });
+    } catch (e) {
+      if (e.status) return res.status(e.status).json({ error: e.message });
+      throw e;
+    }
+  }
+);
+
 app.post('/api/content', requireAuth, (req, res) => {
   const { snapshot: delta, isBase } = req.body || {};
   if (!delta) return res.status(400).json({ error: 'Snapshot requis' });
@@ -516,6 +568,16 @@ app.delete('/api/messages/:id', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+// Erreurs non gérées : réponse courte, détail uniquement dans les logs du serveur
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  if (status >= 500) console.error('Erreur serveur :', err);
+  const message = status >= 500 ? 'Erreur serveur' : 'Requête invalide';
+  if (req.path.startsWith('/api/')) return res.status(status).json({ error: message });
+  res.status(status).type('text/plain').send(message);
+});
+
 // ── Démarrage ────────────────────────────────────────────────────────────────
 
 const { newUsers } = initDatabase();
@@ -531,6 +593,22 @@ if (require.main === module) {
     console.error('✗ Échec de la génération de la page au démarrage :', e.message);
     process.exit(1);
   }
+
+  // Sauvegarde quotidienne de la base et des images (l'hébergement mutualisé n'a pas de cron)
+  const { backup } = require('./scripts/backup');
+  let lastBackupDay = null;
+  const dailyBackup = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (today === lastBackupDay) return;
+    backup()
+      .then(({ target }) => {
+        lastBackupDay = today;
+        console.log(`✓ Sauvegarde quotidienne : ${target}`);
+      })
+      .catch((e) => console.error('✗ Sauvegarde quotidienne impossible :', e.message));
+  };
+  dailyBackup();
+  setInterval(dailyBackup, 60 * 60 * 1000).unref();
 
   app.listen(PORT, () => {
     console.log(`\n🚀 Avé Coach démarré sur http://localhost:${PORT}`);

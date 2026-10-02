@@ -43,6 +43,9 @@ Pour les mises à jour suivantes, la commande de build peut faire le pull : `git
 JWT_SECRET=<valeur longue et aléatoire>
 JWT_EXPIRES_IN=8h
 
+# Mode production (pas de détails techniques dans les erreurs)
+NODE_ENV=production
+
 # Adresse publique du site (canonical, Open Graph, sitemap)
 SITE_URL=https://ave-coach.fr
 
@@ -60,6 +63,9 @@ CONTACT_TO=<adresse qui reçoit les messages du formulaire>
 
 # Base HORS du dossier déployé
 DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
+
+# Images envoyées depuis le CMS, HORS du dossier déployé
+UPLOADS_PATH=../uploads
 ```
 
 - Sans `JWT_SECRET`, le serveur refuse de démarrer.
@@ -91,7 +97,7 @@ DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
 
 1. (Recommandé) Récupérer le contenu actuel du client dans le template local :
    ```bash
-   npm run sync:pull            # depuis SITE_URL (défini dans .env)
+   npm run sync:pull            # depuis https://ave-coach.fr (par défaut)
    SYNC_URL=https://… npm run sync:pull   # autre URL
    ```
 2. Modifier `public/index.html`, le CSS, le JS… puis commit, PR, merge sur `main`.
@@ -104,8 +110,22 @@ Limite : remettre dans le template un texte **identique** à l'ancien défaut n'
 
 ## 7. Sauvegardes
 
+**Sauvegarde automatique** : le serveur sauvegarde lui-même la base et les images une fois par jour (au démarrage, puis vérification toutes les heures) — l'hébergement mutualisé n'offre pas de cron. La base est copiée de façon cohérente (par SQLite lui-même) dans `../data/backups/db/` en gardant les 14 dernières copies, et les nouvelles images sont ajoutées dans `../data/backups/uploads/`. Le résultat apparaît dans la console d'exécution (`✓ Sauvegarde quotidienne : …`).
+
+Sauvegarde manuelle à tout moment, en SSH :
+
+```bash
+cd ~/sites/ave-coach.fr && npm run backup
+```
+
+Variables facultatives : `BACKUP_DIR` (dossier des copies), `BACKUP_KEEP` (nombre de copies, 14 par défaut).
+
+**Copie hors serveur** : rapatrier régulièrement `../data/backups` sur un autre support (ordinateur, kDrive, Swiss Backup), sinon une perte de l'hébergement emporte aussi les sauvegardes.
+
 - Export JSON du contenu : Admin → Historique → **Exporter le contenu** (`GET /api/content/export`, admin uniquement).
 - Copie du fichier SQLite (`DATABASE_PATH`) avec ses fichiers `-wal` et `-shm` s'ils existent, idéalement automatisée.
+- Copie du dossier des images envoyées (`UPLOADS_PATH`) : l'export JSON ne contient que leurs adresses.
+- `npm run sync:pull` rapatrie aussi ces images dans `public/images/` : une fois commitées, git en garde une copie.
 - L'historique ne conserve que la V0 et les 5 dernières éditions.
 
 ## Dépannage
