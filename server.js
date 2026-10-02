@@ -594,6 +594,22 @@ if (require.main === module) {
     process.exit(1);
   }
 
+  // Sauvegarde quotidienne de la base et des images (l'hébergement mutualisé n'a pas de cron)
+  const { backup } = require('./scripts/backup');
+  let lastBackupDay = null;
+  const dailyBackup = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (today === lastBackupDay) return;
+    backup()
+      .then(({ target }) => {
+        lastBackupDay = today;
+        console.log(`✓ Sauvegarde quotidienne : ${target}`);
+      })
+      .catch((e) => console.error('✗ Sauvegarde quotidienne impossible :', e.message));
+  };
+  dailyBackup();
+  setInterval(dailyBackup, 60 * 60 * 1000).unref();
+
   app.listen(PORT, () => {
     console.log(`\n🚀 Avé Coach démarré sur http://localhost:${PORT}`);
     console.log(`   Base de données : ${process.env.DATABASE_PATH || 'database/avcoach.sqlite'}\n`);

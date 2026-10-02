@@ -110,6 +110,18 @@ Limite : remettre dans le template un texte **identique** à l'ancien défaut n'
 
 ## 7. Sauvegardes
 
+**Sauvegarde automatique** : le serveur sauvegarde lui-même la base et les images une fois par jour (au démarrage, puis vérification toutes les heures) — l'hébergement mutualisé n'offre pas de cron. La base est copiée de façon cohérente (par SQLite lui-même) dans `../data/backups/db/` en gardant les 14 dernières copies, et les nouvelles images sont ajoutées dans `../data/backups/uploads/`. Le résultat apparaît dans la console d'exécution (`✓ Sauvegarde quotidienne : …`).
+
+Sauvegarde manuelle à tout moment, en SSH :
+
+```bash
+cd ~/sites/ave-coach.fr && npm run backup
+```
+
+Variables facultatives : `BACKUP_DIR` (dossier des copies), `BACKUP_KEEP` (nombre de copies, 14 par défaut).
+
+**Copie hors serveur** : rapatrier régulièrement `../data/backups` sur un autre support (ordinateur, kDrive, Swiss Backup), sinon une perte de l'hébergement emporte aussi les sauvegardes.
+
 - Export JSON du contenu : Admin → Historique → **Exporter le contenu** (`GET /api/content/export`, admin uniquement).
 - Copie du fichier SQLite (`DATABASE_PATH`) avec ses fichiers `-wal` et `-shm` s'ils existent, idéalement automatisée.
 - Copie du dossier des images envoyées (`UPLOADS_PATH`) : l'export JSON ne contient que leurs adresses.

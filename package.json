@@ -9,6 +9,7 @@
     "build": "npm install --omit=dev",
     "sync:pull": "node scripts/sync-pull.js",
     "sync:check": "node scripts/sync-check.js",
+    "backup": "node scripts/backup.js",
     "build:static": "node build-static.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
     "lint": "eslint .",
