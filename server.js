@@ -52,7 +52,7 @@ const contactLimiter = rateLimit({
   message: { error: 'Trop de messages envoyés, réessayez plus tard' }
 });
 
-// En-têtes de sécurité ; scripts et attributs onclick inline encore utilisés par les pages
+// En-têtes de sécurité ; polices auto-hébergées ; scripts et attributs onclick inline encore utilisés par les pages
 app.disable('x-powered-by');
 app.use(
   helmet({
@@ -60,8 +60,8 @@ app.use(
       directives: {
         scriptSrc: ["'self'", "'unsafe-inline'"],
         scriptSrcAttr: ["'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'"],
         imgSrc: ["'self'", 'data:'],
         frameAncestors: ["'none'"]
       }
