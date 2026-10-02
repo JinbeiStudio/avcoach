@@ -146,6 +146,11 @@ function normalize(value) {
   return value === undefined ? undefined : String(value).replace(/\s+/g, ' ').trim();
 }
 
+// Une image envoyée en production (/uploads/NOM) et sa copie rapatriée dans git (/images/NOM) sont la même image
+function canonicalImage(value) {
+  return typeof value === 'string' ? value.replace(/^\/uploads\//, '/images/') : value;
+}
+
 const SITE_URL_TOKEN = '__SITE_URL__';
 
 // Remplace le jeton du domaine ; sans domaine défini, retire les lignes qui l'utilisent (balises canonical, og…)
@@ -162,6 +167,7 @@ module.exports = {
   applySiteUrl,
   hrefFromText,
   normalize,
+  canonicalImage,
   SITE_URL_TOKEN,
   TEMPLATE_PATH,
   RENDERED_PATH

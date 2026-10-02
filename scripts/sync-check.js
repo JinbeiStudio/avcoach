@@ -1,7 +1,7 @@
 // Vérifie, avant merge, qu'une PR n'écrase pas un texte modifié par la cliente en production.
 const { execFileSync } = require('child_process');
 const fs = require('fs');
-const { readSnapshot, normalize, TEMPLATE_PATH } = require('../database/render');
+const { readSnapshot, normalize, canonicalImage, TEMPLATE_PATH } = require('../database/render');
 
 const DEFAULT_SYNC_URL = 'https://ave-coach.fr';
 
@@ -9,12 +9,13 @@ const DEFAULT_SYNC_URL = 'https://ave-coach.fr';
 function compareSnapshots(base, head, prod) {
   const conflicts = [];
   const outdated = [];
+  const value = (snap, key) => normalize(canonicalImage(snap[key]));
   for (const key of Object.keys(head)) {
     if (prod[key] === undefined || base[key] === undefined) continue;
-    const p = normalize(prod[key]);
-    const changedInPr = normalize(base[key]) !== normalize(head[key]);
-    if (changedInPr && p !== normalize(base[key]) && p !== normalize(head[key])) conflicts.push(key);
-    else if (!changedInPr && p !== normalize(head[key])) outdated.push(key);
+    const p = value(prod, key);
+    const changedInPr = value(base, key) !== value(head, key);
+    if (changedInPr && p !== value(base, key) && p !== value(head, key)) conflicts.push(key);
+    else if (!changedInPr && p !== value(head, key)) outdated.push(key);
   }
   return { conflicts, outdated };
 }

@@ -14,6 +14,8 @@ fs.copyFileSync(path.join(__dirname, '..', 'public', 'index.html'), INDEX_HTML_F
 process.env.INDEX_HTML_PATH = INDEX_HTML_FILE;
 const RENDERED_FILE = path.join(os.tmpdir(), `avcoach-test-${process.pid}-rendered.html`);
 process.env.RENDERED_HTML_PATH = RENDERED_FILE;
+const UPLOADS_DIR = fs.mkdtempSync(path.join(os.tmpdir(), `avcoach-test-${process.pid}-uploads-`));
+process.env.UPLOADS_PATH = UPLOADS_DIR;
 process.env.JWT_SECRET = 'test-secret-key-ci';
 process.env.JWT_EXPIRES_IN = '1h';
 process.env.SMTP_HOST = 'localhost';
@@ -621,5 +623,60 @@ describe('Sécurité HTTP', () => {
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: 'Requête invalide' });
     expect(res.text).not.toContain('node_modules');
+  });
+});
+
+describe('POST /api/images', () => {
+  const sharp = require('sharp');
+  const big = () =>
+    sharp({ create: { width: 3000, height: 2000, channels: 3, background: '#e87520' } })
+      .withMetadata({ exif: { IFD0: { Artist: 'secret' } } })
+      .jpeg()
+      .toBuffer();
+
+  afterAll(() => fs.rmSync(UPLOADS_DIR, { recursive: true, force: true }));
+
+  test('401 sans connexion', async () => {
+    const res = await request(server)
+      .post('/api/images')
+      .set('Content-Type', 'image/jpeg')
+      .send(await big());
+    expect(res.status).toBe(401);
+  });
+
+  test('image optimisée : WebP, réduite, sans métadonnées, servie sous /uploads', async () => {
+    const res = await request(server)
+      .post('/api/images')
+      .set('Authorization', `Bearer ${editorToken}`)
+      .set('Content-Type', 'image/jpeg')
+      .send(await big());
+    expect(res.status).toBe(201);
+    expect(res.body.url).toMatch(/^\/uploads\/[0-9a-f]{24}\.webp$/);
+    const file = path.join(UPLOADS_DIR, path.basename(res.body.url));
+    const meta = await sharp(fs.readFileSync(file)).metadata();
+    expect(meta.format).toBe('webp');
+    expect(Math.max(meta.width, meta.height)).toBe(1600);
+    expect(meta.exif).toBeUndefined();
+    const served = await request(server).get(res.body.url);
+    expect(served.status).toBe(200);
+    expect(served.headers['content-type']).toBe('image/webp');
+  });
+
+  test('415 pour un type non accepté', async () => {
+    const res = await request(server)
+      .post('/api/images')
+      .set('Authorization', `Bearer ${editorToken}`)
+      .set('Content-Type', 'image/gif')
+      .send(Buffer.from('GIF89a'));
+    expect(res.status).toBe(415);
+  });
+
+  test('400 si le contenu n’est pas une image', async () => {
+    const res = await request(server)
+      .post('/api/images')
+      .set('Authorization', `Bearer ${editorToken}`)
+      .set('Content-Type', 'image/png')
+      .send(Buffer.from('pas une image'));
+    expect(res.status).toBe(400);
   });
 });

@@ -13,6 +13,7 @@ const { createTransporter, escapeHtml, sendWelcomeEmails } = require('./lib/mail
 const { initDatabase } = require('./database/init');
 const { RENDERED_PATH } = require('./database/render');
 const { getMeta } = require('./database/meta');
+const { processUpload, UPLOADS_DIR } = require('./lib/images');
 const { renderSite, renderSiteIfMissing, syncTemplate, pruneSaves } = require('./database/content');
 
 const app = express();
@@ -81,6 +82,8 @@ app.get(['/', '/index.html'], (req, res, next) => {
   res.sendFile(RENDERED_PATH, (err) => err && next(err));
 });
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+// Images envoyées depuis le CMS : stockées hors du dossier de l'application, noms aléatoires immuables
+app.use('/uploads', express.static(UPLOADS_DIR, { index: false, maxAge: '365d', immutable: true }));
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -347,6 +350,24 @@ function isValidSnapshot(snapshot) {
 }
 
 // POST /api/content  (sauvegarder le contenu édité)
+// POST /api/images — envoi d'une image depuis le mode édition (corps brut, 10 Mo max)
+app.post(
+  '/api/images',
+  requireAuth,
+  express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '10mb' }),
+  async (req, res) => {
+    if (!Buffer.isBuffer(req.body) || !req.body.length) {
+      return res.status(415).json({ error: 'Format accepté : JPEG, PNG ou WebP' });
+    }
+    try {
+      res.status(201).json({ url: await processUpload(req.body) });
+    } catch (e) {
+      if (e.status) return res.status(e.status).json({ error: e.message });
+      throw e;
+    }
+  }
+);
+
 app.post('/api/content', requireAuth, (req, res) => {
   const { snapshot: delta, isBase } = req.body || {};
   if (!delta) return res.status(400).json({ error: 'Snapshot requis' });

@@ -63,6 +63,9 @@ CONTACT_TO=<adresse qui reçoit les messages du formulaire>
 
 # Base HORS du dossier déployé
 DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
+
+# Images envoyées depuis le CMS, HORS du dossier déployé
+UPLOADS_PATH=../uploads
 ```
 
 - Sans `JWT_SECRET`, le serveur refuse de démarrer.
@@ -109,6 +112,8 @@ Limite : remettre dans le template un texte **identique** à l'ancien défaut n'
 
 - Export JSON du contenu : Admin → Historique → **Exporter le contenu** (`GET /api/content/export`, admin uniquement).
 - Copie du fichier SQLite (`DATABASE_PATH`) avec ses fichiers `-wal` et `-shm` s'ils existent, idéalement automatisée.
+- Copie du dossier des images envoyées (`UPLOADS_PATH`) : l'export JSON ne contient que leurs adresses.
+- `npm run sync:pull` rapatrie aussi ces images dans `public/images/` : une fois commitées, git en garde une copie.
 - L'historique ne conserve que la V0 et les 5 dernières éditions.
 
 ## Dépannage
