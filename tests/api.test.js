@@ -604,3 +604,22 @@ describe('GET /robots.txt', () => {
     expect(res.text).toContain('Sitemap: https://exemple.fr/sitemap.xml');
   });
 });
+
+describe('Sécurité HTTP', () => {
+  test('en-têtes de sécurité présents, X-Powered-By absent', async () => {
+    const res = await request(server).get('/');
+    expect(res.headers['x-powered-by']).toBeUndefined();
+    expect(res.headers['strict-transport-security']).toContain('max-age=');
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('DENY');
+    expect(res.headers['content-security-policy']).toContain("frame-ancestors 'none'");
+    expect(res.headers['content-security-policy']).toContain('https://fonts.gstatic.com');
+  });
+
+  test('JSON invalide : 400 sans trace de pile', async () => {
+    const res = await request(server).post('/api/login').set('Content-Type', 'application/json').send('{bad json');
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'Requête invalide' });
+    expect(res.text).not.toContain('node_modules');
+  });
+});

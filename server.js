@@ -1,6 +1,7 @@
 require('dotenv').config({ quiet: true });
 
 const express = require('express');
+const helmet = require('helmet');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -49,6 +50,24 @@ const contactLimiter = rateLimit({
   skip: skipInTest,
   message: { error: 'Trop de messages envoyés, réessayez plus tard' }
 });
+
+// En-têtes de sécurité ; scripts et attributs onclick inline encore utilisés par les pages
+app.disable('x-powered-by');
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrcAttr: ["'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        imgSrc: ["'self'", 'data:'],
+        frameAncestors: ["'none'"]
+      }
+    },
+    frameguard: { action: 'deny' }
+  })
+);
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -526,6 +545,16 @@ app.delete('/api/messages/:id', requireAuth, (req, res) => {
   if (id === null) return res.status(400).json({ error: 'Identifiant invalide' });
   getDb().prepare('DELETE FROM contact_messages WHERE id = ?').run(id);
   res.json({ ok: true });
+});
+
+// Erreurs non gérées : réponse courte, détail uniquement dans les logs du serveur
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  if (status >= 500) console.error('Erreur serveur :', err);
+  const message = status >= 500 ? 'Erreur serveur' : 'Requête invalide';
+  if (req.path.startsWith('/api/')) return res.status(status).json({ error: message });
+  res.status(status).type('text/plain').send(message);
 });
 
 // ── Démarrage ────────────────────────────────────────────────────────────────

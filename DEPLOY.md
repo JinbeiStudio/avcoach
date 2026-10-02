@@ -43,6 +43,9 @@ Pour les mises à jour suivantes, la commande de build peut faire le pull : `git
 JWT_SECRET=<valeur longue et aléatoire>
 JWT_EXPIRES_IN=8h
 
+# Mode production (pas de détails techniques dans les erreurs)
+NODE_ENV=production
+
 # Adresse publique du site (canonical, Open Graph, sitemap)
 SITE_URL=https://ave-coach.fr
 
