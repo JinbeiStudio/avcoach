@@ -223,3 +223,22 @@ describe('sync-check compareSnapshots', () => {
     expect(r).toEqual({ conflicts: [], outdated: [] });
   });
 });
+
+describe('données structurées du template', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const tpl = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+  const jsonLd = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+
+  test('JSON-LD valide avec un domaine', () => {
+    const data = jsonLd(applySiteUrl(tpl, 'https://exemple.fr'));
+    expect(data.url).toBe('https://exemple.fr');
+    expect(data.founder.name).toBe('Aurélia Vuillemin');
+  });
+
+  test('JSON-LD toujours valide sans domaine (lignes retirées)', () => {
+    const data = jsonLd(applySiteUrl(tpl, undefined));
+    expect(data.url).toBeUndefined();
+    expect(data.name).toBe('Avé Coach');
+  });
+});
