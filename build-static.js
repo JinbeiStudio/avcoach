@@ -36,6 +36,8 @@ function transformHtml(html) {
   html = html.replace(/src="\/images\//g, 'src="images/');
   html = html.replace(/href="\/images\//g, 'href="images/');
   html = html.replace(/href="\/fonts\//g, 'href="fonts/');
+  html = html.replace(/href="\/mentions-legales\.html/g, 'href="mentions-legales.html');
+  html = html.replace(/href="\/"/g, 'href="./"');
   html = html.replace(/href="\/favicon\.ico"/g, 'href="favicon.ico"');
 
   // Supprime les attributs d'édition
@@ -69,6 +71,9 @@ fs.copyFileSync(path.join(SRC, 'favicon.ico'), path.join(DEST, 'favicon.ico'));
 
 const html = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
 fs.writeFileSync(path.join(DEST, 'index.html'), transformHtml(html));
+
+const legal = fs.readFileSync(path.join(SRC, 'mentions-legales.html'), 'utf8');
+fs.writeFileSync(path.join(DEST, 'mentions-legales.html'), transformHtml(legal));
 
 fs.mkdirSync(path.join(DEST, 'js'), { recursive: true });
 const mainJs = fs.readFileSync(path.join(SRC, 'js', 'main.js'), 'utf8');
