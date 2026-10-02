@@ -92,6 +92,22 @@ const Editor = (() => {
     }
   }
 
+  // Liens dont l'adresse suit le texte édité (même règle que database/render.js)
+  function syncHrefs() {
+    document.querySelectorAll('a[data-href-from]').forEach((a) => {
+      const text = a.textContent.replace(/\s+/g, ' ').trim();
+      const kind = a.dataset.hrefFrom;
+      let href = null;
+      if (kind === 'mailto' && text.includes('@')) href = `mailto:${text.replace(/\s/g, '')}`;
+      if (kind === 'tel') {
+        const digits = text.replace(/[^\d+]/g, '');
+        if (digits.length >= 6) href = `tel:${/^0\d{9}$/.test(digits) ? '+33' + digits.slice(1) : digits}`;
+      }
+      if (kind === 'url' && text) href = /^https?:\/\//i.test(text) ? text : `https://${text.replace(/^\/+/, '')}`;
+      if (href) a.setAttribute('href', href);
+    });
+  }
+
   async function loadContent() {
     try {
       const res = await fetch('/api/content/latest');
@@ -105,6 +121,7 @@ const Editor = (() => {
         const key = 'img_' + img.dataset.editId;
         if (img.dataset.editId && snapshot[key]) img.src = snapshot[key];
       });
+      syncHrefs();
     } catch {}
   }
 

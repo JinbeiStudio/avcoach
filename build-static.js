@@ -22,6 +22,9 @@ function copyDir(src, dest) {
 }
 
 function transformHtml(html) {
+  // Domaine non défini pour la version statique : balises canonical / og / url retirées
+  html = html.replace(/^.*__SITE_URL__.*\n/gm, '');
+
   // Supprime tous les blocs dynamiques
   html = html.replace(/[ \t]*<!-- \[DYNAMIC:START\][^>]*-->[\s\S]*?<!-- \[DYNAMIC:END\] -->\n?/gm, '');
 

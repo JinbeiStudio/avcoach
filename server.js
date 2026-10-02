@@ -88,10 +88,12 @@ function generateTempPassword() {
 app.get('/sitemap.xml', (req, res) => {
   const latest = getDb().prepare('SELECT saved_at FROM content_saves ORDER BY id DESC LIMIT 1').get();
   const lastmod = latest ? new Date(latest.saved_at + 'Z').toISOString() : new Date().toISOString();
+  // Domaine défini par SITE_URL ; à défaut, celui de la requête (derrière le proxy : trust proxy)
+  const base = (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://avcoach.fr/</loc>
+    <loc>${escapeHtml(base)}/</loc>
     <lastmod>${lastmod}</lastmod>
   </url>
 </urlset>

@@ -23,7 +23,7 @@ GitHub Pages ne sert qu'à la version statique (sans connexion ni formulaire).
 | Commande de build     | `npm ci --omit=dev`                                          |
 | Commande de démarrage | `npm start`                                                  |
 | Port d'écoute         | celui attribué par le Manager (l'app lit `process.env.PORT`) |
-| Domaine               | `avcoach.fr` + activer le certificat SSL                     |
+| Domaine               | `ave-coach.fr` + activer le certificat SSL                   |
 
 `bcrypt` et `better-sqlite3` sont des modules natifs : ils doivent être installés **sur le serveur** par la commande de build, jamais copiés depuis une machine locale (`node_modules/` ne doit pas être uploadé).
 
@@ -42,6 +42,9 @@ Pour les mises à jour suivantes, la commande de build peut faire le pull : `git
 # Générer avec : node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET=<valeur longue et aléatoire>
 JWT_EXPIRES_IN=8h
+
+# Adresse publique du site (canonical, Open Graph, sitemap)
+SITE_URL=https://ave-coach.fr
 
 # Premier compte admin (créé uniquement si la base est vide)
 ADMIN_USERNAME=<identifiant>
@@ -77,18 +80,18 @@ DATABASE_PATH=/chemin/hors/app/avcoach.sqlite
 
 ## 5. Vérifications après déploiement
 
-- [ ] `https://avcoach.fr/` affiche la page complète (code source HTML avec le contenu).
+- [ ] `https://ave-coach.fr/` affiche la page complète (code source HTML avec le contenu).
 - [ ] Connexion, édition d'un texte, sauvegarde : le changement est visible après rechargement **et après un redémarrage**.
 - [ ] Formulaire de contact : email reçu sur `CONTACT_TO` et message visible dans l'admin.
 - [ ] Statistiques de l'admin : les visites sont comptées (sinon, revoir `trust proxy` dans `server.js`, réglé à `1`).
-- [ ] `https://avcoach.fr/sitemap.xml` et `https://avcoach.fr/robots.txt` répondent.
+- [ ] `https://ave-coach.fr/sitemap.xml` et `https://ave-coach.fr/robots.txt` répondent.
 - [ ] Admin → Historique → **Exporter le contenu** : télécharger une première sauvegarde.
 
 ## 6. Déploiements suivants
 
 1. (Recommandé) Récupérer le contenu actuel du client dans le template local :
    ```bash
-   npm run sync:pull            # depuis https://avcoach.fr
+   npm run sync:pull            # depuis SITE_URL (défini dans .env)
    SYNC_URL=https://… npm run sync:pull   # autre URL
    ```
 2. Modifier `public/index.html`, le CSS, le JS… puis commit, PR, merge sur `main`.
