@@ -221,9 +221,10 @@ describe('Contenu', () => {
     expect(res.body.exists).toBe(true);
   });
 
-  test('GET /api/content/history/full — refusé pour un éditeur', async () => {
+  test('GET /api/content/history/full — accessible à un éditeur', async () => {
     const res = await request(server).get('/api/content/history/full').set('Authorization', `Bearer ${editorToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
   });
 
   test("GET /api/content/history/full — accessible à l'admin", async () => {
@@ -346,15 +347,21 @@ describe('Messages de contact', () => {
     messageId = res.body[0].id;
   });
 
-  test('GET /api/messages — refusé pour un éditeur', async () => {
+  test('GET /api/messages — un éditeur obtient aussi la liste', async () => {
     const res = await request(server).get('/api/messages').set('Authorization', `Bearer ${editorToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
   });
 
-  test('PATCH /api/messages/:id/read — marque comme lu', async () => {
+  test('GET /api/messages — refusé sans connexion', async () => {
+    const res = await request(server).get('/api/messages');
+    expect(res.status).toBe(401);
+  });
+
+  test('PATCH /api/messages/:id/read — un éditeur marque comme lu', async () => {
     const res = await request(server)
       .patch(`/api/messages/${messageId}/read`)
-      .set('Authorization', `Bearer ${adminToken}`);
+      .set('Authorization', `Bearer ${editorToken}`);
     expect(res.status).toBe(200);
   });
 
@@ -379,9 +386,15 @@ describe('Statistiques', () => {
     expect(typeof res.body.totalUnique).toBe('number');
   });
 
-  test('GET /api/stats — refusé pour un éditeur', async () => {
+  test('GET /api/stats — un éditeur obtient aussi les stats', async () => {
     const res = await request(server).get('/api/stats').set('Authorization', `Bearer ${editorToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBeGreaterThan(0);
+  });
+
+  test('GET /api/stats — refusé sans connexion', async () => {
+    const res = await request(server).get('/api/stats');
+    expect(res.status).toBe(401);
   });
 });
 

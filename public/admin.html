@@ -220,6 +220,38 @@
         cursor: pointer;
         font-weight: 500;
       }
+      .select {
+        appearance: none;
+        padding: 0.6rem 2.2rem 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05)
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='1.5'/%3E%3C/svg%3E")
+          no-repeat right 0.8rem center;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .select:focus-visible {
+        outline: 2px solid var(--orange);
+        outline-offset: 1px;
+      }
+      /* Native dropdown list: keep options readable on every OS */
+      .select option {
+        background: var(--navy-mid);
+        color: var(--text-light);
+      }
+      #preview-banner {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.6rem 1rem;
+        background: rgba(232, 117, 32, 0.15);
+        border-bottom: 1px solid rgba(232, 117, 32, 0.4);
+        color: var(--text-light);
+        font-size: 0.85rem;
+      }
       .btn-neutral {
         background: rgba(255, 255, 255, 0.08);
         color: var(--text-light);
@@ -416,6 +448,11 @@
         </div>
       </header>
 
+      <div id="preview-banner" role="status">
+        <span>Aperçu de l'espace éditeur</span>
+        <button class="btn-sm btn-neutral" onclick="endPreview()">Quitter l'aperçu</button>
+      </div>
+
       <div class="tabs">
         <button class="tab active" onclick="switchTab('stats')">Statistiques</button>
         <button class="tab" onclick="switchTab('history')">Historique des éditions</button>
@@ -535,6 +572,9 @@
 
         <!-- Panel utilisateurs -->
         <div id="panel-users" class="panel">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem">
+            <button class="btn-sm btn-neutral" onclick="startPreview()">👁 Voir comme éditeur</button>
+          </div>
           <!-- Formulaire de création -->
           <div class="card" style="margin-bottom: 1.5rem">
             <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem">Créer un utilisateur</div>
@@ -581,19 +621,8 @@
                 <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem">
                   Rôle
                 </label>
-                <select
-                  id="new-role"
-                  style="
-                    padding: 0.6rem 0.8rem;
-                    border-radius: 8px;
-                    border: 1px solid rgba(255, 255, 255, 0.12);
-                    background: rgba(255, 255, 255, 0.05);
-                    color: var(--text-light);
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                  "
-                >
-                  <option value="editor">Editor</option>
+                <select id="new-role" class="select">
+                  <option value="editor">Éditeur</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
@@ -629,6 +658,7 @@
     <script>
       let token = localStorage.getItem('avcoach_token');
       let allVersions = [];
+      let currentUser = null;
 
       // ── Auth ─────────────────────────────────────────────────────────────────────
       async function doLogin() {
@@ -674,17 +704,35 @@
         document.getElementById('auth-gate').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         document.getElementById('user-label').textContent = user?.username || '';
-
-        // Masquer l'onglet Utilisateurs et l'export pour les editors
-        document.querySelectorAll('.tab').forEach((t) => {
-          if (t.textContent.trim() === 'Utilisateurs') t.style.display = user.role === 'admin' ? '' : 'none';
-        });
-        document.getElementById('export-index-wrap').style.display = user.role === 'admin' ? 'flex' : 'none';
+        currentUser = user;
+        applyRole(user.role);
 
         loadMessages();
         loadHistory();
         loadStats();
         if (user.role === 'admin') loadUsers();
+      }
+
+      // Accounts and export are admin-only; everything else is shared by all roles
+      function applyRole(role) {
+        const isAdmin = role === 'admin';
+        document.querySelectorAll('.tab').forEach((t) => {
+          if (t.textContent.trim() === 'Utilisateurs') t.style.display = isAdmin ? '' : 'none';
+        });
+        document.getElementById('export-index-wrap').style.display = isAdmin ? 'flex' : 'none';
+      }
+
+      // UI-only preview: the session stays the admin's own
+      function startPreview() {
+        applyRole('editor');
+        document.getElementById('preview-banner').style.display = 'flex';
+        switchTab('stats');
+      }
+
+      function endPreview() {
+        applyRole(currentUser.role);
+        document.getElementById('preview-banner').style.display = 'none';
+        switchTab('users');
       }
 
       // ── Tabs ──────────────────────────────────────────────────────────────────────
