@@ -1300,9 +1300,31 @@ section {
 }
 
 /* ── Certifications (liste façon frise) ────────────────────────────────────── */
+.certif-badge {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+.certif-badge img {
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+.certif-badge p {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.92rem;
+  color: var(--text-body);
+}
+.certif-badge strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--cream);
+}
 .certif-list {
   list-style: none;
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   border-left: 1px solid rgba(232, 117, 32, 0.3);
 }
 .certif-list li {
