@@ -1156,6 +1156,52 @@ section {
   color: var(--cream);
   font-weight: 500;
 }
+.valeurs {
+  margin-top: 6rem;
+  text-align: center;
+}
+.valeur-nom {
+  font-size: clamp(2.6rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--cream);
+  margin-bottom: 1.75rem;
+}
+.valeur-devise {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.4;
+  color: var(--text-body);
+}
+.valeur-faire {
+  color: var(--cream);
+}
+.valeur-chemin {
+  width: auto;
+  height: 130px;
+  fill: var(--orange);
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.3s;
+}
+.valeurs.visible .valeur-chemin {
+  clip-path: inset(0 0 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .valeur-chemin {
+    clip-path: none;
+    transition: none;
+  }
+}
+@media (max-width: 700px) {
+  .valeur-chemin {
+    height: 100px;
+  }
+}
 .mission {
   max-width: 860px;
   margin: 5rem auto 0;

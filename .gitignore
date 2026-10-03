@@ -13,3 +13,7 @@ docs/*.docx
 
 # Images envoyées depuis le CMS (en local)
 uploads/
+
+# Local backups (npm run backup) and Playwright MCP output
+database/backups/
+.playwright-mcp/
