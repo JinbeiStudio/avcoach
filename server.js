@@ -53,6 +53,8 @@ const contactLimiter = rateLimit({
 });
 
 // En-têtes de sécurité ; polices auto-hébergées ; scripts et attributs onclick inline encore utilisés par les pages
+// Over local http, Safari would upgrade localhost to https and the page would fail to load
+const isLocalDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 app.disable('x-powered-by');
 app.use(
   helmet({
@@ -63,9 +65,11 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'"],
         imgSrc: ["'self'", 'data:'],
-        frameAncestors: ["'none'"]
+        frameAncestors: ["'none'"],
+        upgradeInsecureRequests: isLocalDev ? null : []
       }
     },
+    strictTransportSecurity: !isLocalDev,
     frameguard: { action: 'deny' }
   })
 );
@@ -607,8 +611,11 @@ if (require.main === module) {
       })
       .catch((e) => console.error('✗ Sauvegarde quotidienne impossible :', e.message));
   };
-  dailyBackup();
-  setInterval(dailyBackup, 60 * 60 * 1000).unref();
+  // Skipped in local dev so running the site doesn't fill database/backups/
+  if (!isLocalDev) {
+    dailyBackup();
+    setInterval(dailyBackup, 60 * 60 * 1000).unref();
+  }
 
   app.listen(PORT, () => {
     console.log(`\n🚀 Avé Coach démarré sur http://localhost:${PORT}`);
