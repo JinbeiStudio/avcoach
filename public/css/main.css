@@ -1686,6 +1686,26 @@ footer {
   transform: translateY(0);
 }
 
+/* Short laptop screens: keep room for the "Découvrir" hint so the centered content never runs into it */
+@media (min-width: 601px) and (max-height: 900px) {
+  #hero {
+    padding-top: 7.5rem;
+    padding-bottom: calc(max(4rem, 4.8vw + 1rem) + 4.5rem);
+  }
+  /* As low as possible: just above the waves, but never below the first screen */
+  .hero-scroll {
+    bottom: auto;
+    top: min(calc(100% - 4.8vw - 3.5rem), calc(100vh - 3.75rem));
+  }
+}
+
+/* Too short to show the hint without covering the buttons */
+@media (min-width: 601px) and (max-height: 720px) {
+  .hero-scroll {
+    display: none;
+  }
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
