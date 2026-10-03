@@ -160,6 +160,15 @@ function requireAuth(req, res, next) {
   next();
 }
 
+// Any signed-in account (editor) handles content, history, stats and messages;
+// admins also manage accounts and the content export.
+function requireAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+    next();
+  });
+}
+
 // ── Routes API ───────────────────────────────────────────────────────────────
 
 // POST /api/login
@@ -222,16 +231,14 @@ app.post('/api/logout', requireAuth, (req, res) => {
   res.json({ message: 'Déconnecté' });
 });
 
-// GET /api/users  (admin seulement — liste des comptes)
-app.get('/api/users', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+// GET /api/users  (admin — liste des comptes)
+app.get('/api/users', requireAdmin, (req, res) => {
   const users = getDb().prepare('SELECT id, username, role, created_at, last_login FROM users').all();
   res.json(users);
 });
 
-// POST /api/users  (créer un utilisateur — admin seulement)
-app.post('/api/users', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+// POST /api/users  (admin — créer un utilisateur)
+app.post('/api/users', requireAdmin, async (req, res) => {
   const { username, email, role } = req.body || {};
   if (!username || !email || typeof username !== 'string' || typeof email !== 'string') {
     return res.status(400).json({ error: 'Identifiant et email requis' });
@@ -305,8 +312,7 @@ app.put('/api/users/:id/password', requireAuth, async (req, res) => {
 });
 
 // POST /api/users/:id/reset-password  (admin — réinitialise avec un mot de passe temporaire)
-app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+app.post('/api/users/:id/reset-password', requireAdmin, async (req, res) => {
   const targetId = parseId(req.params.id);
   if (targetId === null) return res.status(400).json({ error: 'Identifiant invalide' });
   const db = getDb();
@@ -338,8 +344,7 @@ app.post('/api/users/:id/reset-password', requireAuth, async (req, res) => {
 });
 
 // DELETE /api/users/:id
-app.delete('/api/users/:id', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
+app.delete('/api/users/:id', requireAdmin, (req, res) => {
   const targetId = parseId(req.params.id);
   if (targetId === null) return res.status(400).json({ error: 'Identifiant invalide' });
   if (req.user.id === targetId) return res.status(400).json({ error: 'Impossible de se supprimer soi-même' });
@@ -419,9 +424,8 @@ app.get('/api/content/base', requireAuth, (req, res) => {
   res.json({ exists: !!row });
 });
 
-// GET /api/content/history/full  (toutes les versions avec auteur — pour admin)
+// GET /api/content/history/full  (toutes les versions avec auteur)
 app.get('/api/content/history/full', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
   const rows = getDb()
     .prepare(
       `
@@ -436,8 +440,7 @@ app.get('/api/content/history/full', requireAuth, (req, res) => {
 });
 
 // GET /api/content/export  (admin — sauvegarde complète du contenu en JSON)
-app.get('/api/content/export', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+app.get('/api/content/export', requireAdmin, (req, res) => {
   const rows = getDb()
     .prepare(
       `
@@ -483,9 +486,8 @@ app.post('/api/track', (req, res) => {
   res.json({ ok: true });
 });
 
-// GET /api/stats  (admin seulement)
+// GET /api/stats  (tout utilisateur connecté)
 app.get('/api/stats', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Interdit' });
   const db = getDb();
   const today = new Date().toISOString().slice(0, 10);
   const totals = db.prepare('SELECT SUM(count) as t, SUM(unique_count) as u FROM page_views').get();
@@ -547,16 +549,14 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   res.json({ message: 'Message reçu' });
 });
 
-// GET /api/messages  (liste des messages de contact — admin seulement)
+// GET /api/messages  (liste des messages de contact — tout utilisateur connecté)
 app.get('/api/messages', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
   const rows = getDb().prepare('SELECT * FROM contact_messages ORDER BY id DESC').all();
   res.json(rows);
 });
 
 // PATCH /api/messages/:id/read
 app.patch('/api/messages/:id/read', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
   const id = parseId(req.params.id);
   if (id === null) return res.status(400).json({ error: 'Identifiant invalide' });
   getDb().prepare('UPDATE contact_messages SET read = 1 WHERE id = ?').run(id);
@@ -565,7 +565,6 @@ app.patch('/api/messages/:id/read', requireAuth, (req, res) => {
 
 // DELETE /api/messages/:id
 app.delete('/api/messages/:id', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
   const id = parseId(req.params.id);
   if (id === null) return res.status(400).json({ error: 'Identifiant invalide' });
   getDb().prepare('DELETE FROM contact_messages WHERE id = ?').run(id);
